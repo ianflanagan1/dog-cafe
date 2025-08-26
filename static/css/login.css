@@ -1,0 +1,39 @@
+#thirdParty {
+    margin: auto;
+    padding: 175px 20px;
+    width: calc(100% - 40px);
+    max-width: 300px;
+}
+
+#thirdParty a {
+    display: block;
+    margin-bottom: 20px;
+    border-radius: 2px;
+    display: flex;
+    color: white;
+    align-items: center;
+    font-size: 20px;
+}
+
+#thirdParty a div:first-child {
+    height: 50px;
+    width: 50px;
+    background: white;
+    margin-right: 14px;
+}
+
+#thirdParty img {
+    height: 30px;
+    width: 30px;
+    margin: 10px;
+}
+
+#google {
+    background: rgb(68, 134, 246);
+    border: 2px solid rgb(68, 134, 246);
+}
+
+#discord {
+    background: rgb(30, 31, 34);
+    border: 2px solid rgb(30, 31, 34);
+}

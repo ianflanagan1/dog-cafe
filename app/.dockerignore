@@ -1,0 +1,45 @@
+# Environment
+.env
+.env.*
+
+# Dependencies
+/vendor/
+/node_modules/
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+
+# Development files
+.dockerignore
+*.sqlite
+README.md
+
+# Tests
+/tests/
+/coverage/
+phpunit.xml
+.phpunit.result.cache
+.php-cs-fixer.cache
+
+# IDE
+.vscode/
+.editorconfig
+
+# Misc
+*.key
+*.neon
+pint.json
+pint-test.json
+*.log
+*.swp
+*.swo
+*.bak
+*.bk
+*.tmp
+.idea/
+*.iml
+*.DS_Store
+Thumbs.db
+ehthumbs.db

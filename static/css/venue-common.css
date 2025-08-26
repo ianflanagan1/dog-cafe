@@ -1,0 +1,33 @@
+.cafe {
+    color: rgb(56, 118, 29); /* rgb(22, 46, 11); */
+    background-color: rgb(217, 234, 211);
+}
+.restaurant {
+    color: rgb(17, 85, 204); /*rgb(19, 79, 92);  rgb(8,31,36); */
+    background-color: rgb(201, 218, 248); /*rgb(208,224,227);*/
+}
+.bar {
+    color: rgb(204, 0, 0); /* rgb(80, 0, 0); */
+    background-color: rgb(244, 204, 204);
+}
+
+.open {
+    color: rgb(0, 128, 85);
+    font-weight: bold;
+}
+.closed {
+    color: rgb(100, 100, 100);
+}
+
+.types-holder{
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 4px;
+}
+.types-holder div {
+    font-size: 12px;
+    padding: 4px 6px;
+    margin-right: 5px;
+    border-radius: 3px;
+    font-weight: bold;
+}

@@ -1,0 +1,57 @@
+
+/*
+    $o = $this->createStub(SomeInterface::class);
+    $o->method('methodName')
+        ->willReturn('foo');
+        ->willReturn(1, 2, 3);
+        ->willThrowException(new Exception);
+        ->willReturnArgument(0);
+        ->willReturnCallback('str_rot13');
+        ->willReturnSelf();
+        ->willReturnMap(['a', 'b', 'c', 'd'], ['e', 'f', 'g', 'h']);
+
+    $o = $this->createStubForIntersectionOfInterfaces([X::class, Y::class]);
+
+    $o = $this->createConfiguredStub(
+        SomeInterface::class,
+        [
+            'doSomething'     => 'foo',
+            'doSomethingElse' => 'bar',
+        ]
+    );
+
+    $o = $this->createConfiguredMock(
+        SomeInterface::class,
+        [
+            'doSomething'     => 'foo',
+            'doSomethingElse' => 'bar',
+        ],
+    );
+
+    $stub = $this->getMockBuilder(SomeClass::class)
+        ->setConstructorArgs(...)
+        ->disableOriginalConstructor()
+        ->disableOriginalClone()
+        ->disableArgumentCloning()
+        ->disallowMockingUnknownTypes()
+        ->getMock();
+
+    // assert that mock's method will be called with certain arguments
+    $observer->expects($this->once())
+                any() never() atLeastOnce() once() atMost(int) exactly(int)
+        ->method('update')
+        ->with($this->identicalTo('something'));
+
+        ->willReturn('foo');
+            
+
+    $this->expectException(InvalidArgumentException::class);
+
+    $this->assertEquals($asserted, self::$database->snakeToCamel($input));
+
+    $this->expectOutputString('foo');
+    print 'foo';
+
+    $this->markTestIncomplete()
+    $this->markTestSkipped()
+*/

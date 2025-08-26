@@ -1,0 +1,28 @@
+#holder {
+    /* display: flex;
+    padding: 50px 15px;
+    justify-content: center;
+    flex-wrap: wrap; */
+    text-align: center;
+    padding: 60px 20px;
+}
+
+#holder a, #holder button {
+    display: inline-block;
+    width: 100%;
+    max-width: 300px;
+    padding: 15px;
+    background: rgb(220,220,220);
+    text-align: center;
+    color: black;
+    font-weight: bold;
+    border-radius: 4px;
+    margin-bottom: 25px;
+    box-sizing: border-box;
+    border: none;
+    font-size: 15px;
+}
+
+#holder a:active, #holder button:active {
+    background: rgb(180,180,180);
+}

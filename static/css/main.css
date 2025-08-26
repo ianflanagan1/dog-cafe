@@ -1,0 +1,174 @@
+:root {
+  --nav-height: 60px;
+  --panel-width: 250px;
+  --highlight: #ed2020;
+}
+
+* {
+  user-select: none;
+}
+
+html, body, main {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}
+
+#desktopNav, #mobileNav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  align-items: center;
+  z-index: 2;
+  background: white;
+  box-shadow: 0px 0px 6px rgb(0,0,0,0.3);
+}
+
+#desktopNav {
+  height: var(--nav-height);
+  display: flex;
+  font-size: 22px;
+}
+
+#desktopNav > *, #mobileNav > a, #mobileNav > button {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+#desktopNav a {
+  padding: 0 7px;
+}
+
+#desktopNav > :first-child, #mobileNav > :first-child {
+  padding: 0 10px 0 22px;
+}
+
+#desktopNav a img, #mobileNav a img {
+  height: 32px;
+  width: 32px;
+}
+
+#desktopNav > :last-child {
+  padding-right: 20px;
+}
+
+#desktopNav .stretch, #mobileNav .stretch {
+  flex-grow: 1;
+}
+
+#mobileNav {
+  display: none;
+  height: var(--nav-height);
+}
+
+#profile {
+  height: 22px;
+  width: 22px;
+  border-radius: 50%;
+  border: 1px solid black;
+  margin: 5px;
+}
+
+#page {
+  height: 100%;
+  width: 100%;
+}
+
+.header {
+  height: var(--nav-height);
+}
+
+#main {
+    flex-grow: 1;
+}
+
+#dropdownMenuButton {
+  padding: 0 22px 0 10px;
+  border: none;
+  background: white;
+  font-size: 25px;
+  color: rgb(100, 100, 100);
+}
+
+#dropdown {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  z-index: 3;
+  display: none;
+}
+#dropdown a {
+  display: block;
+  font-size: 24px;
+  padding: 10px 20px;
+}
+
+#dropdown div + a {
+  margin-top: 20px;
+}
+
+#settings {
+  display: none;
+  position: fixed;
+  top: var(--nav-height);
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+}
+
+.close {
+  width: var(--nav-height);
+  height: var(--nav-height);
+  font-size: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.close:active {
+  background: rgb(220, 220, 220);
+}
+
+.mobile-only {
+    display: none;
+}
+
+/* smartphones, iPhone, portrait 480x320 phones */
+@media only screen and (max-width: 430px) {
+  #desktopNav {
+    display: none;
+  }
+
+  #mobileNav {
+    display: flex;
+  }
+
+  .header {
+    height: var(--nav-height);
+  }
+
+  .desktop-only {
+      display: none !important;
+  }
+
+  .mobile-only {
+      display: block;
+  }
+
+  .mobile-hide {
+    display: none !important;
+  }
+}

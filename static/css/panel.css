@@ -1,0 +1,48 @@
+#panel {
+    line-height: 1;
+}
+
+#panel .section {
+    margin: 0 12px;
+    padding: 20px 0;
+    border-bottom: 1px solid rgb(200, 200, 200);
+}
+
+#panel > .section:nth-child(2) {
+    padding-top: 15px;
+}
+
+#panel .title {
+    color: rgb(60, 60, 60)
+}
+
+#panel input {
+    margin: 0 10px 0 0;
+    height: 15px;
+    width: 15px;
+    accent-color: var(--highlight);
+}
+#panel img {
+    margin-right: 10px;
+    height: 20px;
+    width: 16px;
+    object-fit: contain;
+}
+
+#panel .section > * {
+    padding: 10px 8px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+}
+
+#panel .section > *:active {
+background: rgb(220, 220, 220);
+}
+
+/* smartphones, iPhone, portrait 480x320 phones */
+@media only screen and (max-width: 430px) {
+    #panel > .section:nth-child(2) {
+        padding-top: 0;
+    }
+}

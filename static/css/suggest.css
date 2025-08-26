@@ -1,0 +1,26 @@
+#holder {
+    margin: auto;
+    width: 100%;
+    max-width: 450px;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+textarea {
+    height: 200px;
+    width: 98%;
+}
+
+#remaining {
+    text-align: right;
+    color: rgb(100, 100, 100);
+    font-size: 12px;
+}
+
+input[type=submit] {
+    padding: 6px 12px;
+}
+
+.error {
+    color: red;
+}

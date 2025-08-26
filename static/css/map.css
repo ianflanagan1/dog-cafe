@@ -1,0 +1,240 @@
+.gm-style iframe + div { border:none!important; }
+
+#page {
+    display: flex;
+    flex-direction: column;
+}
+
+#main {
+    display: flex;
+}
+
+#panel, #venueBox {
+    height: calc(100vh - var(--nav-height));
+    width: var(--panel-width);
+    overflow-x: hidden;
+    background: white;
+}
+
+#map {
+    height: 100%;
+    flex-grow: 1;
+}
+
+#userLocation {
+    height: 14px;
+    width: 14px;
+    border-radius: 50%;
+    background-color: rgba(0,200,0,0.4);
+    padding: 7px;
+    translate: 0 50%;
+}
+#userLocation div {
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    background-color: rgb(0,200,0);
+    border: 2px solid white;
+}
+
+.single {
+    height: 42px;
+    width: 42px;
+    translate: 0 10%;
+
+    background: url(/images/core/dog.svg) no-repeat;
+    background-size: cover;
+}
+
+.cluster {
+    height: 50px;
+    width: 50px;
+    translate: 0 40%;
+    line-height: 1;
+    
+    font-size: 30px;
+
+    text-align: center;
+    padding-top: 19px;
+    box-sizing: border-box;
+    font-size: 21px;
+
+
+    /*
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    */
+
+    /*
+    opacity: 0.6;
+    color: white;
+    background: black;
+    border-radius: 50%;
+    */
+
+    
+    color: black;
+    background: url(/images/core/sign.svg) no-repeat;
+    background-size: cover;
+    
+}
+
+.cluster img {
+    height: 50px;
+    width: 50px;
+}
+
+.single:hover, .cluster:hover {
+    opacity: 0.9;
+}
+
+.single:active, .cluster:active {
+    opacity: 0.5;
+}
+
+.digits-2 {
+    font-size: 22px;
+}
+
+.digits-3 {
+    padding-top: 20px;
+    font-size: 18px;
+}
+
+.digits-4 {
+    padding-top: 22px;
+    font-size: 15px;
+}
+
+.digits-5 {
+    padding-top: 22px;
+    font-size: 13px;
+}
+
+.check, .radio {
+    display: flex;
+}
+
+
+
+#venueBox {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: calc(100% - var(--nav-height));
+}
+
+#venueBox img {
+    width: calc(100% - 24px);
+    height: 180px;
+    background: rgb(220, 220, 220);
+    margin: 0 12px;
+    object-fit: cover;
+}
+#venueBox .body {
+    padding: 12px;
+}
+#venueBox .body > div {
+    margin-bottom: 10px;
+}
+
+#venueBox .body > div:first-child {
+    font-size: 18px;
+}
+
+#venueBox .body > div:last-child {
+    font-size: 15px;
+}
+
+#seeVenue {
+    display: block;
+    background: var(--highlight);
+    color: white;
+    border-radius: 3px;
+    margin: 10px 12px;
+    padding: 10px;
+    text-align: center;
+}
+
+#filterButton {
+    display: none;
+    position: fixed;
+    top: var(--nav-height);
+    left: 0;
+    padding: 20px 10px 10px 15px;
+}
+
+#filterButton div {
+    background: white;
+    padding: 6px 5px;
+    border-radius: 2px;
+    font-size: 12px;
+    box-shadow: 0px 0px 2px rgb(0,0,0,0.8);
+}
+#filterButton:active div {
+    background: rgb(220, 220, 220);
+}
+
+/* desktop */
+@media only screen and (min-width: 430px) {
+  #panel {
+    display: block;
+  }
+}
+
+/* mobile */
+@media only screen and (max-width: 430px) {
+    #venueBox {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+
+        background-color: white;
+        border-radius: 5px;
+        height: 120px;
+        padding: 0;
+        left: 25px;
+        width: calc(100% - 50px);
+
+        box-shadow: 0px 0px 14px black;
+    }
+    #venueBoxContent {
+        display: flex;
+    }
+    #venueBox img {
+        width: 35%;
+        height: 120px;
+        background: rgb(220, 220, 220);
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+        object-fit: cover;
+        margin: 0;
+    }
+    #venueBox .body {
+        width: 240px;
+        padding: 10px;
+        box-sizing: border-box;
+        width: calc(65% - 1px);
+    }
+
+    #venueBox .body > div {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        margin-bottom: 5px;
+    }
+
+    #filterButton {
+        display: block;
+    }
+
+    #panel {
+        position: fixed;
+        top: var(--nav-height);
+        left: 0;
+        width: 100%;
+        z-index: 1;
+    }
+}

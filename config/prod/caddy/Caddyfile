@@ -1,0 +1,7 @@
+www.dogcafeuk.com {
+    redir https://dogcafeuk.com{uri}
+}
+
+dogcafeuk.com {
+    reverse_proxy dog-cafe-nginx:80
+}

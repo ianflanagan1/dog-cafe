@@ -1,0 +1,130 @@
+name: dog-cafe-prod
+
+networks:
+  public:
+    driver: bridge
+  private:
+    driver: bridge
+
+volumes:
+  postgres:
+  redis-data:
+  shared-frontend:
+  caddy_data:
+  caddy_config:
+
+services:
+
+  init:
+      image: busybox
+      user: 0:0
+      volumes:
+        - shared-frontend:/app/shared-frontend
+      restart: no
+      command: ["sh", "-c", "chown -R 65532:65532 /app/shared-frontend && chmod -R 0700 /app/shared-frontend"]
+
+  caddy:
+    image: caddy:latest
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./config/prod/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - nginx
+    networks:
+      - public
+
+  nginx:
+    container_name: dog-cafe-nginx
+    hostname: dog-cafe-nginx
+    build:
+      context: ./
+      dockerfile: ./docker/nginx.Dockerfile
+      target: prod
+    user: 65532:65532
+    depends_on:
+      init:
+        condition: service_completed_successfully
+      php:
+        condition: service_started
+    volumes:
+      - ./config/prod/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./static/:/static/:rw
+      - shared-frontend:/static/sh/:rw
+
+      - ./production/venue-images/mid/:/static/images/mid/
+      - ./production/venue-images/small/:/static/images/small/
+    networks:
+      - public
+    # ports:
+    #   - 8080:80
+      # - 433:433
+
+  php:
+    container_name: dog-cafe-php
+    hostname: dog-cafe-php
+    build:
+      context: ./app/
+      dockerfile: ./../docker/php.Dockerfile
+      target: prod
+    user: 65532:65532
+    depends_on:
+      postgres:
+        condition: service_healthy
+    working_dir: /app/
+    env_file: ./app/.env.production
+    volumes:
+      # - ./app/:/app/
+      - ./config/prod/php/php.ini:/usr/local/etc/php/php.ini:ro
+      - ./config/prod/php-fpm/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro
+      - shared-frontend:/app/storage/app/public/:rw
+
+      - ./production/cache/:/app/shared-backend/cache/:ro
+    networks:
+      - public
+      - private
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  redis:
+    container_name: ${REDIS_HOST}
+    hostname: ${REDIS_HOST}
+    image: docker.io/library/redis:7.4-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      start_period: 1s
+      interval: 1s
+      timeout: 1s
+      retries: 1
+    entrypoint: ["/usr/local/bin/docker-entrypoint.sh"]
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--requirepass", "${REDIS_PASSWORD}"]
+    volumes:
+      - ./../config/prod/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - redis-data:/data:rw
+    networks:
+      - private
+    # ports:
+    #   - 6379:6379
+
+  postgres:
+    container_name: ${DB_CORE_HOST}
+    hostname: ${DB_CORE_HOST}
+    image: docker.io/library/postgres:17.5-alpine
+    env_file: ./app/.env.production
+    healthcheck:
+      test: ["CMD-SHELL", "sh", "-c", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      start_period: 1s
+      interval: 1s
+      timeout: 1s
+      retries: 1
+    command: ["postgres", "-c", "timezone=Europe/London"]
+    volumes:
+      - ./production/postgres/initial.sql:/docker-entrypoint-initdb.d/initial.sql:ro
+      - postgres:/var/lib/postgresql/data:rw
+    networks:
+      - private
+    #ports
+    #  - 5432:5432

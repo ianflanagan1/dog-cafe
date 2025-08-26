@@ -1,0 +1,6 @@
+.vscode
+
+*.log
+
+_gitignore/
+production/

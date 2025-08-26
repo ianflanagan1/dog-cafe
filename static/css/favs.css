@@ -1,0 +1,14 @@
+#pageContent {
+    margin: auto;
+    width: 750px;
+}
+
+@media only screen and (max-width: 750px) {
+    #pageContent {
+        width: 100%;
+    }
+
+    .venue {
+        width: calc(100vw - 15px);
+    }
+}

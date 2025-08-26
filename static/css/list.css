@@ -1,0 +1,56 @@
+#filterButton {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid rgb(100, 100, 100);
+}
+#filterButton:active {
+    background: rgb(220, 220, 220);
+}
+
+#panel {
+    position: fixed;
+    top: var(--nav-height);
+    left: 0;
+    height: calc(100vh - var(--nav-height));
+    width: var(--panel-width);
+    background: white;
+}
+
+#pageContent {
+    margin-left: 25%;
+}
+
+#header {
+    padding-top: 15px;
+}
+
+.page-title {
+    padding: 10px;
+    border-bottom: 1px solid rgb(220, 220, 220);
+}
+
+@media only screen and (max-width: 1015px) {
+    #pageContent {
+        margin-left: var(--panel-width);
+    }
+
+    .venue {
+        width: calc(100vw - var(--panel-width) - 15px);
+    }
+}
+
+/* smartphones, iPhone, portrait 480x320 phones */
+@media only screen and (max-width: 430px) {
+    #pageContent {
+        margin: 0;
+    }
+
+    #header {
+        padding: 0;
+    }
+
+    #panel {
+        width: 100%;
+        z-index: 1;
+    }
+}

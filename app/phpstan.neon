@@ -1,0 +1,9 @@
+parameters:
+    level: 9            # 0-9
+    errorFormat: table  # raw table checkstyle json prettyJson junit github gitlab teamcity
+    paths:
+        - app
+        - config
+        - public
+        - tests
+    # excluding static/ vendor/

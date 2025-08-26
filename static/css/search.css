@@ -1,0 +1,104 @@
+#searchButtonMobile, #searchButtonDesktop {
+    padding: 10px;
+}
+
+#searchButtonDesktop {
+    max-width: 270px;
+}
+
+#searchButtonDesktop > input {
+    max-width: 250px;
+}
+
+#searchButtonMobile > input, #searchButtonDesktop > input {
+    /*color: rgb(160, 160, 160);*/
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+#searchInput, #searchButtonMobile > input, #searchButtonDesktop > input  {
+    border: 1px solid rgb(200, 200, 200);
+    border-radius: 20px;
+    height: 40px;
+    background:url(/images/core/search.svg) no-repeat 16px center; 
+    background-size: 16px 16px;
+    padding: 8px 13px 8px 45px;
+    font-size: 20px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+#searchCover {
+    display: none;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 3;
+}
+
+#search {
+    display: none;
+    position: fixed;
+    background: white;
+    top: 0;
+    left: 64px;
+    width: 400px;
+    max-width: calc(100% - 64px);
+    z-index: 4;
+}
+
+#search > :first-child {
+    display: flex;
+    border-bottom: 1px solid rgb(220, 220, 220);
+    padding: 10px 10px 9px 10px;
+}
+
+#searchResults a {
+    display: block;
+    padding: 0 15px;
+    font-size: 18px;
+}
+
+#searchResults a:active {
+    background: rgb(240, 240, 240);
+}
+
+#searchResults a > div {
+    padding: 15px 0 ;
+    border-bottom: 1px solid rgb(220, 220, 220);
+}
+
+#searchResults a > div :last-child {
+    color: rgb(140, 140, 140);
+    font-size: 15px;
+    margin-top: 3px;
+}
+
+#searching, #noResults {
+    padding: 15px;
+}
+
+
+/* mobile */
+@media only screen and (max-width: 430px) {
+    #search {
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+    }
+
+    #search > :first-child {
+        padding: 0;
+    }
+
+    #searchInput {
+        width: calc(100% - 70px);
+        margin: 10px 0;
+    }
+}
