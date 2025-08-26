@@ -52,8 +52,14 @@ arg-check:
 up:
 	docker compose -f ./compose.yaml --env-file ./$(PHP_DIRECTORY)/.env up --build
 
+up-detach:
+	docker compose -f ./compose.yaml --env-file ./$(PHP_DIRECTORY)/.env up --build --detach
+
 down:
 	docker compose -f ./compose.yaml down
+
+down-delete:
+	docker compose -f ./compose.yaml down --volumes --remove-orphans
 
 prod-up:
 	docker compose -f ./compose.production.yaml --env-file ./$(PHP_DIRECTORY)/.env.production up --build

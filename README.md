@@ -19,29 +19,31 @@ Access at: [https://dogcafeuk.com](https://dogcafeuk.com)
 
 ## Local Installation
 
-```bash
+```
 git clone git@github.com:ianflanagan1/dog-cafe.git
 cd dog-cafe
-cp .env.example .env
-make composer-install
-make up
+cp app/.env.example app/.env
+sudo make up-detach
+sudo make composer-install
 ```
-Access in a browser at `http://localhost:8080`.
+Access in a browser at `http://localhost:8090`.
 
-If another application is using port 8080, in `./docker/compose.yml` modify `services.nginx.ports` from `8080:80` to `X:80`, where `X` is another port number, and access `http://localhost:X` instead.
+If your user is added to the `docker` group, `sudo` is not required for `make` commands.
+
+If another application is using port 8090, in `./docker/compose.yml` modify `services.nginx.ports` from `8090:80` to `X:80`, where `X` is a free port number, and access `http://localhost:X` instead.
 
 The login function requires Google and/or Discord developer ID and Secret configured in `.env`, so will not work out-of-the-box in the local environment.
 
-Tear down with `make down`.
+Execute `sudo make down-delete` to stop and remove all containers, named volumes and networks.
 
 ## Static Analysis
 
-```bash
+```
 make phpstan
 ```
 
 ## Unit Tests
 
-```bash
+```
 make test
 ```

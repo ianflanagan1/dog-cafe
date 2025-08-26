@@ -42,7 +42,7 @@ services:
     networks:
       - public
     ports:
-      - 8080:80
+      - 8090:80
       # - 433:433
 
   php:
