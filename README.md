@@ -39,11 +39,11 @@ Execute `sudo make down-delete` to stop and remove all containers, named volumes
 ## Static Analysis
 
 ```
-make phpstan
+sudo make phpstan
 ```
 
 ## Unit Tests
 
 ```
-make test
+sudo make test
 ```
