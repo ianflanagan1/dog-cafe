@@ -26,7 +26,7 @@ class Database
         PDO::ATTR_ERRMODE               => PDO::ERRMODE_EXCEPTION,
     ];
     protected ?PDO $pdo = null;
-    
+
     /** @var callable */
     protected $pdoFactory;
 
@@ -45,8 +45,7 @@ class Database
     public function __construct(
         protected array $config,
         callable $pdoFactory,
-    )
-    {
+    ) {
         $this->pdoFactory = $pdoFactory;
     }
 

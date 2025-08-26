@@ -10,8 +10,8 @@ use App\Http\DTOs\ViewParameters;
 use App\Http\FormRequests\MapRequest;
 use App\Http\FormRequests\SearchMapRequest;
 use App\Http\Response\Response;
-use App\Resolvers\TownResolver;
 use App\MapPoints\MapPointsService;
+use App\Resolvers\TownResolver;
 
 /**
  * @phpstan-import-type MapValidated from MapRequest

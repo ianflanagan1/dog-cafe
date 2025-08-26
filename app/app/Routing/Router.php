@@ -1,14 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Routing;
 
-use Throwable;
 use App\Container;
+use App\Http\Enums\HttpMethod;
 use App\Http\View;
 use App\Session\Auth;
-use App\Http\Enums\HttpMethod;
-use App\Routing\RouteRegistry;
-use App\Routing\ActionExecutor;
+use Throwable;
 
 class Router
 {
@@ -16,8 +16,7 @@ class Router
         protected Container $container,
         protected RouteRegistry $routeRegistry,
         protected ActionExecutor $actionExecutor,
-    )
-    {
+    ) {
     }
 
     /**

@@ -6,11 +6,11 @@ namespace Tests\Unit\Database;
 
 use App\Database\Database;
 use App\Exceptions\SystemException;
+use PDO;
+use PDOException;
+use PDOStatement;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PDO;
-use PDOStatement;
-use PDOException;
 use RuntimeException;
 
 final class DatabaseTest extends TestCase
@@ -29,13 +29,13 @@ final class DatabaseTest extends TestCase
         $this->statementMock = $this->createMock(PDOStatement::class);
 
         $this->database = new Database([
-                'driver' => 'sqlite',
-                'host' => 'localhost',
-                'port' => 0,
-                'database' => ':memory:',
-                'user' => 'user',
-                'password' => 'pass',
-            ],
+            'driver' => 'sqlite',
+            'host' => 'localhost',
+            'port' => 0,
+            'database' => ':memory:',
+            'user' => 'user',
+            'password' => 'pass',
+        ],
             function (array $config, array $defaultOptions): MockObject&PDO {
                 return $this->pdoMock;
             },
@@ -92,7 +92,7 @@ final class DatabaseTest extends TestCase
         $this->statementMock->method('execute')->willReturn(true);
         $this->statementMock->method('fetchAll')->willReturn([
             ['id' => 1],
-            ['id' => 2]
+            ['id' => 2],
         ]);
 
         $result = $this->database->fetchAll('SELECT * FROM test');

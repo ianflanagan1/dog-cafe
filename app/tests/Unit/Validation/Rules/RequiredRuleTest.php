@@ -6,9 +6,9 @@ namespace Tests\Unit\Validation\Rules;
 
 use App\DTOs\Error;
 use App\Enums\ErrorCode;
-use PHPUnit\Framework\TestCase;
 use App\Validation\Rules\RequiredRule;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
 class RequiredRuleTest extends TestCase
 {
@@ -55,7 +55,7 @@ class RequiredRuleTest extends TestCase
     #[DataProvider('cases_to_test_rule_passes')]
     public function test_rule_passes(mixed $value): void
     {
-        $result = (new RequiredRule())->validate(self::FIELD, $value);
+        $result = (new RequiredRule)->validate(self::FIELD, $value);
 
         $this->assertNull($result);
     }
@@ -80,7 +80,7 @@ class RequiredRuleTest extends TestCase
     #[DataProvider('cases_to_test_rule_fails')]
     public function test_rule_fails(mixed $value): void
     {
-        $result = (new RequiredRule())->validate(self::FIELD, $value);
+        $result = (new RequiredRule)->validate(self::FIELD, $value);
 
         $this->assertInstanceOf(Error::class, $result);
         $this->assertSame(ErrorCode::RequiredParameterMissing, $result->code);

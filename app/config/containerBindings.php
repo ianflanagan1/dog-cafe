@@ -5,13 +5,13 @@ declare(strict_types=1);
 use App\Config;
 use App\Database\Database;
 use App\Interfaces\SessionInterface;
+use App\MapPoints\MapPointsService;
 use App\RedisCache;
 use App\Repositories\AppUserRepository;
 use App\Repositories\VenueRepository;
 use App\Routing\RouteRegistry;
 use App\Services\AppUserPictureService;
 use App\Services\LoginService;
-use App\MapPoints\MapPointsService;
 use App\Session\Auth;
 use App\Session\FavouriteSessionStore;
 use App\Session\Session;
@@ -41,7 +41,7 @@ return [
         $dbConfig = $config->get('dbCore');
 
         // This is moved outside the Database class to aid unit testing
-        $pdoFactory = function(array $config, array $defaultOptions): PDO {
+        $pdoFactory = function (array $config, array $defaultOptions): PDO {
             try {
                 $pdo = new PDO(
                     sprintf(

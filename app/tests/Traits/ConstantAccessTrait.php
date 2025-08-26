@@ -9,9 +9,8 @@ use ReflectionClass;
 trait ConstantAccessTrait
 {
     /**
-     * @param class-string $class
-     * @param non-empty-string|list<non-empty-string> $const
-     * @return mixed
+     * @param  class-string  $class
+     * @param  non-empty-string|list<non-empty-string>  $const
      */
     protected static function getConstantValue(string $class, string|array $const): mixed
     {
@@ -23,7 +22,7 @@ trait ConstantAccessTrait
 
         $array = [];
 
-        foreach($const as $c) {
+        foreach ($const as $c) {
             $array[] = $reflection->getConstant($c);
         }
 

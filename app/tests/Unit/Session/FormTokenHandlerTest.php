@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Session;
 
-use PHPUnit\Framework\TestCase;
 use App\Session\FormTokenHandler;
 use App\Session\SessionListManager;
-use Tests\Traits\ConstantAccessTrait;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Tests\Traits\ConstantAccessTrait;
 
 final class FormTokenHandlerTest extends TestCase
 {
@@ -18,7 +18,9 @@ final class FormTokenHandlerTest extends TestCase
     protected SessionListManager $sessionListManagerMock;
 
     protected FormTokenHandler $formTokenHandler;
+
     protected int $MAX_TOKENS;
+
     protected string $SESSION_PREFIX;
 
     protected function setUp(): void
@@ -33,13 +35,13 @@ final class FormTokenHandlerTest extends TestCase
         [$this->SESSION_PREFIX, $this->MAX_TOKENS] = $result;
     }
 
-    public function test_isValidToken_returns_false_if_token_is_null(): void
+    public function test_is_valid_token_returns_false_if_token_is_null(): void
     {
         $result = $this->formTokenHandler->isValidToken('a-key', null);
         $this->assertFalse($result);
     }
 
-    public function test_isValidToken_delegates_to_session_list_manager(): void
+    public function test_is_valid_token_delegates_to_session_list_manager(): void
     {
         $key = 'a-key';
         $token = 'abc123';
@@ -47,14 +49,14 @@ final class FormTokenHandlerTest extends TestCase
         $this->sessionListManagerMock
             ->expects($this->once())
             ->method('consumeValue')
-            ->with($this->SESSION_PREFIX . $key, $token)
+            ->with($this->SESSION_PREFIX.$key, $token)
             ->willReturn(true);
 
         $result = $this->formTokenHandler->isValidToken($key, $token);
         $this->assertTrue($result);
     }
 
-    public function test_isValidToken_returns_false_if_SessionListManager_returns_false(): void
+    public function test_is_valid_token_returns_false_if_session_list_manager_returns_false(): void
     {
         $key = 'a-key';
         $token = 'abc123';
@@ -62,14 +64,14 @@ final class FormTokenHandlerTest extends TestCase
         $this->sessionListManagerMock
             ->expects($this->once())
             ->method('consumeValue')
-            ->with($this->SESSION_PREFIX . $key, $token)
+            ->with($this->SESSION_PREFIX.$key, $token)
             ->willReturn(false);
 
         $result = $this->formTokenHandler->isValidToken($key, $token);
         $this->assertFalse($result);
     }
 
-    public function test_createToken_generates_and_stores_and_returns_sha1_token(): void
+    public function test_create_token_generates_and_stores_and_returns_sha1_token(): void
     {
         $capturedToken = null;
 
@@ -77,9 +79,10 @@ final class FormTokenHandlerTest extends TestCase
             ->expects($this->once())
             ->method('addValue')
             ->with(
-                $this->SESSION_PREFIX . 'a-key',
+                $this->SESSION_PREFIX.'a-key',
                 $this->callback(function ($token) use (&$capturedToken) {
                     $capturedToken = $token;
+
                     return true;
                 }),
                 $this->MAX_TOKENS,
@@ -91,7 +94,7 @@ final class FormTokenHandlerTest extends TestCase
         $this->assertSame($capturedToken, $token);
     }
 
-    public function test_createToken_returns_unique_values_for_different_keys(): void
+    public function test_create_token_returns_unique_values_for_different_keys(): void
     {
         $token1 = $this->formTokenHandler->createToken('key1');
         $token2 = $this->formTokenHandler->createToken('key2');
@@ -99,7 +102,7 @@ final class FormTokenHandlerTest extends TestCase
         $this->assertNotSame($token1, $token2);
     }
 
-    public function test_createToken_returns_unique_values_for_same_key(): void
+    public function test_create_token_returns_unique_values_for_same_key(): void
     {
         $token1a = $this->formTokenHandler->createToken('key1');
         $token1b = $this->formTokenHandler->createToken('key1');

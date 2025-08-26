@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Utils\Geo;
 use App\Models\Town;
 use App\Repositories\TownRepository;
+use App\Utils\Geo;
 
 /**
  * Service for geospatial operations related to towns.

@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Routing;
 
-use Exception;
 use App\Container;
-use App\RedisCache;
-use App\Http\Attributes\Get;
-use App\Http\Attributes\Post;
-use App\Http\Enums\HttpMethod;
-use App\Routing\RouteRegistry;
-use App\Http\Attributes\Delete;
-use App\Routing\ActionExecutor;
-use PHPUnit\Framework\TestCase;
-use Tests\Traits\ConstantAccessTrait;
 use App\Exceptions\RouteConflictException;
 use App\Exceptions\RouteNotFoundException;
 use App\Exceptions\RouteNotValidException;
-use PHPUnit\Framework\MockObject\MockObject;
+use App\Http\Attributes\Delete;
+use App\Http\Attributes\Get;
+use App\Http\Attributes\Post;
+use App\Http\Enums\HttpMethod;
+use App\RedisCache;
+use App\Routing\ActionExecutor;
+use App\Routing\RouteRegistry;
+use Exception;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Tests\Traits\ConstantAccessTrait;
 
 /**
  * @phpstan-import-type Actionable from ActionExecutor
@@ -28,13 +28,15 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class RouteRegistryTest extends TestCase
 {
     use ConstantAccessTrait;
-    
+
     protected RouteRegistry $routeRegistry;
-    /** @var MockObject&Container */
+
     protected MockObject&Container $containerMock;
-    /** @var MockObject&RedisCache */
+
     protected MockObject&RedisCache $cacheMock;
+
     protected string $CACHE_KEY_ROUTES;
+
     protected string $CACHE_KEY_ACTIONS;
 
     protected function setUp(): void
@@ -60,23 +62,23 @@ class RouteRegistryTest extends TestCase
     public static function cases_to_test_registering_invalid_route_throws(): array
     {
         return [
-            'Trailing slash (segment)'          => ['/abc/def/'],
-            'Trailing slash (parameter)'        => ['/abc/:def/'],
-            'No leading slash (one segment)'    => ['abc'],
-            'No leading slash (two segments)'   => ['abc/def'],
-            'No leading slash (one parameter)'  => [':abc'],
+            'Trailing slash (segment)' => ['/abc/def/'],
+            'Trailing slash (parameter)' => ['/abc/:def/'],
+            'No leading slash (one segment)' => ['abc'],
+            'No leading slash (two segments)' => ['abc/def'],
+            'No leading slash (one parameter)' => [':abc'],
             'No leading slash (two parameters)' => [':abc/:def'],
-            'No leading slash (mixed 1)'        => [':abc/def'],
-            'No leading slash (mixed 2)'        => ['abc/:def'],
-            'Double slash (only)'               => ['//'],
-            'Double slash (at start)'           => ['//abc'],
-            'Double slash (midway)'             => ['/abc//def'],
-            'Double slash (at end)'             => ['/abc/def//'],
+            'No leading slash (mixed 1)' => [':abc/def'],
+            'No leading slash (mixed 2)' => ['abc/:def'],
+            'Double slash (only)' => ['//'],
+            'Double slash (at start)' => ['//abc'],
+            'Double slash (midway)' => ['/abc//def'],
+            'Double slash (at end)' => ['/abc/def//'],
         ];
     }
 
     /**
-     * @param non-empty-string $route
+     * @param  non-empty-string  $route
      */
     #[DataProvider('cases_to_test_registering_invalid_route_throws')]
     public function test_registering_invalid_route_throws(string $route): void
@@ -97,29 +99,29 @@ class RouteRegistryTest extends TestCase
     public static function cases_to_test_registering_route_with_invalid_segment_name_throws(): array
     {
         return [
-            'Parameter with no name'            => [':'],
-            'Parameter stating with a number'   => [':2foo'],
-            'Parameter with a dash'             => [':foo-bar'],
-            'Parameter with an asterisk'        => [':foo*bar'],
-            'Parameter with a tilde'            => [':foo~bar'],
-            'Parameter with a dot'              => [':foo.bar'],
-            'Parameter with a bracket'          => [':foo(bar'],
-            'Parameter with a comma'            => [':foo,bar'],
-            'Parameter with a colon (midway)'   => [':foo:bar'],
-            'Parameter with a plus sign'        => [':foo+bar'],
-            'Parameter with a percent sign'     => [':foo%bar'],
-            'Parameter with a at sign'          => [':foo@bar'],
-            'Parameter with a equals sign'      => [':foo=bar'],
-            'Parameter with a back slash'       => [':foo\bar'],
+            'Parameter with no name' => [':'],
+            'Parameter stating with a number' => [':2foo'],
+            'Parameter with a dash' => [':foo-bar'],
+            'Parameter with an asterisk' => [':foo*bar'],
+            'Parameter with a tilde' => [':foo~bar'],
+            'Parameter with a dot' => [':foo.bar'],
+            'Parameter with a bracket' => [':foo(bar'],
+            'Parameter with a comma' => [':foo,bar'],
+            'Parameter with a colon (midway)' => [':foo:bar'],
+            'Parameter with a plus sign' => [':foo+bar'],
+            'Parameter with a percent sign' => [':foo%bar'],
+            'Parameter with a at sign' => [':foo@bar'],
+            'Parameter with a equals sign' => [':foo=bar'],
+            'Parameter with a back slash' => [':foo\bar'],
 
-            'Segment with a bracket'            => ['foo(bar'],
-            'Segment with a comma'              => ['foo,bar'],
-            'Segment with a colon (midway)'     => ['foo:bar'],
-            'Segment with a plus sign'          => ['foo+bar'],
-            'Segment with a percent sign'       => ['foo%bar'],
-            'Segment with a at sign'            => ['foo@bar'],
-            'Segment with a equals sign'        => ['foo=bar'],
-            'Segment with a back slash'         => ['foo\bar'],
+            'Segment with a bracket' => ['foo(bar'],
+            'Segment with a comma' => ['foo,bar'],
+            'Segment with a colon (midway)' => ['foo:bar'],
+            'Segment with a plus sign' => ['foo+bar'],
+            'Segment with a percent sign' => ['foo%bar'],
+            'Segment with a at sign' => ['foo@bar'],
+            'Segment with a equals sign' => ['foo=bar'],
+            'Segment with a back slash' => ['foo\bar'],
         ];
     }
 
@@ -149,16 +151,16 @@ class RouteRegistryTest extends TestCase
     public static function cases_to_test_registering_conflicting_routes_throws()
     {
         return [
-            'Conflicting parameter (at start)'      => ['/:abc'],
-            'Conflicting parameter (midway)'        => ['/abc/:def/ghi'],
-            'Conflicting parameter (at end)'        => ['/abc/def/:ghi'],
-            'Conflicting segment routes (single)'   => ['/abc'],
-            'Conflicting segment routes (double)'   => ['/abc/def'],
+            'Conflicting parameter (at start)' => ['/:abc'],
+            'Conflicting parameter (midway)' => ['/abc/:def/ghi'],
+            'Conflicting parameter (at end)' => ['/abc/def/:ghi'],
+            'Conflicting segment routes (single)' => ['/abc'],
+            'Conflicting segment routes (double)' => ['/abc/def'],
         ];
     }
 
     /**
-     * @param non-empty-string $route
+     * @param  non-empty-string  $route
      */
     #[DataProvider('cases_to_test_registering_conflicting_routes_throws')]
     public function test_registering_conflicting_routes_throws(string $route): void
@@ -190,16 +192,16 @@ class RouteRegistryTest extends TestCase
             ->method('set')
             ->willReturnCallback(function ($key, $value, $ttl) use ($routesKey, $actionsKey): bool {
                 $expected = [
-                    $routesKey  => json_encode([]),
+                    $routesKey => json_encode([]),
                     $actionsKey => json_encode([]),
                 ];
 
-                if (!array_key_exists($key, $expected)) {
+                if (! array_key_exists($key, $expected)) {
                     self::fail("Cache key not expected: {$key}");
                 }
 
                 if ($value !== $expected[$key]) {
-                    self::fail("Unexpected value for `{$key}`: " . var_export($value, true) . ' instead of ' . var_export($expected[$key], true));
+                    self::fail("Unexpected value for `{$key}`: ".var_export($value, true).' instead of '.var_export($expected[$key], true));
                 }
 
                 return true;
@@ -306,27 +308,27 @@ class RouteRegistryTest extends TestCase
                 ],
                 'routesToResolve' => [
                     [
-                        'uri'       => '/abc',
-                        'method'    => HttpMethod::GET,
-                        'expected'  => [
+                        'uri' => '/abc',
+                        'method' => HttpMethod::GET,
+                        'expected' => [
                             SingleMethodWithMultipleMethodsController::class,
                             'get',
                             [],
                         ],
                     ],
                     [
-                        'uri'       => '/abc',
-                        'method'    => HttpMethod::POST,
-                        'expected'  => [
+                        'uri' => '/abc',
+                        'method' => HttpMethod::POST,
+                        'expected' => [
                             SingleMethodWithMultipleMethodsController::class,
                             'post',
                             [],
                         ],
                     ],
                     [
-                        'uri'       => '/abc',
-                        'method'    => HttpMethod::DELETE,
-                        'expected'  => [
+                        'uri' => '/abc',
+                        'method' => HttpMethod::DELETE,
+                        'expected' => [
                             SingleMethodWithMultipleMethodsController::class,
                             'delete',
                             [],
@@ -335,7 +337,7 @@ class RouteRegistryTest extends TestCase
                 ],
             ],
 
-            ///////////////////////////////////////////////////////////////////////////////////
+            // /////////////////////////////////////////////////////////////////////////////////
 
             // #[Get('/')]
             // #[Get('/abc')]
@@ -375,36 +377,36 @@ class RouteRegistryTest extends TestCase
                 ],
                 'routesToResolve' => [
                     [
-                        'uri'       => '/',
-                        'method'    => HttpMethod::GET,
-                        'expected'  => [
+                        'uri' => '/',
+                        'method' => HttpMethod::GET,
+                        'expected' => [
                             SegmentRouteMethodWithMultipleRoutesController::class,
                             'get',
                             [],
                         ],
                     ],
                     [
-                        'uri'       => '/abc',
-                        'method'    => HttpMethod::GET,
-                        'expected'  => [
+                        'uri' => '/abc',
+                        'method' => HttpMethod::GET,
+                        'expected' => [
                             SegmentRouteMethodWithMultipleRoutesController::class,
                             'get',
                             [],
                         ],
                     ],
                     [
-                        'uri'       => '/abc/def',
-                        'method'    => HttpMethod::GET,
-                        'expected'  => [
+                        'uri' => '/abc/def',
+                        'method' => HttpMethod::GET,
+                        'expected' => [
                             SegmentRouteMethodWithMultipleRoutesController::class,
                             'get',
                             [],
                         ],
                     ],
                     [
-                        'uri'       => '/123/456/789',
-                        'method'    => HttpMethod::GET,
-                        'expected'  => [
+                        'uri' => '/123/456/789',
+                        'method' => HttpMethod::GET,
+                        'expected' => [
                             SegmentRouteMethodWithMultipleRoutesController::class,
                             'get',
                             [],
@@ -413,7 +415,7 @@ class RouteRegistryTest extends TestCase
                 ],
             ],
 
-            ///////////////////////////////////////////////////////////////////////////////////
+            // /////////////////////////////////////////////////////////////////////////////////
 
             // #[Get('/:para1')]
             // #[Get('/abc/:para1')]
@@ -456,72 +458,72 @@ class RouteRegistryTest extends TestCase
                 ],
                 'routesToResolve' => [
                     [
-                        'uri'       => '/',
-                        'method'    => HttpMethod::GET,
-                        'expected'  => [
+                        'uri' => '/',
+                        'method' => HttpMethod::GET,
+                        'expected' => [
                             ParameterRouteMethodWithMultipleRoutesController::class,
                             'get',
                             ['para1' => ''],
                         ],
                     ],
                     [
-                        'uri'       => '/123',
-                        'method'    => HttpMethod::GET,
-                        'expected'  => [
+                        'uri' => '/123',
+                        'method' => HttpMethod::GET,
+                        'expected' => [
                             ParameterRouteMethodWithMultipleRoutesController::class,
                             'get',
                             ['para1' => '123'],
                         ],
                     ],
                     [
-                        'uri'       => '/abc',
-                        'method'    => HttpMethod::GET,
-                        'expected'  => [
+                        'uri' => '/abc',
+                        'method' => HttpMethod::GET,
+                        'expected' => [
                             ParameterRouteMethodWithMultipleRoutesController::class,
                             'get',
                             ['para1' => ''],
                         ],
                     ],
                     [
-                        'uri'       => '/abc/123',
-                        'method'    => HttpMethod::GET,
-                        'expected'  => [
+                        'uri' => '/abc/123',
+                        'method' => HttpMethod::GET,
+                        'expected' => [
                             ParameterRouteMethodWithMultipleRoutesController::class,
                             'get',
                             ['para1' => '123'],
                         ],
                     ],
                     [
-                        'uri'       => '//def',
-                        'method'    => HttpMethod::GET,
-                        'expected'  => [
+                        'uri' => '//def',
+                        'method' => HttpMethod::GET,
+                        'expected' => [
                             ParameterRouteMethodWithMultipleRoutesController::class,
                             'get',
                             ['para1' => ''],
                         ],
                     ],
                     [
-                        'uri'       => '/123/def',
-                        'method'    => HttpMethod::GET,
-                        'expected'  => [
+                        'uri' => '/123/def',
+                        'method' => HttpMethod::GET,
+                        'expected' => [
                             ParameterRouteMethodWithMultipleRoutesController::class,
                             'get',
                             ['para1' => '123'],
                         ],
                     ],
                     [
-                        'uri'       => '/ghi//jkl',
-                        'method'    => HttpMethod::GET,
-                        'expected'  => [
+                        'uri' => '/ghi//jkl',
+                        'method' => HttpMethod::GET,
+                        'expected' => [
                             ParameterRouteMethodWithMultipleRoutesController::class,
                             'get',
                             ['para1' => ''],
                         ],
                     ],
                     [
-                        'uri'       => '/ghi/123/jkl',
-                        'method'    => HttpMethod::GET,
-                        'expected'  => [
+                        'uri' => '/ghi/123/jkl',
+                        'method' => HttpMethod::GET,
+                        'expected' => [
                             ParameterRouteMethodWithMultipleRoutesController::class,
                             'get',
                             ['para1' => '123'],
@@ -530,7 +532,7 @@ class RouteRegistryTest extends TestCase
                 ],
             ],
 
-            ///////////////////////////////////////////////////////////////////////////////////
+            // /////////////////////////////////////////////////////////////////////////////////
 
             // #[Get('/abc/def/ghi/jkl/mno/pqr/stu/vwx/:para1')]
 
@@ -579,9 +581,9 @@ class RouteRegistryTest extends TestCase
                 ],
                 'routesToResolve' => [
                     [
-                        'uri'       => '/abc/def/ghi/jkl/mno/pqr/stu/vwx/123',
-                        'method'    => HttpMethod::GET,
-                        'expected'  => [
+                        'uri' => '/abc/def/ghi/jkl/mno/pqr/stu/vwx/123',
+                        'method' => HttpMethod::GET,
+                        'expected' => [
                             LongRouteController::class,
                             'get',
                             ['para1' => '123'],
@@ -593,9 +595,9 @@ class RouteRegistryTest extends TestCase
     }
 
     /**
-     * @param list<class-string> $controllers
-     * @param array<mixed> $routes
-     * @param list<ControllerAction> $actions
+     * @param  list<class-string>  $controllers
+     * @param  array<mixed>  $routes
+     * @param  list<ControllerAction>  $actions
      * @param list<array{
      *      uri: non-empty-string,
      *      method: HttpMethod,
@@ -623,16 +625,16 @@ class RouteRegistryTest extends TestCase
             ->method('set')
             ->willReturnCallback(function ($key, $value, $ttl) use ($routesKey, $actionsKey, $routes, $actions): bool {
                 $expected = [
-                    $routesKey  => json_encode($routes),
+                    $routesKey => json_encode($routes),
                     $actionsKey => json_encode($actions),
                 ];
 
-                if (!array_key_exists($key, $expected)) {
+                if (! array_key_exists($key, $expected)) {
                     self::fail("Cache key not expected: {$key}");
                 }
 
                 if ($value !== $expected[$key]) {
-                    self::fail("Unexpected value for `{$key}`: " . var_export($value, true) . ' instead of ' . var_export($expected[$key], true));
+                    self::fail("Unexpected value for `{$key}`: ".var_export($value, true).' instead of '.var_export($expected[$key], true));
                 }
 
                 return true;
@@ -649,16 +651,16 @@ class RouteRegistryTest extends TestCase
 
             $actionable = $this->routeRegistry->resolve($route['uri'], $route['method']);
 
-            if (!$route['expected'] instanceof Exception) {
+            if (! $route['expected'] instanceof Exception) {
                 $this->assertSame($route['expected'], $actionable);
             }
         }
     }
 
     /**
-     * @param list<class-string> $controllers
-     * @param array<mixed> $routes
-     * @param list<ControllerAction> $actions
+     * @param  list<class-string>  $controllers
+     * @param  array<mixed>  $routes
+     * @param  list<ControllerAction>  $actions
      * @param list<array{
      *      uri: non-empty-string,
      *      method: HttpMethod,
@@ -689,19 +691,19 @@ class RouteRegistryTest extends TestCase
 
             $actionable = $this->routeRegistry->resolve($route['uri'], $route['method']);
 
-            if (!$route['expected'] instanceof Exception) {
+            if (! $route['expected'] instanceof Exception) {
                 $this->assertSame($route['expected'], $actionable);
             }
         }
     }
 
     /**
-     * @param non-empty-string $route
+     * @param  non-empty-string  $route
      * @return class-string
      */
     protected function makeDynamicController(string $route): string
     {
-        $className = 'TestController_' . md5(uniqid());
+        $className = 'TestController_'.md5(uniqid());
 
         $classCode = <<<PHP
             namespace DynamicTest;
@@ -724,19 +726,13 @@ class RouteRegistryTest extends TestCase
 class SingleMethodWithMultipleMethodsController
 {
     #[Get('/abc')]
-    public function get(): void
-    {
-    }
+    public function get(): void {}
 
     #[Post('/abc')]
-    public function post(): void
-    {
-    }
+    public function post(): void {}
 
     #[Delete('/abc')]
-    public function delete(): void
-    {
-    }
+    public function delete(): void {}
 }
 
 class SegmentRouteMethodWithMultipleRoutesController
@@ -745,9 +741,7 @@ class SegmentRouteMethodWithMultipleRoutesController
     #[Get('/abc')]
     #[Get('/abc/def')]
     #[Get('/123/456/789')]
-    public function get(): void
-    {
-    }
+    public function get(): void {}
 }
 
 class ParameterRouteMethodWithMultipleRoutesController
@@ -756,15 +750,11 @@ class ParameterRouteMethodWithMultipleRoutesController
     #[Get('/abc/:para1')]
     #[Get('/:para1/def')]
     #[Get('/ghi/:para1/jkl')]
-    public function get(string $para1): void
-    {
-    }
+    public function get(string $para1): void {}
 }
 
 class LongRouteController
 {
     #[Get('/abc/def/ghi/jkl/mno/pqr/stu/vwx/:para1')]
-    public function get(string $para1): void
-    {
-    }
+    public function get(string $para1): void {}
 }

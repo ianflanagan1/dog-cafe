@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Routing;
 
-use ReflectionClass;
-use ReflectionAttribute;
-use App\Types\StandardTypes;
-use App\Http\Attributes\Route;
-use App\Http\Enums\HttpMethod;
-use Psr\SimpleCache\CacheInterface;
 use App\Exceptions\RouteConflictException;
 use App\Exceptions\RouteNotFoundException;
 use App\Exceptions\RouteNotValidException;
+use App\Http\Attributes\Route;
+use App\Http\Enums\HttpMethod;
+use App\Types\StandardTypes;
+use Psr\SimpleCache\CacheInterface;
+use ReflectionAttribute;
+use ReflectionClass;
 
 /**
  * Handles HTTP routing by resolving paths to controller methods using attributes.
@@ -71,7 +71,7 @@ class RouteRegistry
 
     /**
      * Parameter name must be a colon followed by a valid PHP variable name
-     * 
+     *
      * :            Colon
      * [A-Za-z_]    One alphabetic or underscore
      * [A-Za-z0-9_] Zero or more alpha-number or underscore
@@ -80,7 +80,7 @@ class RouteRegistry
 
     /**
      * Segment name must be alpha-numeric or . _ ~ -
-     * 
+     *
      * A-Za-z0-9    Alpha-numeric
      * ._~-         Literals
      * +            One or more such characters
@@ -223,11 +223,11 @@ class RouteRegistry
             throw new RouteNotValidException();
         }
 
-        foreach($segments as $segment) {
+        foreach ($segments as $segment) {
             if (!preg_match('/^(' . self::PARAMETER_ALLOWED . '|' . self::SEGMENT_ALLOWED . ')$/', $segment) && $segments !== ['']) {
-                    // Empty string fails       -> Can't have double slashes in route; can't end with a slash
-                    //                          -> But allow a single empty-string segment
-                    // Single colon ":" fails   -> Parameters must have names
+                // Empty string fails       -> Can't have double slashes in route; can't end with a slash
+                //                          -> But allow a single empty-string segment
+                // Single colon ":" fails   -> Parameters must have names
 
                 throw new RouteNotValidException();
             }
@@ -287,7 +287,7 @@ class RouteRegistry
         if (count($segments) > 1) {
 
             // If multiple routes reference the same parameter, they must must use the same parameter name
-            if(isset($routes['par']) && $routes['par']['name'] !== $parameterName) {
+            if (isset($routes['par']) && $routes['par']['name'] !== $parameterName) {
                 throw new RouteConflictException();
             }
 
@@ -311,7 +311,7 @@ class RouteRegistry
 
         // If multiple routes reference the same parameter, they must must use the same parameter name
         // And don't allow multiple routes to end at the same route and method
-        if(
+        if (
             isset($routes['par'])
             && ($routes['par']['name'] !== $parameterName || isset($routes['par'][$httpMethod->value]))
         ) {
@@ -354,7 +354,7 @@ class RouteRegistry
 
         // Otherwise, this is the last segment/parameter, so link to the action
 
-        if(isset($routes['seg'][$segment][$httpMethod->value])) {
+        if (isset($routes['seg'][$segment][$httpMethod->value])) {
             throw new RouteConflictException();
         }
 

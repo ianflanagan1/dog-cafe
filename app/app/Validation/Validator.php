@@ -58,7 +58,7 @@ class Validator
                 $field = $properties;
                 $properties = [];
 
-            // Otherwise, if properties is not an array, convert to empty array
+                // Otherwise, if properties is not an array, convert to empty array
             } elseif (!is_array($properties)) {
                 $properties = [];
             }

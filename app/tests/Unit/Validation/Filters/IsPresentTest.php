@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Validation\Filters;
 
-use PHPUnit\Framework\TestCase;
 use App\Validation\Filters\IsPresent;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-class IsPresentTest extends TestCase{
+class IsPresentTest extends TestCase
+{
     /**
      * @return array<
      *      non-empty-string,
@@ -50,7 +51,7 @@ class IsPresentTest extends TestCase{
     #[DataProvider('cases_to_test_rule_passes')]
     public function test_rule_passes(mixed $value): void
     {
-        $result = (new IsPresent())->filter($value);
+        $result = (new IsPresent)->filter($value);
 
         $this->assertTrue($result);
     }
@@ -75,7 +76,7 @@ class IsPresentTest extends TestCase{
     #[DataProvider('cases_to_test_rule_fails')]
     public function test_rule_fails(mixed $value): void
     {
-        $result = (new IsPresent())->filter($value);
+        $result = (new IsPresent)->filter($value);
 
         $this->assertFalse($result);
     }

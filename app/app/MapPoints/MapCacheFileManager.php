@@ -4,29 +4,29 @@ declare(strict_types=1);
 
 namespace App\MapPoints;
 
-use RuntimeException;
 use App\Enums\VenueType;
 use App\Types\StandardTypes;
+use RuntimeException;
 
 /**
  * A class to retrieve cache files of `Chunks` of map points.
- * 
+ *
  * A `Chunk` is a pre-calculated array of map points for a geographical "rectangle", the specified zoom level, the
  * specified set of filters, and for the current day-of-week and time interval (if openNow filter is enabled),
  * `json_encode`d in a cache file. `Chunks` tesselate with the size and location of the "rectangles" vary per zoom level
  * and are configured in `./config/`mapZoomLevelProperties`. The width and height of `Chunks` are specified by
  * `latChunkSize` and `lngChunkSize` respectively, and the number of decimals in the filename is specified by
  * `chunkDecimals`.
- * 
+ *
  * The start point of `Chunks` is set by `self::COVERAGE['lat_min']` and `['lng_min']`, and `Chunks` continue Eastward
  * and Southward until `['lat_max']` and `['lng_max']` are met or exceeded.
- * 
+ *
  * @phpstan-import-type NonNegInt from StandardTypes
  * @phpstan-import-type MapZoom from StandardTypes
  * @phpstan-import-type DayOfWeek from StandardTypes
  * @phpstan-import-type SinglePoint from MapPointsBuilder
  * @phpstan-import-type ClusterPoint from MapPointsBuilder
- * 
+ *
  * @phpstan-type Chunk list<SinglePoint|ClusterPoint>
  */
 class MapCacheFileManager
@@ -45,7 +45,7 @@ class MapCacheFileManager
     /**
      * Get an array points from cache files for the specified geographical "rectangle", the specified zoom level, and
      * the specified filters.
-     * 
+     *
      * @param float $lat1
      * @param float $lat2
      * @param float $lng1
@@ -69,8 +69,7 @@ class MapCacheFileManager
         float $latChunkSize,
         float $lngChunkSize,
         int $chunkDecimals,
-    ): array
-    {
+    ): array {
         $chunks = self::getChunks(
             $lat1,
             $lat2,
@@ -95,7 +94,7 @@ class MapCacheFileManager
 
     /**
      * From an array of `Chunks`, return only the point that are within the specified geographical "rectangle".
-     * 
+     *
      * @param float $lat1
      * @param float $lat2
      * @param float $lng1
@@ -139,7 +138,7 @@ class MapCacheFileManager
 
     /**
      * Get an array of `Chunks` for the passed zoom level and filters that overlap with the passed "rectangle".
-     * 
+     *
      * @param float $lat1
      * @param float $lat2
      * @param float $lng1
@@ -163,8 +162,7 @@ class MapCacheFileManager
         float $latChunkSize,
         float $lngChunkSize,
         int $chunkDecimals,
-    ): array
-    {
+    ): array {
         $chunks = [];
 
         $cacheFileBase = self::determineCacheFileBase($zoom, $types, $openNow);
@@ -205,7 +203,7 @@ class MapCacheFileManager
 
     /**
      * Determine the appropriate minimum and maximum Latitude and Longitude of `Chunks` that overlap with the pass rectangle.
-     * 
+     *
      * @param float $lat1
      * @param float $lat2
      * @param float $lng1
@@ -241,7 +239,7 @@ class MapCacheFileManager
 
     /**
      * Determine the location base for cache files from the passed zoom level and filters.
-     * 
+     *
      * @param list<VenueType> $types
      * @param bool $openNow
      * @param MapZoom $zoom
@@ -283,7 +281,7 @@ class MapCacheFileManager
 
     /**
      * Get the time of the cache files that cover the current time.
-     * 
+     *
      * @param non-empty-string $typesString
      * @param DayOfWeek $day
      * @param non-empty-string $currentTime
@@ -318,7 +316,7 @@ class MapCacheFileManager
 
     /**
      * Get location of a cache file.
-     * 
+     *
      * @param non-empty-string $cacheFileBase
      * @param float $lat
      * @param float $lng
@@ -332,9 +330,9 @@ class MapCacheFileManager
 
     /**
      * Get the location of the cache file listing times for the passed day and filters.
-     * 
+     *
      * These times mark when at least one Venue opens or closes.
-     * 
+     *
      * @param non-empty-string $typesString
      * @param DayOfWeek $day
      * @return non-empty-string

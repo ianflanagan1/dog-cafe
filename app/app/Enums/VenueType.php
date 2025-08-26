@@ -99,9 +99,9 @@ enum VenueType: int implements JsonSerializable
 
     /**
      * Generate a string of value from an array of `VenueTypes`
-     * 
+     *
      * An empty array results in a string of all `VenueTypes` since this is usually the desired search behaviour.
-     * 
+     *
      * @param list<VenueType> $types
      * @return non-empty-string
      */

@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\MapPoints;
 
-use App\Models\Venue;
 use App\Enums\VenueType;
-use App\Types\StandardTypes;
+use App\Models\Venue;
 use App\Repositories\VenueRepository;
-use App\MapPoints\MapCacheFileManager;
+use App\Types\StandardTypes;
 
 /**
  * Service responsible for producing map point data of Venues within a given map rectangle.

@@ -52,12 +52,12 @@ class VenueHydrator
             $isOpen = false;
             $changeTime = 'at ' . Time::militaryToCivilianTime($openTime);
 
-        // Venue is currently open
+            // Venue is currently open
         } elseif ($closeTime !== null && $time < $closeTime) {
             $isOpen = true;
             $changeTime = Time::militaryToCivilianTime($closeTime);
 
-        // Venue is currently closed and won't open today, so loop through day of the week to find next opening time
+            // Venue is currently closed and won't open today, so loop through day of the week to find next opening time
         } else {
             $isOpen = false;
             $changeTime = '-';

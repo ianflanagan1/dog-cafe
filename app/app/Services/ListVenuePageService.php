@@ -42,7 +42,7 @@ class ListVenuePageService
 
     /**
      * Process the `types` array of a post-cache Venue, ready for outputting in JSON format.
-     * 
+     *
      * @param VenueMinimalForHtml $venue
      * @return VenueMinimalForJson
      */
@@ -235,7 +235,7 @@ class ListVenuePageService
             /** @var list<VenueMinimalForCache> $items */
             $items = json_decode($items, true);
 
-        // Otherwise, get from database and save to cache
+            // Otherwise, get from database and save to cache
         } else {
             if ($where === null) {
                 $where = VenueRepository::getWhereForList($townId, $types, $openNow);

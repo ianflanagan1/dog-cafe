@@ -373,8 +373,8 @@ class ContainerTest extends TestCase
      *      non-empty-string,
      *      callable|string|object,
      * > $instructions
-     * @param non-empty-string $idToTest
-     * @param class-string $expectedClass
+     * @param  non-empty-string  $idToTest
+     * @param  class-string  $expectedClass
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('cases_to_test_set_and_get')]
     public function test_set_and_get(array $instructions, string $idToTest, string $expectedClass): void
@@ -411,6 +411,7 @@ class ContainerTest extends TestCase
 class ClassWithContainer
 {
     public Container $containerFromInterface;
+
     public Container $containerFromClass;
 }
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Utils\Log;
 use App\Database\Database;
 use App\Database\SqlWhere;
 use App\Types\StandardTypes;

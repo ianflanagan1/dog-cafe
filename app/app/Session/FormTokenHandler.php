@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Session;
 
-use App\Http\Request;
-
 readonly class FormTokenHandler
 {
     protected const int MAX_TOKENS = 10;
     protected const string SESSION_PREFIX = 'formToken-';
 
-    public function __construct(protected SessionListManager $sessionListManager) {
+    public function __construct(protected SessionListManager $sessionListManager)
+    {
     }
 
     /**

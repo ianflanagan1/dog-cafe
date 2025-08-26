@@ -6,9 +6,9 @@ namespace Tests\Unit\Validation\Rules;
 
 use App\DTOs\Error;
 use App\Enums\ErrorCode;
-use PHPUnit\Framework\TestCase;
 use App\Validation\Rules\MinIntRule;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
 class MinIntRuleTest extends TestCase
 {

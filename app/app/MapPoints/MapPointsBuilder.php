@@ -10,7 +10,7 @@ use App\Utils\Geo;
 
 /**
  * A class to build map points from database data.
- * 
+ *
  * @phpstan-import-type NonNegInt from StandardTypes
  * @phpstan-import-type VenueMapRaw from Venue
  *
@@ -39,7 +39,7 @@ use App\Utils\Geo;
  *      2: float,
  *      3: float,
  * }
- * 
+ *
  * @phpstan-type ClusteringMetadata array{
  *      links: list<NonNegInt>,
  *      clustered: bool,
@@ -58,7 +58,7 @@ class MapPointsBuilder
 
     /**
      * Process an array of `VenueMapRaw` from the database into an array of `SinglePoints`.
-     * 
+     *
      * @param list<VenueMapRaw> $venues
      * @return list<SinglePoint>
      */
@@ -69,16 +69,16 @@ class MapPointsBuilder
 
     /**
      * Process an array of `VenueMapRaw` from the database into an array of `ClusterPoints` and `SinglePoints`.
-     * 
+     *
      * To generate `ClusterPoints`:
      * - For each Venue, record which other Venues are nearby in `links` array
      * - Identify which Venue has the most `links`, create a `ClusterPoint` from those Venues, and mark those Venues as
      *   `clustered` true
      * - Continue with the non-Clustered venue with the most `links`
      * - Repeat until all Venues with non-empty `links` are `clustered` true.
-     * 
+     *
      * Then generate `SinglePoints` from all remaining (`clustered` false) Venues
-     * 
+     *
      * @param list<VenueMapRaw> $venues
      * @param float $latClusterLimit
      * @param float $lngClusterLimit
@@ -107,7 +107,7 @@ class MapPointsBuilder
 
         $singles = [];
 
-        foreach($venues as $i => $venue) {
+        foreach ($venues as $i => $venue) {
             if (!$metadata[$i]['clustered']) {
                 $singles[] = self::createSinglePoint($venue);
             }
@@ -118,11 +118,11 @@ class MapPointsBuilder
 
     /**
      * Create a parallel `$metadata` array for `$venues` to hold `links` and `clustered` for each Venue
-     * 
+     *
      * - `links` is an array of indices of the Venues (in `$venues`) that are in close proximity (when their Latitude
      *   differential is below `$latClusterLimit` and their Longitude differential is below `$lngClusterLimit`).
      * - `clustered` is a boolean to show whether or not the Venue has been used in a ClusterPoint.
-     * 
+     *
      * @param list<VenueMapRaw> $venues
      * @param float $latClusterLimit
      * @param float $lngClusterLimit
@@ -138,7 +138,7 @@ class MapPointsBuilder
 
         for ($i = 0; $i < count($venues); $i++) {
             for ($j = $i + 1; $j < count($venues); $j++) {
-                if(Geo::isWithinRectangle(
+                if (Geo::isWithinRectangle(
                     $venues[$i]['lat'],
                     $venues[$i]['lng'],
                     $venues[$j]['lat'],
@@ -158,7 +158,7 @@ class MapPointsBuilder
     /**
      * Set `clustered` to true for all Venues in a new cluster and determine the minimum and maximum Latitude and
      * Longitude.
-     * 
+     *
      * @param int $index
      * @param non-empty-list<VenueMapRaw> $venues
      * @param non-empty-list<ClusteringMetadata> $metadata
@@ -203,7 +203,7 @@ class MapPointsBuilder
 
     /**
      * Get the index of the `$metadata` array with the most links.
-     * 
+     *
      * @param list<ClusteringMetadata> $metadata
      * @return ?NonNegInt
      */
@@ -225,7 +225,7 @@ class MapPointsBuilder
     /**
      * Remove and newly `clustered` points from any `links` arrays, and get the index of the `$metadata` array with the
      * most links remaining
-     * 
+     *
      * @param list<ClusteringMetadata> $metadata
      * @return ?NonNegInt
      */
@@ -271,8 +271,7 @@ class MapPointsBuilder
         float $lngMin,
         float $lngMax,
         int $count
-    ): array
-    {
+    ): array {
         // Calculate centre point
         $lat = ($latMin + $latMax) / 2;
         $lng = ($lngMin + $lngMax) / 2;
@@ -294,7 +293,7 @@ class MapPointsBuilder
             ],
         ];
     }
-    
+
     /**
      * @param VenueMapRaw $venue
      * @return SinglePoint

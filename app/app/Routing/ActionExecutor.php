@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Routing;
 
 use App\Container;
@@ -13,7 +15,8 @@ use App\Http\DTOs\ViewParameters;
  *      2: array<non-empty-string, string>
  * }
  */
-class ActionExecutor{
+class ActionExecutor
+{
     public function __construct(protected Container $container)
     {
     }
