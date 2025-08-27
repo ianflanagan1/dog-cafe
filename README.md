@@ -19,31 +19,39 @@ Access at: [https://dogcafeuk.com](https://dogcafeuk.com)
 
 ## Local Installation
 
+Ensure your user is added to the `docker` group:
+
+```
+sudo usermod -aG docker $USER
+```
+
+Install:
+
 ```
 git clone git@github.com:ianflanagan1/dog-cafe.git
 cd dog-cafe
 cp app/.env.example app/.env
-sudo make up-detach
-sudo make composer-install
+make up-detach
+make composer-install
 ```
 Access in a browser at `http://localhost:8090`.
 
 If your user is added to the `docker` group, `sudo` is not required for `make` commands.
 
-If another application is using port 8090, in `./docker/compose.yml` modify `services.nginx.ports` from `8090:80` to `X:80`, where `X` is a free port number, and access `http://localhost:X` instead.
+If another application is using port 8090, in `./compose.yaml` modify `services.nginx.ports` from `8090:80` to `X:80`, where `X` is a free port number, and access `http://localhost:X` instead.
 
 The login function requires Google and/or Discord developer ID and Secret configured in `.env`, so will not work out-of-the-box in the local environment.
 
-Execute `sudo make down-delete` to stop and remove all containers, named volumes and networks.
+Execute `make down-delete` to stop and remove all containers, named volumes and networks.
 
 ## Static Analysis
 
 ```
-sudo make phpstan
+make phpstan
 ```
 
 ## Unit Tests
 
 ```
-sudo make test
+make test
 ```
