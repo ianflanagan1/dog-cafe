@@ -11,8 +11,6 @@ readonly class App
 {
     public function run(Router $router): void
     {
-        date_default_timezone_set('Europe/London');
-
         echo $router->resolve(
             Request::getRequestTarget(),
             Request::getMethod(),
