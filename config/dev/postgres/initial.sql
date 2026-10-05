@@ -8,7 +8,7 @@ CREATE TABLE app_user (
     name        VARCHAR(100),
     picture     VARCHAR(45),
     active      BOOL            NOT NULL DEFAULT true,
-    created_at  TIMESTAMP       NOT NULL
+    created_at  TIMESTAMPTZ     NOT NULL
 );
 
 CREATE TABLE favourite (
@@ -17,7 +17,7 @@ CREATE TABLE favourite (
     venue_id        INTEGER     NOT NULL,
     venue_ext_id    CHAR(22)    NOT NULL,
     active          BOOL        NOT NULL DEFAULT true,
-    created_at      TIMESTAMP   NOT NULL
+    created_at      TIMESTAMPTZ NOT NULL
 );
 
 CREATE TABLE venue (

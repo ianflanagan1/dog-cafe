@@ -100,7 +100,7 @@ services:
       interval: 1s
       timeout: 1s
       retries: 1
-    command: ["postgres", "-c", "timezone=Europe/London"]
+    command: ["postgres", "-c", "timezone=UTC"]
     volumes:
       - ./config/dev/postgres/initial.sql:/docker-entrypoint-initdb.d/initial.sql:ro
       - postgres:/var/lib/postgresql/data:rw
