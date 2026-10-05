@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Database\SqlWhere;
+use App\Enums\Locality;
 use App\Enums\VenueOrderBy;
 use App\Enums\VenueType;
 use App\Hydrators\VenueHydrator;
@@ -155,7 +156,7 @@ class ListVenuePageService
         );
 
         $items = array_map(fn (array $v): array => VenueHydrator::processTypes($v), $items);
-        $items = array_map(fn (array $v): array => VenueHydrator::processOpeningTimes($v), $items);
+        $items = array_map(fn (array $v): array => VenueHydrator::processOpeningTimes($v, Locality::UnitedKingdom), $items);
 
         return [$totalPages, $items];
     }
@@ -251,7 +252,7 @@ class ListVenuePageService
         }
 
         // Determine "open" status and "opening at" or "closing at" message
-        return array_map(fn (array $v): array => VenueHydrator::processOpeningTimes($v), $items);
+        return array_map(fn (array $v): array => VenueHydrator::processOpeningTimes($v, Locality::UnitedKingdom), $items);
     }
 
     /**

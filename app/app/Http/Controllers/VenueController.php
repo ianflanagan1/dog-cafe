@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Enums\Locality;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\RouteNotFoundException;
 use App\Http\Attributes\Get;
@@ -38,7 +39,7 @@ readonly class VenueController extends Controller
         }
 
         $venue = VenueHydrator::processTypes($venue);
-        $venue = VenueHydrator::processOpeningTimes($venue);
+        $venue = VenueHydrator::processOpeningTimes($venue, Locality::UnitedKingdom);
 
         return Response::json([
             'venue' => $venue,

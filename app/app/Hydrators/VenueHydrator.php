@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Hydrators;
 
+use App\Enums\Locality;
 use App\Enums\VenueType;
 use App\Models\Venue;
 use App\Types\StandardTypes;
@@ -36,12 +37,14 @@ class VenueHydrator
 
     /**
      * @param VenueMinimalForCache $venue
+     * @param Locality $locality
      * @return VenueMinimalForHtml
      */
-    public static function processOpeningTimes(array $venue): array
+    public static function processOpeningTimes(array $venue, Locality $locality): array
     {
-        $time  = date('H:i');       // Hour with zero, minute with zero             date('H:i:s') => '09:09:33'
-        $today = (int) date('w');   // Day of week: 0 (Sunday) to 6 (Saturday)
+        $now   = $locality->now();
+        $time  = $now->format('H:i');       // Hour with zero, minute with zero             format('H:i:s') => '09:09:33'
+        $today = (int) $now->format('w');   // Day of week: 0 (Sunday) to 6 (Saturday)
 
         // Get the opening/closing times for today
         $openTime = $venue[Venue::COLUMN_PREFIX_OPEN_TIME . $today];

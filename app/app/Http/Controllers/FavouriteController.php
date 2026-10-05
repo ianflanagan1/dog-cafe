@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Enums\Locality;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\SystemException;
 use App\Http\Attributes\Delete;
@@ -62,7 +63,7 @@ readonly class FavouriteController extends Controller
         );
 
         $venues = array_map(fn (array $v): array => VenueHydrator::processTypes($v), $venues);
-        $venues = array_map(fn (array $v): array => VenueHydrator::processOpeningTimes($v), $venues);
+        $venues = array_map(fn (array $v): array => VenueHydrator::processOpeningTimes($v, Locality::UnitedKingdom), $venues);
 
         return new ViewParameters(
             'main',
@@ -109,7 +110,7 @@ readonly class FavouriteController extends Controller
         );
 
         $venues = array_map(fn (array $v): array => VenueHydrator::processTypes($v), $venues);
-        $venues = array_map(fn (array $v): array => VenueHydrator::processOpeningTimes($v), $venues);
+        $venues = array_map(fn (array $v): array => VenueHydrator::processOpeningTimes($v, Locality::UnitedKingdom), $venues);
 
         return Response::json([
             'items'         => $venues,

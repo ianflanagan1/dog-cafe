@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MapPoints;
 
+use App\Enums\Locality;
 use App\Enums\VenueType;
 use App\Types\StandardTypes;
 use RuntimeException;
@@ -165,7 +166,7 @@ class MapCacheFileManager
     ): array {
         $chunks = [];
 
-        $cacheFileBase = self::determineCacheFileBase($zoom, $types, $openNow);
+        $cacheFileBase = self::determineCacheFileBase($zoom, $types, $openNow, Locality::UnitedKingdom);
 
         [$chunkLatMin, $chunkLatMax, $chunkLngMin, $chunkLngMax] = self::determineChunkBounds($lat1, $lat2, $lng1, $lng2, $latChunkSize, $lngChunkSize);
 
@@ -242,10 +243,11 @@ class MapCacheFileManager
      *
      * @param list<VenueType> $types
      * @param bool $openNow
+     * @param Locality $locality
      * @param MapZoom $zoom
      * @return non-empty-string
      */
-    protected static function determineCacheFileBase(int $zoom, array $types, bool $openNow): string
+    protected static function determineCacheFileBase(int $zoom, array $types, bool $openNow, Locality $locality): string
     {
         $typesString = VenueType::typesToString($types);
 
@@ -253,8 +255,9 @@ class MapCacheFileManager
             return self::buildCacheFileBase($zoom, $typesString);
         }
 
-        $day = (int) date('w');     // 0 - 6
-        $currentTime = date('H:i'); // 09:05
+        $now = $locality->now();
+        $day = (int) $now->format('w');     // 0 - 6
+        $currentTime = $now->format('H:i'); // 09:05
         $cacheFileTime = self::getCacheFileTime($typesString, $day, $currentTime);
 
         return self::buildCacheFileBase($zoom, $typesString, true, $day, $cacheFileTime);

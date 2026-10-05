@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Database\SqlWhere;
+use App\Enums\Locality;
 use App\Enums\VenueOrderBy;
 use App\Enums\VenueType;
 use App\Models\Venue;
@@ -64,7 +65,7 @@ class VenueRepository
         $where->addStatement('lat BETWEEN ? AND ?');
         $where->addStatement('lng BETWEEN ? AND ?');
 
-        return self::commonWhereStatements($where, $types, $openNow, null, $filterActive);
+        return self::commonWhereStatements($where, $types, $openNow, Locality::UnitedKingdom, null, $filterActive);
         ;
     }
 
@@ -78,7 +79,7 @@ class VenueRepository
     public static function getWhereForList(?int $townId = null, array $types = [], bool $openNow = false, bool $filterActive = true): SqlWhere
     {
         $where = new SqlWhere();
-        return self::commonWhereStatements($where, $types, $openNow, $townId, $filterActive);
+        return self::commonWhereStatements($where, $types, $openNow, Locality::UnitedKingdom, $townId, $filterActive);
     }
 
     /**
@@ -97,7 +98,7 @@ class VenueRepository
             $where->addStatement('(id = ' . implode(' OR id = ', $favourites) . ')');
         }
 
-        return self::commonWhereStatements($where, $types, $openNow, $townId, $filterActive);
+        return self::commonWhereStatements($where, $types, $openNow, Locality::UnitedKingdom, $townId, $filterActive);
     }
 
     /**
@@ -304,11 +305,12 @@ class VenueRepository
      * @param SqlWhere $where
      * @param list<VenueType> $types
      * @param bool $openNow
+     * @param Locality $locality
      * @param ?PosInt $townId
      * @param bool $filterActive
      * @return SqlWhere
      */
-    protected static function commonWhereStatements(SqlWhere $where, array $types = [], bool $openNow = false, ?int $townId = null, bool $filterActive = true): SqlWhere
+    protected static function commonWhereStatements(SqlWhere $where, array $types, bool $openNow, Locality $locality, ?int $townId = null, bool $filterActive = true): SqlWhere
     {
         // Don't return venues that are permanently closed
         if ($filterActive) {
@@ -327,11 +329,13 @@ class VenueRepository
         }
 
         if ($openNow) {
-            $day    = (int) date('w');
+            $now    = $locality->now();
+            $day    = (int) $now->format('w');
             $open   = Venue::COLUMN_PREFIX_OPEN_TIME . $day;
             $close  = Venue::COLUMN_PREFIX_CLOSE_TIME . $day;
 
-            $where->addStatement("CURRENT_TIME BETWEEN {$open} AND {$close}");
+            $where->addParameter($now->format('H:i:s'));
+            $where->addStatement("CAST(? AS TIME) BETWEEN {$open} AND {$close}");
         }
 
         return $where;
