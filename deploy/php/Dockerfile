@@ -53,7 +53,7 @@ RUN pecl install xdebug \
 RUN mkdir /tmp/profiles \
     && chown -R www-data:www-data /tmp/profiles
 
-# COPY ./config/debug/xdebug.ini ${PHP_INI_DIR}/conf.d/xdebug.ini   // alternative to bind mount
+# COPY ./deploy/php/xdebug.ini ${PHP_INI_DIR}/conf.d/xdebug.ini   // alternative to bind mount
 
 USER www-data
 ENTRYPOINT ["/usr/local/sbin/php-fpm"]
@@ -157,7 +157,7 @@ RUN pecl install xdebug \
 RUN mkdir /tmp/profiles \
     && chown -R www-data:www-data /tmp/profiles
 
-# COPY ./config/debug/xdebug.ini ${PHP_INI_DIR}/conf.d/xdebug.ini   // alternative to bind mount
+# COPY ./deploy/php/xdebug.ini ${PHP_INI_DIR}/conf.d/xdebug.ini   // alternative to bind mount
 
 USER www-data
 ENTRYPOINT ["/usr/local/sbin/php-fpm"]
