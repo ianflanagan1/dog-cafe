@@ -17,7 +17,7 @@ class ContainerTest extends TestCase
     {
         $container = new Container([
             'id' => function (ContainerInterface $containerFromInterface, Container $containerFromClass): ClassWithContainer {
-                $a = new ClassWithContainer;
+                $a = new ClassWithContainer();
 
                 $this->assertInstanceOf(Container::class, $containerFromInterface);
 
@@ -44,7 +44,7 @@ class ContainerTest extends TestCase
             'id' => function () use (&$callCount): stdClass {
                 $callCount++;
 
-                return new stdClass;
+                return new stdClass();
             },
         ]);
 
@@ -57,7 +57,7 @@ class ContainerTest extends TestCase
 
     public function test_get_caches_result_for_class(): void
     {
-        $container = new Container;
+        $container = new Container();
 
         $a = $container->get(stdClass::class);
         $b = $container->get(stdClass::class);
@@ -69,7 +69,7 @@ class ContainerTest extends TestCase
     {
         $container = new Container([
             'id' => function ($noType): stdClass {
-                return new stdClass;
+                return new stdClass();
             },
         ]);
 
@@ -79,28 +79,28 @@ class ContainerTest extends TestCase
 
     public function test_get_resolves_class_with_no_constructor(): void
     {
-        $container = new Container;
+        $container = new Container();
         $a = $container->get(NoConstructor::class);
         $this->assertInstanceOf(NoConstructor::class, $a);
     }
 
     public function test_get_resolves_class_with_no_parameters(): void
     {
-        $container = new Container;
+        $container = new Container();
         $a = $container->get(NoParameters::class);
         $this->assertInstanceOf(NoParameters::class, $a);
     }
 
     public function test_get_resolves_class_with_parameters(): void
     {
-        $container = new Container;
+        $container = new Container();
         $a = $container->get(NoParameters::class);
         $this->assertInstanceOf(NoParameters::class, $a);
     }
 
     public function test_get_resolves_autowiring_all_parameters(): void
     {
-        $container = new Container;
+        $container = new Container();
         $a = $container->get(AutowiringD::class);
 
         $this->assertInstanceOf(AutowiringD::class, $a);
@@ -125,7 +125,7 @@ class ContainerTest extends TestCase
 
     public function test_get_resolves_nested_autowiring(): void
     {
-        $container = new Container;
+        $container = new Container();
         $a = $container->get(AutowiringA::class);
 
         $this->assertInstanceOf(AutowiringA::class, $a);
@@ -229,7 +229,7 @@ class ContainerTest extends TestCase
     {
         $container = new Container([
             stdClass::class => function (AutowiringD $d): stdClass {
-                $obj = new stdClass;
+                $obj = new stdClass();
                 $obj->d = $d;
 
                 return $obj;
@@ -245,7 +245,7 @@ class ContainerTest extends TestCase
 
     public function test_get_throws_exception_for_autowiring_without_defaults(): void
     {
-        $container = new Container;
+        $container = new Container();
 
         $this->expectException(ContainerException::class);
         $container->get(NoDefaults::class);
@@ -253,7 +253,7 @@ class ContainerTest extends TestCase
 
     public function test_get_throws_exception_for_autowiring_with_circular_reference(): void
     {
-        $container = new Container;
+        $container = new Container();
 
         $this->expectException(ContainerException::class);
         $container->get(CircularA::class);
@@ -261,14 +261,14 @@ class ContainerTest extends TestCase
 
     public function test_get_throws_exception_for_nonexistent_class(): void
     {
-        $container = new Container;
+        $container = new Container();
         $this->expectException(NotFoundExceptionInterface::class);
         $container->get('nonexistent');
     }
 
     public function test_get_throws_exception_for_non_instantiable_class(): void
     {
-        $container = new Container;
+        $container = new Container();
 
         $this->expectException(ContainerException::class);
         $container->get(AbstractClass::class);
@@ -277,7 +277,7 @@ class ContainerTest extends TestCase
     public function test_has(): void
     {
         $container = new Container([
-            'id' => new stdClass,
+            'id' => new stdClass(),
         ]);
         $this->assertTrue($container->has('id'));
         $this->assertFalse($container->has('nonexistent'));
@@ -301,7 +301,7 @@ class ContainerTest extends TestCase
         return [
             'object' => [
                 'instructions' => [
-                    'id' => new stdClass,
+                    'id' => new stdClass(),
                 ],
                 'idToTest' => 'id',
                 'expectedClass' => stdClass::class,
@@ -316,7 +316,7 @@ class ContainerTest extends TestCase
             'closure' => [
                 'instructions' => [
                     'id' => function (): stdClass {
-                        return new stdClass;
+                        return new stdClass();
                     },
                 ],
                 'idToTest' => 'id',
@@ -324,7 +324,7 @@ class ContainerTest extends TestCase
             ],
             'closure_arrow_function' => [
                 'instructions' => [
-                    'id' => static fn (): stdClass => new stdClass,
+                    'id' => static fn (): stdClass => new stdClass(),
                 ],
                 'idToTest' => 'id',
                 'expectedClass' => stdClass::class,
@@ -339,11 +339,10 @@ class ContainerTest extends TestCase
             'callable_array_instance' => [
                 'instructions' => [
                     'id' => [
-                        new class
-                        {
+                        new class () {
                             public function make(): stdClass
                             {
-                                return new stdClass;
+                                return new stdClass();
                             }
                         },
                         'make',
@@ -354,11 +353,10 @@ class ContainerTest extends TestCase
             ],
             'callable_invokable_object' => [
                 'instructions' => [
-                    'id' => new class
-                    {
+                    'id' => new class () {
                         public function __invoke(): stdClass
                         {
-                            return new stdClass;
+                            return new stdClass();
                         }
                     },
                 ],
@@ -379,7 +377,7 @@ class ContainerTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('cases_to_test_set_and_get')]
     public function test_set_and_get(array $instructions, string $idToTest, string $expectedClass): void
     {
-        $container = new Container;
+        $container = new Container();
 
         foreach ($instructions as $id => $instruction) {
             $container->set($id, $instruction);
@@ -394,14 +392,14 @@ class ContainerTest extends TestCase
     public function test_set_overwrites_existing_entry(): void
     {
         $container = new Container([
-            'id' => new stdClass,
+            'id' => new stdClass(),
         ]);
 
         $a = $container->get('id');
 
         $this->assertInstanceOf(stdClass::class, $a);
 
-        $b = new stdClass;
+        $b = new stdClass();
         $container->set('id', $b);
 
         $this->assertNotSame($a, $container->get('id'));
@@ -419,15 +417,19 @@ class TestClass
 {
     public static function createInstance(): stdClass
     {
-        return new stdClass;
+        return new stdClass();
     }
 }
 
-class NoConstructor {}
+class NoConstructor
+{
+}
 
 class NoParameters
 {
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 }
 
 class AutowiringA
@@ -437,7 +439,8 @@ class AutowiringA
         public AutowiringD $d,
         public int $int = 1,
         public string $string = 'a',
-    ) {}
+    ) {
+    }
 }
 
 class AutowiringB
@@ -448,7 +451,8 @@ class AutowiringB
         public AutowiringD $d,
         public int $int = 2,
         public string $string = 'b',
-    ) {}
+    ) {
+    }
 }
 
 class AutowiringC1
@@ -457,7 +461,8 @@ class AutowiringC1
         public AutowiringD $d,
         public int $int = 3,
         public string $string = 'c1',
-    ) {}
+    ) {
+    }
 }
 
 class AutowiringC2
@@ -465,7 +470,8 @@ class AutowiringC2
     public function __construct(
         public int $int = 3,
         public string $string = 'c2',
-    ) {}
+    ) {
+    }
 }
 
 class AutowiringD
@@ -473,27 +479,38 @@ class AutowiringD
     public function __construct(
         public int $int = 4,
         public string $string = 'd',
-    ) {}
+    ) {
+    }
 }
 
 class NoDefaults
 {
-    public function __construct(public int $a) {}
+    public function __construct(public int $a)
+    {
+    }
 }
 
 class CircularA
 {
-    public function __construct(protected CircularB $b) {}
+    public function __construct(protected CircularB $b)
+    {
+    }
 }
 
 class CircularB
 {
-    public function __construct(protected CircularC $c) {}
+    public function __construct(protected CircularC $c)
+    {
+    }
 }
 
 class CircularC
 {
-    public function __construct(protected CircularA $a) {}
+    public function __construct(protected CircularA $a)
+    {
+    }
 }
 
-abstract class AbstractClass {}
+abstract class AbstractClass
+{
+}

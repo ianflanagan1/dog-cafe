@@ -136,8 +136,7 @@ class RedisCacheTest extends TestCase
 
     public function test_set_accepts_stringable_object(): void
     {
-        $stringable = new class implements \Stringable
-        {
+        $stringable = new class () implements \Stringable {
             public function __toString(): string
             {
                 return 'stringable_value';
@@ -297,7 +296,7 @@ class RedisCacheTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Only scalar, Stringable, or null values are supported for Redis storage. Type: stdClass');
 
-        $values = ['key1' => 'valid', 'key2' => new \stdClass];
+        $values = ['key1' => 'valid', 'key2' => new \stdClass()];
         $this->cache->setMultiple($values);
     }
 
@@ -388,7 +387,7 @@ class RedisCacheTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Only scalar, Stringable, or null values are supported for Redis storage. Type: stdClass');
 
-        $this->cache->set('test_key', new \stdClass);
+        $this->cache->set('test_key', new \stdClass());
     }
 
     public function test_assert_redis_compatible_value_with_invalid_array(): void
