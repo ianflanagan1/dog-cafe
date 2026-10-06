@@ -11,11 +11,7 @@ NGINX_DOCKERFILE						:= $(DEPLOY_DIRECTORY)/nginx/Dockerfile
 NGINX_PROD_IMAGE						:= $(IMAGE_NAMESPACE)/dog-cafe-nginx-prod
 NGINX_DEV_IMAGE							:= $(IMAGE_NAMESPACE)/dog-cafe-nginx-dev
 
-COMPOSE_PROJECT							:= dog-cafe
-COMPOSE_PHP_CONTAINER 			:= $(COMPOSE_PROJECT)-php
-COMPOSE_NGINX_CONTAINER 		:= $(COMPOSE_PROJECT)-nginx
-COMPOSE_POSTGRES_CONTAINER 	:= $(COMPOSE_PROJECT)-postgres
-COMPOSE_REDIS_CONTAINER 		:= $(COMPOSE_PROJECT)-redis
+COMPOSE											:= docker compose -f ./compose.yaml --env-file ./$(PHP_DIRECTORY)/.env
 
 PHP_FPM_NGINX_USER					:= 65532
 
@@ -50,16 +46,16 @@ arg-check:
 ##### DOCKER COMPOSE #####
 
 up:
-	docker compose -f ./compose.yaml --env-file ./$(PHP_DIRECTORY)/.env up --build
+	$(COMPOSE) up --build
 
 up-detach:
-	docker compose -f ./compose.yaml --env-file ./$(PHP_DIRECTORY)/.env up --build --detach
+	$(COMPOSE) up --build --detach
 
 down:
-	docker compose -f ./compose.yaml down
+	$(COMPOSE) down
 
 down-delete:
-	docker compose -f ./compose.yaml down --volumes --remove-orphans
+	$(COMPOSE) down --volumes --remove-orphans
 
 prod-up:
 	docker compose -f ./compose.production.yaml --env-file ./$(PHP_DIRECTORY)/.env.production up --build
@@ -72,9 +68,9 @@ prod-down:
 
 # Example: make test tests/Unit/ContainerTest.php
 test:
-	docker exec -it \
+	$(COMPOSE) exec \
 		$(USER_STRING_PHP_FPM_NGINX) \
-		$(COMPOSE_PHP_CONTAINER) \
+		php \
 			php ./vendor/bin/phpunit --configuration phpunit.xml --testdox $(filter-out $@,$(MAKECMDGOALS))
 
 phpstan:
@@ -92,20 +88,20 @@ pint:
 
 # Example: make php-exec A="id"
 exec-php: arg-check
-	docker exec -it \
+	$(COMPOSE) exec \
 		$(USER_STRING_PHP_FPM_NGINX) \
-		$(COMPOSE_PHP_CONTAINER) \
+		php \
 			sh -c "umask 0002 && $(A)"
 
 shell-php: A=/bin/sh
 shell-php: exec-php
 
 define composer-cmd
-	docker exec -it \
+	$(COMPOSE) exec \
 		$(USER_STRING_PHP_FPM_NGINX) \
 		-e XDEBUG_MODE=off \
 		-e COMPOSER_CACHE_DIR=/tmp/composer-cache \
-		$(COMPOSE_PHP_CONTAINER) \
+		php \
 			sh -c "umask 0002 && /usr/bin/composer $(1) --no-interaction --no-progress"
 endef
 
@@ -126,9 +122,9 @@ composer-remove: arg-check
 ##### NGINX CONTAINER #####
 
 exec-nginx: arg-check
-	docker exec -it \
+	$(COMPOSE) exec \
 		$(USER_STRING_PHP_FPM_NGINX) \
-		$(COMPOSE_NGINX_CONTAINER) \
+		nginx \
 			sh -c "umask 0002 && $(A)"
 
 shell-nginx: A=/bin/sh
@@ -138,13 +134,13 @@ shell-nginx: exec-nginx
 ##### OTHER CONTAINERS #####
 
 define exec-cmd
-	docker exec -it $(USER_STRING_OTHER) $(1)
+	$(COMPOSE) exec $(USER_STRING_OTHER) $(1)
 endef
 
 exec-postgres: arg-check
-	$(call exec-cmd,$(COMPOSE_POSTGRES_CONTAINER) $(A))
+	$(call exec-cmd,postgres $(A))
 exec-redis: arg-check
-	$(call exec-cmd,$(COMPOSE_REDIS_CONTAINER) $(A))
+	$(call exec-cmd,redis $(A))
 
 shell-postgres: A=/bin/sh
 shell-postgres: exec-postgres
