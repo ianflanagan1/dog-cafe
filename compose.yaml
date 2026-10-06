@@ -62,7 +62,7 @@ services:
       - ./deploy/php/php.dev.ini:/usr/local/etc/php/conf.d/php.dev.ini:ro
       - ./deploy/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini:ro
       - ./deploy/php/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro
-      - shared-frontend:/app/storage/app/public/:rw
+      - shared-frontend:/app/storage/uploads/:rw
     networks:
       - public
       - private
