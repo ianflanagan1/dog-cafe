@@ -104,7 +104,10 @@ class View
 
     protected static function getAndCheckFilePath(string $type, string $name): string
     {
-        $filePath = VIEW_PATH . '/' . $type . '/' . $name . '.php';
+        // layouts/{name}.php, pages/{name}/{head|body}.php
+        $filePath = $type === 'layout'
+            ? VIEW_PATH . '/layouts/' . $name . '.php'
+            : VIEW_PATH . '/pages/' . $name . '/' . $type . '.php';
 
         if (!file_exists($filePath)) {
             throw new ViewNotFoundException();
