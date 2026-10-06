@@ -102,7 +102,8 @@ services:
       retries: 1
     command: ["postgres", "-c", "timezone=UTC"]
     volumes:
-      - ./app/database/initial.sql:/docker-entrypoint-initdb.d/initial.sql:ro
+      - ./app/database/01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./app/database/02-seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
       - postgres:/var/lib/postgresql/data:rw
     networks:
       - private
