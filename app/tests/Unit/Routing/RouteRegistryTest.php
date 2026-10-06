@@ -726,13 +726,19 @@ class RouteRegistryTest extends TestCase
 class SingleMethodWithMultipleMethodsController
 {
     #[Get('/abc')]
-    public function get(): void {}
+    public function get(): void
+    {
+    }
 
     #[Post('/abc')]
-    public function post(): void {}
+    public function post(): void
+    {
+    }
 
     #[Delete('/abc')]
-    public function delete(): void {}
+    public function delete(): void
+    {
+    }
 }
 
 class SegmentRouteMethodWithMultipleRoutesController
@@ -741,7 +747,9 @@ class SegmentRouteMethodWithMultipleRoutesController
     #[Get('/abc')]
     #[Get('/abc/def')]
     #[Get('/123/456/789')]
-    public function get(): void {}
+    public function get(): void
+    {
+    }
 }
 
 class ParameterRouteMethodWithMultipleRoutesController
@@ -750,11 +758,15 @@ class ParameterRouteMethodWithMultipleRoutesController
     #[Get('/abc/:para1')]
     #[Get('/:para1/def')]
     #[Get('/ghi/:para1/jkl')]
-    public function get(string $para1): void {}
+    public function get(string $para1): void
+    {
+    }
 }
 
 class LongRouteController
 {
     #[Get('/abc/def/ghi/jkl/mno/pqr/stu/vwx/:para1')]
-    public function get(string $para1): void {}
+    public function get(string $para1): void
+    {
+    }
 }

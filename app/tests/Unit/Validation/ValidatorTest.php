@@ -77,7 +77,7 @@ class ValidatorTest extends TestCase
         $inputs = ['a' => $input];
         $outputs = ['a' => $output];
 
-        $validated = (new Validator)->handle($inputs, $expectedInputs);
+        $validated = (new Validator())->handle($inputs, $expectedInputs);
 
         $this->assertSame($outputs, $validated);
     }
@@ -144,7 +144,7 @@ class ValidatorTest extends TestCase
         $inputs = ['a' => $input];
         $outputs = ['a' => $output];
 
-        $validated = (new Validator)->handle($inputs, $expectedInputs);
+        $validated = (new Validator())->handle($inputs, $expectedInputs);
 
         $this->assertSame($outputs, $validated);
     }
@@ -212,7 +212,7 @@ class ValidatorTest extends TestCase
         $inputs = ['a' => $input];
         $outputs = ['a' => $output];
 
-        $validated = (new Validator)->handle($inputs, $expectedInputs);
+        $validated = (new Validator())->handle($inputs, $expectedInputs);
 
         $this->assertEquals($outputs, $validated);
     }
@@ -226,7 +226,7 @@ class ValidatorTest extends TestCase
         $inputs = ['a' => 'abc'];
         $outputs = ['a' => 'abc'];
 
-        $validated = (new Validator)->handle($inputs, $expectedInputs);
+        $validated = (new Validator())->handle($inputs, $expectedInputs);
 
         $this->assertSame($outputs, $validated);
     }
@@ -243,7 +243,7 @@ class ValidatorTest extends TestCase
 
         $this->expectException(InputValidationException::class);
 
-        $validated = (new Validator)->handle($inputs, $expectedInputs);
+        $validated = (new Validator())->handle($inputs, $expectedInputs);
     }
 }
 
@@ -256,7 +256,9 @@ enum CallbackEnum: string
 
 class CallbackClass
 {
-    public function __construct(public int $property) {}
+    public function __construct(public int $property)
+    {
+    }
 
     public static function fromString(string $input): self
     {

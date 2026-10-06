@@ -28,7 +28,8 @@ final class DatabaseTest extends TestCase
         $this->pdoMock = $this->createMock(PDO::class);
         $this->statementMock = $this->createMock(PDOStatement::class);
 
-        $this->database = new Database([
+        $this->database = new Database(
+            [
             'driver' => 'sqlite',
             'host' => 'localhost',
             'port' => 0,
