@@ -102,7 +102,7 @@ services:
     entrypoint: ["/usr/local/bin/docker-entrypoint.sh"]
     command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--requirepass", "${REDIS_PASSWORD}"]
     volumes:
-      - ./../config/prod/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - ./config/prod/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
       - redis-data:/data:rw
     networks:
       - private
