@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Validation\Rules\Venue;
 
-use App\DTOs\Error;
-use App\Enums\ErrorCode;
+use App\Framework\Errors\Error;
+use App\Framework\Errors\ErrorCode;
 use App\Validation\Rules\Venue\MightBeExtIdRule;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

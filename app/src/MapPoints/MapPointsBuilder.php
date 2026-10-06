@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\MapPoints;
 
+use App\Framework\Support\Geo;
+use App\Framework\Support\StandardTypes;
 use App\Models\Venue;
-use App\Types\StandardTypes;
-use App\Utils\Geo;
 
 /**
  * A class to build map points from database data.

@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Framework\Database\GenericRepository;
+use App\Framework\Support\StandardTypes;
 use App\Models\Town;
-use App\Types\StandardTypes;
 use Psr\SimpleCache\CacheInterface;
 use RuntimeException;
 

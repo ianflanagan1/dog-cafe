@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Framework\Session\Auth;
+use App\Framework\Support\Log;
 use App\Repositories\AppUserRepository;
-use App\Session\Auth;
-use App\Utils\Log;
 
 /**
  * Service responsible for handling self-service user account deletion and anonymisation.

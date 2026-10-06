@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Validation\Rules\Venue;
 
-use App\DTOs\Error;
-use App\Enums\ErrorCode;
+use App\Framework\Errors\Error;
+use App\Framework\Errors\ErrorCode;
+use App\Framework\Support\StandardTypes;
+use App\Framework\Validation\Rules\RuleInterface;
 use App\Models\Venue;
-use App\Types\StandardTypes;
-use App\Validation\Rules\RuleInterface;
 use InvalidArgumentException;
 
 /**

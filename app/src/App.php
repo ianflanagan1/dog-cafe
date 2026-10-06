@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App;
 
-use App\Http\Request;
-use App\Routing\Router;
+use App\Framework\Http\Request;
+use App\Framework\Routing\Router;
 
 readonly class App
 {

@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Enums\Locality;
-use App\Exceptions\NotFoundException;
-use App\Exceptions\RouteNotFoundException;
-use App\Http\Attributes\Get;
-use App\Http\DTOs\ViewParameters;
+use App\Framework\Errors\NotFoundException;
+use App\Framework\Http\Controller;
+use App\Framework\Http\Response\Response;
+use App\Framework\Routing\Attributes\Get;
+use App\Framework\Routing\RouteNotFoundException;
+use App\Framework\Session\Auth;
+use App\Framework\View\ViewParameters;
 use App\Http\FormRequests\VenueShortRequest;
-use App\Http\Response\Response;
-use App\Hydrators\VenueHydrator;
 use App\Models\Venue;
+use App\Repositories\VenueHydrator;
 use App\Repositories\VenueRepository;
-use App\Session\Auth;
 use App\Session\FavouriteSessionStore;
 
 /**

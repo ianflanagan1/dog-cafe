@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Environment\Server;
+use App\Framework\Http\Server;
+use App\Framework\Session\Auth;
+use App\Framework\Session\Session;
+use App\Framework\Support\Curl;
+use App\Framework\Support\Log;
+use App\Framework\Support\StandardTypes;
 use App\Repositories\AppUserRepository;
-use App\Session\Auth;
 use App\Session\FavouriteSessionStore;
-use App\Session\Session;
-use App\Types\StandardTypes;
-use App\Utils\Curl;
-use App\Utils\Log;
 use Google\Client;
 use Google\Service\Oauth2;
 

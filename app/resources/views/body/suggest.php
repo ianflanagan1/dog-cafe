@@ -1,7 +1,7 @@
 <?php
 
-use App\DTOs\Error;
-use App\Http\Helpers\HtmlEscaper;
+use App\Framework\Errors\Error;
+use App\Framework\View\HtmlEscaper;
 
 /**
  * @var array{

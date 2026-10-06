@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Enums\VenueType;
-use App\Exceptions\NotFoundException;
-use App\Http\Attributes\Get;
+use App\Framework\Errors\NotFoundException;
+use App\Framework\Http\Controller;
+use App\Framework\Http\Response\Response;
+use App\Framework\Routing\Attributes\Get;
+use App\Framework\View\ViewParameters;
 use App\Http\DTOs\ListPageUrls;
-use App\Http\DTOs\ViewParameters;
 use App\Http\FormRequests\ListRequest;
-use App\Http\Response\Response;
 use App\Models\Venue;
 use App\Repositories\TownRepository;
-use App\Resolvers\TownResolver;
 use App\Services\ListVenuePageService;
+use App\Services\TownResolver;
 
 /**
  * @phpstan-import-type ListValidated from ListRequest

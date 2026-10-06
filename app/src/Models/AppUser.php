@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Types\StandardTypes;
+use App\Framework\Database\Model;
+use App\Framework\Support\StandardTypes;
 
 /**
  * @phpstan-import-type PosInt from StandardTypes

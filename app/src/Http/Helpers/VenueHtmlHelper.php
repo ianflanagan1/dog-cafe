@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Helpers;
 
 use App\Enums\VenueType;
+use App\Framework\View\HtmlEscaper;
 use App\Models\Venue;
 
 /**

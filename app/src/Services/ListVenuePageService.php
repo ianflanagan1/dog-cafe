@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Database\SqlWhere;
 use App\Enums\Locality;
 use App\Enums\VenueOrderBy;
 use App\Enums\VenueType;
-use App\Hydrators\VenueHydrator;
+use App\Framework\Database\GenericRepository;
+use App\Framework\Database\SqlWhere;
+use App\Framework\Support\StandardTypes;
 use App\Models\Venue;
-use App\Repositories\GenericRepository;
+use App\Repositories\VenueHydrator;
 use App\Repositories\VenueRepository;
-use App\Types\StandardTypes;
 use Psr\SimpleCache\CacheInterface;
 
 /**

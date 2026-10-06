@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Attributes\Get;
+use App\Framework\Http\Controller;
+use App\Framework\Http\Response\Response;
+use App\Framework\Routing\Attributes\Get;
 use App\Http\FormRequests\SearchTownRequest;
-use App\Http\Response\Response;
 use App\Services\TownSearchService;
 
 /**

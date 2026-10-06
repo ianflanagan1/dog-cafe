@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Container;
+use App\Framework\Container\Container;
 
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../config/pathConstants.php';
