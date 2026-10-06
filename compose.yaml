@@ -26,7 +26,7 @@ services:
     hostname: dog-cafe-nginx
     build:
       context: ./
-      dockerfile: ./docker/nginx.Dockerfile
+      dockerfile: ./deploy/nginx/Dockerfile
       target: dev
     user: 65532:65532
     depends_on:
@@ -35,8 +35,8 @@ services:
       php:
         condition: service_started
     volumes:
-      - ./config/prod/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./config/dev/nginx/nginx-dev-override.conf:/etc/nginx/conf.d/nginx-dev-override.conf:ro
+      - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./deploy/nginx/nginx.dev.conf:/etc/nginx/conf.d/nginx.dev.conf:ro
       - ./static/:/static/:rw
       - shared-frontend:/static/sh/:rw
     networks:
@@ -51,17 +51,17 @@ services:
     # image: ianflanagan1/dog-cafe-php-prod
     build:
       context: ./app/
-      dockerfile: ./../docker/php.Dockerfile
+      dockerfile: ./../deploy/php/Dockerfile
       target: dev
     user: 65532:65532
     working_dir: /app/
     env_file: ./app/.env
     volumes:
       - ./app/:/app/
-      - ./config/prod/php/php.ini:/usr/local/etc/php/php.ini:ro
-      - ./config/dev/php/php-dev-override.ini:/usr/local/etc/php/conf.d/php-dev-override.ini:ro
-      - ./config/dev/xdebug/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini:ro
-      - ./config/prod/php-fpm/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro
+      - ./deploy/php/php.ini:/usr/local/etc/php/php.ini:ro
+      - ./deploy/php/php.dev.ini:/usr/local/etc/php/conf.d/php.dev.ini:ro
+      - ./deploy/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini:ro
+      - ./deploy/php/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro
       - shared-frontend:/app/storage/app/public/:rw
     networks:
       - public
@@ -82,7 +82,7 @@ services:
     entrypoint: ["/usr/local/bin/docker-entrypoint.sh"]
     command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--requirepass", "${REDIS_PASSWORD}"]
     volumes:
-      - ./config/prod/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - ./deploy/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
       - redis-data:/data:rw
     networks:
       - private

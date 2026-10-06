@@ -1,13 +1,13 @@
 PHP_DIRECTORY 							:= app
-DOCKER_DIRECTORY						:= docker
+DEPLOY_DIRECTORY						:= deploy
 
 IMAGE_NAMESPACE 						:= ianflanagan1
 
-PHP_DOCKERFILE							:= $(DOCKER_DIRECTORY)/php.Dockerfile
+PHP_DOCKERFILE							:= $(DEPLOY_DIRECTORY)/php/Dockerfile
 PHP_PROD_IMAGE 							:= $(IMAGE_NAMESPACE)/dog-cafe-php-prod
 PHP_DEV_IMAGE 							:= $(IMAGE_NAMESPACE)/dog-cafe-php-dev
 
-NGINX_DOCKERFILE						:= $(DOCKER_DIRECTORY)/nginx.Dockerfile
+NGINX_DOCKERFILE						:= $(DEPLOY_DIRECTORY)/nginx/Dockerfile
 NGINX_PROD_IMAGE						:= $(IMAGE_NAMESPACE)/dog-cafe-nginx-prod
 NGINX_DEV_IMAGE							:= $(IMAGE_NAMESPACE)/dog-cafe-nginx-dev
 
