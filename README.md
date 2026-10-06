@@ -55,3 +55,38 @@ make phpstan
 ```
 make test
 ```
+## Project Structure
+
+```
+app/            PHP application (Docker build context for the PHP image)
+  src/
+    Framework/  Hand-built framework: container, routing, HTTP, views, validation, sessions, database
+    ...         Dog Cafe domain: controllers, models, repositories, services
+  config/       Application config (routes, container bindings)
+  database/     01-schema.sql (tables), 02-seed.sql (dev data); run in order on first Postgres start
+  resources/views/
+    layouts/    Page layouts
+    pages/      One folder per page: head.php, body.php
+  public/       PHP entry point
+  storage/      Logs and user uploads
+static/         CSS, JS and images, served directly by nginx
+deploy/         Dockerfiles and runtime config, one folder per tool
+                (base config plus *.dev.* overrides for local development)
+```
+
+## Production
+
+`compose.production.yaml` expects these git-ignored files:
+
+```
+app/.env.production
+production/
+  postgres/initial.sql      Production schema and data
+  cache/                    Pre-built map cache, mounted at app/shared-backend/cache
+  venue-images/small/       Venue images served by nginx
+  venue-images/mid/
+```
+
+```
+make prod-up
+```
