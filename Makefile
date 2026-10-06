@@ -85,7 +85,7 @@ pint:
 	cd $(PHP_DIRECTORY) && \
   	php ./vendor/bin/pint -v --config=pint.json
 	cd $(PHP_DIRECTORY) && \
-  	php ./vendor/bin/pint -v --config=pint-tests.json tests/
+  	php ./vendor/bin/pint -v --config=pint-test.json tests/
 
 
 ##### PHP CONTAINER #####
