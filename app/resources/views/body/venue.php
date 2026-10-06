@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Helpers\HtmlEscaper;
+use App\Framework\View\HtmlEscaper;
 use App\Http\Helpers\VenueHtmlHelper;
 
 /**

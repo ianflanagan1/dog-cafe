@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Database\Database;
-use App\Types\StandardTypes;
+use App\Framework\Database\Database;
+use App\Framework\Support\StandardTypes;
 
 /**
  * @phpstan-import-type PosInt from StandardTypes

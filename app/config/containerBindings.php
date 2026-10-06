@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-use App\Config;
-use App\Database\Database;
-use App\Interfaces\SessionInterface;
+use App\Framework\Cache\RedisCache;
+use App\Framework\Config\Config;
+use App\Framework\Database\Database;
+use App\Framework\Routing\RouteRegistry;
+use App\Framework\Session\Auth;
+use App\Framework\Session\Session;
+use App\Framework\Session\SessionInterface;
 use App\MapPoints\MapPointsService;
-use App\RedisCache;
 use App\Repositories\AppUserRepository;
 use App\Repositories\VenueRepository;
-use App\Routing\RouteRegistry;
 use App\Services\AppUserPictureService;
 use App\Services\LoginService;
-use App\Session\Auth;
 use App\Session\FavouriteSessionStore;
-use App\Session\Session;
 use Psr\SimpleCache\CacheInterface;
 
 return [

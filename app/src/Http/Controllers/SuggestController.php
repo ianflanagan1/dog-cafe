@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\DTOs\Error;
-use App\Exceptions\InputValidationException;
-use App\Http\Attributes\Get;
-use App\Http\Attributes\Post;
-use App\Http\DTOs\ViewParameters;
+use App\Framework\Errors\Error;
+use App\Framework\Http\Controller;
+use App\Framework\Http\Response\Response;
+use App\Framework\Routing\Attributes\Get;
+use App\Framework\Routing\Attributes\Post;
+use App\Framework\Session\FormTokenHandler;
+use App\Framework\Support\StandardTypes;
+use App\Framework\Validation\InputValidationException;
+use App\Framework\View\ViewParameters;
 use App\Http\FormRequests\SuggestRequest;
-use App\Http\Response\Response;
 use App\Repositories\SuggestRepository;
-use App\Session\FormTokenHandler;
-use App\Types\StandardTypes;
 
 /**
  * @phpstan-import-type Inputs from StandardTypes

@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Database\Database;
-use App\Database\SqlWhere;
+use App\Framework\Database\Database;
+use App\Framework\Database\GenericRepository;
+use App\Framework\Database\SqlWhere;
+use App\Framework\Support\StandardTypes;
 use App\Models\AppUser;
-use App\Types\StandardTypes;
 
 /**
  * @phpstan-import-type PosInt from StandardTypes

@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Enums\VenueType;
-use App\Http\Attributes\Get;
-use App\Http\DTOs\ViewParameters;
+use App\Framework\Http\Controller;
+use App\Framework\Http\Response\Response;
+use App\Framework\Routing\Attributes\Get;
+use App\Framework\View\ViewParameters;
 use App\Http\FormRequests\MapRequest;
 use App\Http\FormRequests\SearchMapRequest;
-use App\Http\Response\Response;
 use App\MapPoints\MapPointsService;
-use App\Resolvers\TownResolver;
+use App\Services\TownResolver;
 
 /**
  * @phpstan-import-type MapValidated from MapRequest

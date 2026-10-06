@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Framework\Support\File;
+use App\Framework\Support\Image;
+use App\Framework\Support\StandardTypes;
 use App\Repositories\AppUserRepository;
-use App\Types\StandardTypes;
-use App\Utils\File;
-use App\Utils\Image;
 
 /**
  * @phpstan-import-type PosInt from StandardTypes

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\VenueType;
-use App\Types\StandardTypes;
+use App\Framework\Support\StandardTypes;
 
 /**
  * Constructs canonical and paginated venue list URLs with appropriate query string parameters.

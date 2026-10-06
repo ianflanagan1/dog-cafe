@@ -6,8 +6,9 @@ namespace App\Http\FormRequests;
 
 use App\Enums\VenueOrderBy;
 use App\Enums\VenueType;
-use App\Types\StandardTypes;
-use App\Validation\Filters\IsPresent;
+use App\Framework\Http\FormRequest;
+use App\Framework\Support\StandardTypes;
+use App\Framework\Validation\Filters\IsPresent;
 
 /**
  * @phpstan-import-type PosInt from StandardTypes

@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Http\FormRequests;
 
 use App\Enums\VenueType;
-use App\Types\StandardTypes;
-use App\Validation\Filters\IsPresent;
+use App\Framework\Http\FormRequest;
+use App\Framework\Support\StandardTypes;
+use App\Framework\Validation\Filters\IsPresent;
 
 /**
  * @phpstan-import-type MapZoom from StandardTypes

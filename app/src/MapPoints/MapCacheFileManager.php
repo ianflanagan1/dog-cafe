@@ -6,7 +6,7 @@ namespace App\MapPoints;
 
 use App\Enums\Locality;
 use App\Enums\VenueType;
-use App\Types\StandardTypes;
+use App\Framework\Support\StandardTypes;
 use RuntimeException;
 
 /**

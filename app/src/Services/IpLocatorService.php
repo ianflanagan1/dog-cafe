@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Http\Request;
-use App\Utils\Curl;
-use App\Utils\Log;
+use App\Framework\Http\Request;
+use App\Framework\Support\Curl;
+use App\Framework\Support\Log;
 
 /**
  * @phpstan-type IpLocation array{

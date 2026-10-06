@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Attributes\Delete;
-use App\Http\Attributes\Get;
-use App\Http\Attributes\Post;
-use App\Http\DTOs\ViewParameters;
-use App\Http\Request;
-use App\Http\Response\Response;
+use App\Framework\Http\Controller;
+use App\Framework\Http\Request;
+use App\Framework\Http\Response\Response;
+use App\Framework\Routing\Attributes\Delete;
+use App\Framework\Routing\Attributes\Get;
+use App\Framework\Routing\Attributes\Post;
+use App\Framework\Session\Auth;
+use App\Framework\Session\FormTokenHandler;
+use App\Framework\View\ViewParameters;
 use App\Services\AppUserDeletionService;
-use App\Session\Auth;
-use App\Session\FormTokenHandler;
 
 readonly class AccountManagementController extends Controller
 {

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Http\DTOs;
 
 use App\Enums\VenueType;
-use App\Exceptions\RouteNotFoundException;
+use App\Framework\Routing\RouteNotFoundException;
+use App\Framework\Support\StandardTypes;
 use App\Services\VenueRouteBuilderService;
-use App\Types\StandardTypes;
 
 /**
  * @phpstan-import-type PosInt from StandardTypes

@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Helpers\HtmlEscaper;
+use App\Framework\View\HtmlEscaper;
 
 /**
  * @var array{

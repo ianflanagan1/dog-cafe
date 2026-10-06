@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Session;
 
+use App\Framework\Session\Auth;
+use App\Framework\Session\Session;
+use App\Framework\Support\StandardTypes;
 use App\Repositories\FavouriteRepository;
-use App\Types\StandardTypes;
 
 /**
  * @phpstan-import-type PosInt from StandardTypes

@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Http\FormRequests;
 
 use App\Enums\VenueType;
-use App\Validation\Filters\IsPresent;
+use App\Framework\Http\FormRequest;
+use App\Framework\Validation\Filters\IsPresent;
 
 /**
  * @phpstan-type MapValidated array{
