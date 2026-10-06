@@ -14,7 +14,7 @@ use App\Repositories\AppUserRepository;
  */
 class AppUserPictureService
 {
-    protected const string PATH = SHARED_FRONTEND_PATH . '/user';
+    protected const string PATH = UPLOADS_PATH . '/user';
 
     public function __construct(
         protected AppUserRepository $appUserRepository,

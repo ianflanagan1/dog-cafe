@@ -80,7 +80,7 @@ services:
       # - ./app/:/app/
       - ./deploy/php/php.ini:/usr/local/etc/php/php.ini:ro
       - ./deploy/php/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro
-      - shared-frontend:/app/storage/app/public/:rw
+      - shared-frontend:/app/storage/uploads/:rw
 
       - ./production/cache/:/app/shared-backend/cache/:ro
     networks:
