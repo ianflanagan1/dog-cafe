@@ -11,7 +11,7 @@
 
 ## Authorised redirect URIs
 
-The app builds each redirect URI from the request's scheme and host plus the route path, so every origin that serves the app needs its own registered URI.
+The app builds each redirect URI from `APP_URL` (app/.env) plus the route path, so every origin that serves the app needs its own registered URI matching its `APP_URL`.
 
 - COUPLED:oauth-redirect-paths. path = app:LoginController::REDIRECT_ROUTE_GOOGLE (`/redirect-google-login`)
 - COUPLED:public-domain. production host = caddy:site address (`dogcafeuk.com`)

@@ -5,6 +5,8 @@ declare(strict_types=1);
 return [
     'app' => [
         'app_env'   => trim(getenv('APP_ENV') ?: 'production'),
+        // COUPLED:public-domain. default = caddy:site address
+        'url'       => rtrim(trim(getenv('APP_URL') ?: 'https://dogcafeuk.com'), '/'),
     ],
     'dbCore' => [
         'driver'    => trim(getenv('DB_CORE_DRIVER') ?: 'pgsql'),

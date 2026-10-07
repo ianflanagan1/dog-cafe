@@ -80,7 +80,7 @@ deploy/         Dockerfiles and runtime config, one folder per tool
 `compose.production.yaml` expects these git-ignored files:
 
 ```
-app/.env.production
+app/.env.production         Set APP_URL=https://dogcafeuk.com
 production/
   postgres/initial.sql      Production schema and data
   cache/                    Pre-built map cache, mounted at app/shared-backend/cache

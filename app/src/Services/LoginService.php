@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Framework\Http\Server;
 use App\Framework\Session\Auth;
 use App\Framework\Session\Session;
 use App\Framework\Support\Curl;
@@ -31,7 +30,13 @@ class LoginService
      *      googleClientSecret: non-empty-string,
      *      discordClientId: non-empty-string,
      *      discordClientSecret: non-empty-string,
-     * } $config,
+     * } $config
+     * @param AppUserRepository $appUserRepository
+     * @param Session $session
+     * @param FavouriteSessionStore $favouriteSessionStore
+     * @param AppUserPictureService $appUserPictureService
+     * @param Auth $auth
+     * @param non-empty-string $appUrl Base URL without trailing slash, e.g. `https://example.com`
      */
     public function __construct(
         protected array $config,
@@ -40,6 +45,7 @@ class LoginService
         protected FavouriteSessionStore $favouriteSessionStore,
         protected AppUserPictureService $appUserPictureService,
         protected Auth $auth,
+        protected string $appUrl,
     ) {
     }
 
@@ -51,7 +57,7 @@ class LoginService
      */
     public function getLoginUrlGoogle(string $route): string
     {
-        $redirectUrl = Server::getSchemeAndHost() . $route;
+        $redirectUrl = $this->appUrl . $route;
 
         return 'https://accounts.google.com/o/oauth2/v2/auth?response_type=code&access_type=online&client_id=' . $this->config['googleClientId'] . '&redirect_uri=' . urlencode($redirectUrl) . '&state&scope=email%20profile&approval_prompt=auto';
 
@@ -66,7 +72,7 @@ class LoginService
      */
     public function getLoginUrlDiscord(string $route): string
     {
-        $redirectUrl = Server::getSchemeAndHost() . $route;
+        $redirectUrl = $this->appUrl . $route;
 
         return 'https://discord.com/oauth2/authorize?client_id=' . $this->config['discordClientId'] . '&response_type=code&redirect_uri=' . urlencode($redirectUrl) . '&scope=identify+email';
 
@@ -86,7 +92,7 @@ class LoginService
 
         /** @phpstan-var string $code */
 
-        $redirectUrl = Server::getSchemeAndHost() . $route;
+        $redirectUrl = $this->appUrl . $route;
 
         $clientGoogle = new Client();
         $clientGoogle->setClientId($this->config['googleClientId']);
@@ -151,7 +157,7 @@ class LoginService
 
         /** @phpstan-var string $code */
 
-        $redirectUrl = Server::getSchemeAndHost() . $route;
+        $redirectUrl = $this->appUrl . $route;
 
         $result = Curl::arrayResponse(
             self::DISCORD_TOKEN_URL,
