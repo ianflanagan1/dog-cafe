@@ -1,3 +1,4 @@
+# COUPLED:php-version. = docker:minimal-base FROM tag; must satisfy composer.json:require.php (^8.4)
 FROM php:8.4-fpm-bookworm AS builder
 
 RUN mkdir -p \
@@ -49,7 +50,7 @@ FROM builder AS dev
 RUN pecl install xdebug \
     && docker-php-ext-enable xdebug
 
-# Output directory for Xdebug cachegrind files
+# Output directory for Xdebug cachegrind files. COUPLED:xdebug-output-dir. = xdebug.ini xdebug.output_dir
 RUN mkdir /tmp/profiles \
     && chown -R www-data:www-data /tmp/profiles
 
@@ -97,6 +98,7 @@ RUN find vendor/ \
         \) -delete
 
 
+# COUPLED:php-version. = docker:builder FROM tag; must satisfy composer.json:require.php (^8.4)
 FROM php:8.4-fpm-bookworm AS minimal-base
 
 ENV HOME=/app \
@@ -153,7 +155,7 @@ FROM minimal-base AS minimal-dev
 RUN pecl install xdebug \
     && docker-php-ext-enable xdebug
 
-# Output directory for Xdebug cachegrind files
+# Output directory for Xdebug cachegrind files. COUPLED:xdebug-output-dir. = xdebug.ini xdebug.output_dir
 RUN mkdir /tmp/profiles \
     && chown -R www-data:www-data /tmp/profiles
 
