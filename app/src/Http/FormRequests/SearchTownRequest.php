@@ -11,7 +11,7 @@ use App\Framework\Http\FormRequest;
  *      search: string,
  * }
  */
-class SearchTownRequest extends FormRequest
+readonly class SearchTownRequest extends FormRequest
 {
     protected const array EXPECTED_INPUTS = [
         'search' => [

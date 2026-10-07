@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Framework\Routing;
 
 use App\Framework\Http\HttpMethod;
+use App\Framework\Http\Request;
 use App\Framework\Routing\Attributes\Route;
 use App\Framework\Support\StandardTypes;
 use Psr\SimpleCache\CacheInterface;
@@ -96,14 +97,13 @@ class RouteRegistry
     }
 
     /**
-     * @param non-empty-string $requestUri
-     * @param HttpMethod $httpMethod
+     * @param Request $request
      * @return Actionable
+     * @throws RouteNotFoundException
      */
-    public function resolve(string $requestUri, HttpMethod $httpMethod): array
+    public function resolve(Request $request): array
     {
-        $route = explode('?', $requestUri)[0];
-        $segments = explode('/', $route);
+        $segments = explode('/', $request->path());
 
         if ($segments[0] !== '') {
             throw new RouteNotFoundException();
@@ -120,7 +120,7 @@ class RouteRegistry
         $actionIndex = $this->resolveRecursive(
             $segments,
             $this->routes,
-            $httpMethod,
+            $request->method,
             $parameters
         );
 
@@ -204,6 +204,7 @@ class RouteRegistry
      * @param NonNegInt $actionIndex
      * @param RouteSegment|RouteParameter $routes
      * @return void
+     * @throws RouteNotValidException
      */
     protected function registerRoute(string $route, HttpMethod $httpMethod, int $actionIndex, array &$routes): void
     {
@@ -274,6 +275,7 @@ class RouteRegistry
      * @param NonNegInt $actionIndex
      * @param RouteSegment|RouteParameter $routes
      * @return void
+     * @throws RouteConflictException
      */
     protected static function registerParameter(array $segments, HttpMethod $httpMethod, int $actionIndex, array &$routes): void
     {
@@ -325,6 +327,7 @@ class RouteRegistry
      * @param NonNegInt $actionIndex
      * @param RouteSegment|RouteParameter $routes
      * @return void
+     * @throws RouteConflictException
      */
     protected static function registerSegment(array $segments, HttpMethod $httpMethod, int $actionIndex, array &$routes): void
     {

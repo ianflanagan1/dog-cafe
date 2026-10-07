@@ -28,8 +28,13 @@ readonly class TownResolver
      * 2. The last town specified by the user (in List or Map views)
      * 3. The town closest to the user's IP address (UK only)
      * 4. The default town (London)
+     *
+     * @param string $townStr Town name from the request URL, or empty if none
+     * @param ?non-empty-string $ip Client IP address, used for step 3
+     * @return Town
+     * @throws RouteNotFoundException If $townStr is not empty and matches no town
      */
-    public function resolve(string $townStr): Town
+    public function resolve(string $townStr, ?string $ip): Town
     {
         // If a town was specified in the request, return it
         if (!empty($townStr)) {
@@ -59,7 +64,7 @@ readonly class TownResolver
         }
 
         // Otherwise, for UK users, try to get IP address and return closest town
-        $location = IpLocatorService::find();
+        $location = $ip !== null ? IpLocatorService::find($ip) : null;
 
         if ($location !== null && IpLocatorService::isInServedArea($location['countryCode'])) {
             $town = $this->townGeoService->getClosestTown($location['lat'], $location['lng']);

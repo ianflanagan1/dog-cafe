@@ -11,7 +11,7 @@ use App\Framework\Http\FormRequest;
  *      ext_id: non-empty-string,
  * }
  */
-class VenueShortRequest extends FormRequest
+readonly class VenueShortRequest extends FormRequest
 {
     protected const array EXPECTED_INPUTS = [
         'ext_id' => [

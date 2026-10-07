@@ -17,16 +17,16 @@ use Throwable;
 
 class RouteExceptionHandler
 {
-    public static function handle(Throwable $e): ViewParameters|string
+    public static function handle(Throwable $e, Request $request): ViewParameters|string
     {
         if ($e instanceof RouteNotFoundException || $e instanceof NotFoundException) {
-            return Request::wantsJson()
+            return $request->wantsJson()
                 ? Response::jsonError(ErrorCode::ItemNotFound, 404)
                 : Response::htmlError(404);
         }
 
         if ($e instanceof UnauthenticatedException) {
-            if (Request::wantsJson()) {
+            if ($request->wantsJson()) {
                 return Response::jsonError(ErrorCode::NotLoggedIn, 401);
             }
 
@@ -38,7 +38,7 @@ class RouteExceptionHandler
         }
 
         if ($e instanceof InputValidationException) {
-            return Request::wantsJson()
+            return $request->wantsJson()
                 ? Response::jsonErrors($e->getErrors(), 422)
                 : Response::htmlError(422);
         }
@@ -46,7 +46,7 @@ class RouteExceptionHandler
         if ($e instanceof SystemException) {
             Log::exception($e);
 
-            return Request::wantsJson()
+            return $request->wantsJson()
                 ? Response::jsonError(ErrorCode::SystemError, 500)
                 : Response::htmlError(500);
         }
@@ -54,7 +54,7 @@ class RouteExceptionHandler
         // Fallback: unhandled exception
         Log::exception($e);
 
-        return Request::wantsJson()
+        return $request->wantsJson()
             ? Response::jsonError(ErrorCode::SystemError, 500)
             : Response::htmlError(500);
     }

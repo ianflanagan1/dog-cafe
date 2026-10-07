@@ -19,10 +19,10 @@ readonly class TownController extends Controller
     /**
      * Return a list of towns matching a text search query.
      */
-    public function searchTown(TownSearchService $townSearchService): string
+    public function searchTown(SearchTownRequest $request, TownSearchService $townSearchService): string
     {
         /** @var SearchTownValidated $validated */
-        $validated = SearchTownRequest::validate();
+        $validated = $request->validate();
 
         return Response::json([
             'results' => $townSearchService->search($validated['search']),

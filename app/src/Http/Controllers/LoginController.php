@@ -26,10 +26,10 @@ readonly class LoginController extends Controller
     /**
      * Render login page.
      */
-    public function login(LoginService $loginService): ViewParameters
+    public function login(LoginRequest $request, LoginService $loginService): ViewParameters
     {
         /** @var LoginValidated $validated */
-        $validated = LoginRequest::validate();
+        $validated = $request->validate();
 
         // Store the route to return to after successful login
         $loginService->storePreLoginLocation($validated['location']);
@@ -57,10 +57,10 @@ readonly class LoginController extends Controller
     /**
      * Handle to callback from Google OAuth.
      */
-    public function redirectGoogleLogin(LoginService $loginService): void
+    public function redirectGoogleLogin(LoginRedirectRequest $request, LoginService $loginService): void
     {
         /** @var LoginRedirectValidated $validated */
-        $validated = LoginRedirectRequest::validate();
+        $validated = $request->validate();
 
         $loginService->processLoginGoogle($validated['code'], self::REDIRECT_ROUTE_GOOGLE);
         Response::redirect($loginService->getPreLoginLocation(), 303);
@@ -70,10 +70,10 @@ readonly class LoginController extends Controller
     /**
      * Handle to callback from Discord OAuth.
      */
-    public function redirectDiscordLogin(LoginService $loginService): void
+    public function redirectDiscordLogin(LoginRedirectRequest $request, LoginService $loginService): void
     {
         /** @var LoginRedirectValidated $validated */
-        $validated = LoginRedirectRequest::validate();
+        $validated = $request->validate();
 
         $loginService->processLoginDiscord($validated['code'], self::REDIRECT_ROUTE_DISCORD);
         Response::redirect($loginService->getPreLoginLocation(), 303);

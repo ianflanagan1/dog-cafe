@@ -48,11 +48,11 @@ readonly class AccountManagementController extends Controller
     }
 
     #[Post('/logout')]
-    public function logout(Auth $auth, FormTokenHandler $formTokenHandler): void
+    public function logout(Request $request, Auth $auth, FormTokenHandler $formTokenHandler): void
     {
         $auth->guard(true);
 
-        if (!$formTokenHandler->isValidToken(self::LOGOUT_KEY, Request::getFormToken('logout_form_token'))) {
+        if (!$formTokenHandler->isValidToken(self::LOGOUT_KEY, $request->formToken('logout_form_token'))) {
             Response::htmlError(403);
         }
 
@@ -63,13 +63,14 @@ readonly class AccountManagementController extends Controller
 
     #[Delete('/account')]
     public function deleteAccount(
+        Request $request,
         Auth $auth,
         FormTokenHandler $formTokenHandler,
         AppUserDeletionService $appUserDeletionService
     ): string {
         $auth->guard(true);
 
-        if (!$formTokenHandler->isValidToken(self::DELETE_KEY, Request::getFormToken('delete_form_token'))) {
+        if (!$formTokenHandler->isValidToken(self::DELETE_KEY, $request->formToken('delete_form_token'))) {
             Response::htmlError(403);
         }
 

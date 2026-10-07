@@ -11,7 +11,7 @@ use App\Framework\Http\FormRequest;
  *      ext_id: non-empty-string,
  * }
  */
-class FavRequest extends FormRequest
+readonly class FavRequest extends FormRequest
 {
     protected const array EXPECTED_INPUTS = [
         'ext_id' => [

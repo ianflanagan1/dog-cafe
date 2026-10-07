@@ -28,10 +28,10 @@ readonly class VenueController extends Controller
     /**
      * Return the minimal details of a venue, when the user selects a Venue on the map.
      */
-    public function venueMinimal(VenueRepository $venueRepository): string
+    public function venueMinimal(VenueShortRequest $request, VenueRepository $venueRepository): string
     {
         /** @var VenueShortValidated $validated */
-        $validated = VenueShortRequest::validate();
+        $validated = $request->validate();
 
         $venue = $venueRepository->findMinimalByExtId($validated['ext_id']);
 

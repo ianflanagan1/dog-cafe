@@ -11,7 +11,7 @@ use App\Framework\Http\FormRequest;
  *      suggest: string,
  * }
  */
-class SuggestRequest extends FormRequest
+readonly class SuggestRequest extends FormRequest
 {
     protected const array EXPECTED_INPUTS = [
         'suggest' => [

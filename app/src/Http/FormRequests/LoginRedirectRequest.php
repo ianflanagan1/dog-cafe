@@ -11,7 +11,7 @@ use App\Framework\Http\FormRequest;
  *      code: string,
  * }
  */
-class LoginRedirectRequest extends FormRequest
+readonly class LoginRedirectRequest extends FormRequest
 {
     protected const array EXPECTED_INPUTS = [
         'code',
