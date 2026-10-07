@@ -1,0 +1,218 @@
+version: '3'
+
+# Usage:
+#   task --list                                   list tasks
+#   task test -- tests/Unit/ContainerTest.php     pass arguments after --
+#   task php:shell ROOT=1                         run as root:root
+#   task build:php-dev NC=1                       build with --no-cache
+
+vars:
+  PHP_DIRECTORY: app
+  DEPLOY_DIRECTORY: deploy
+
+  IMAGE_NAMESPACE: ianflanagan1
+
+  PHP_DOCKERFILE: '{{.DEPLOY_DIRECTORY}}/php/Dockerfile'
+  PHP_PROD_IMAGE: '{{.IMAGE_NAMESPACE}}/dog-cafe-php-prod'
+  PHP_DEV_IMAGE: '{{.IMAGE_NAMESPACE}}/dog-cafe-php-dev'
+
+  NGINX_DOCKERFILE: '{{.DEPLOY_DIRECTORY}}/nginx/Dockerfile'
+  NGINX_PROD_IMAGE: '{{.IMAGE_NAMESPACE}}/dog-cafe-nginx-prod'
+  NGINX_DEV_IMAGE: '{{.IMAGE_NAMESPACE}}/dog-cafe-nginx-dev'
+
+  COMPOSE: docker compose -f ./compose.yaml --env-file ./{{.PHP_DIRECTORY}}/.env
+
+  PHP_FPM_NGINX_USER: '65532'
+  GID:
+    sh: id -g
+
+
+# Flags that depend on CLI variables (NC=1, ROOT=1). Global vars are evaluated
+# before CLI variables are set, so each task declares these in its own vars.
+x-flags:
+  no-cache: &no_cache '{{if .NC}}--no-cache{{end}}'
+  user-php-fpm-nginx: &user_php_fpm_nginx '{{if .ROOT}}--user root:root{{else}}--user {{.PHP_FPM_NGINX_USER}}:{{.GID}}{{end}}'
+  user-other: &user_other '{{if .ROOT}}--user root:root{{end}}'
+
+tasks:
+
+  default:
+    cmds:
+      - task --list
+    silent: true
+
+
+  ##### DOCKER COMPOSE #####
+
+  up:
+    desc: Build and start the dev stack (foreground)
+    cmds:
+      - '{{.COMPOSE}} up --build'
+
+  up:detach:
+    desc: Build and start the dev stack (background)
+    cmds:
+      - '{{.COMPOSE}} up --build --detach'
+
+  down:
+    desc: Stop the dev stack
+    cmds:
+      - '{{.COMPOSE}} down'
+
+  down:delete:
+    desc: Stop the dev stack and delete its volumes
+    cmds:
+      - '{{.COMPOSE}} down --volumes --remove-orphans'
+
+  prod:up:
+    desc: Build and start the production stack
+    cmds:
+      - docker compose -f ./compose.production.yaml --env-file ./{{.PHP_DIRECTORY}}/.env.production up --build
+
+  prod:down:
+    desc: Stop the production stack
+    cmds:
+      - docker compose -f ./compose.production.yaml down
+
+
+  ##### TESTING #####
+
+  test:
+    desc: 'Run PHPUnit, e.g. task test -- tests/Unit/ContainerTest.php'
+    vars: { USER_STRING_PHP_FPM_NGINX: *user_php_fpm_nginx }
+    cmds:
+      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} php php ./vendor/bin/phpunit --configuration phpunit.xml --testdox {{.CLI_ARGS}}'
+
+  phpstan:
+    desc: Run PHPStan
+    vars: { USER_STRING_PHP_FPM_NGINX: *user_php_fpm_nginx }
+    cmds:
+      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} -e XDEBUG_MODE=off php php ./vendor/bin/phpstan analyse --no-progress --memory-limit=1G --configuration=phpstan.neon {{.CLI_ARGS}}'
+
+  pint:
+    desc: Run Pint on src and tests
+    vars: { USER_STRING_PHP_FPM_NGINX: *user_php_fpm_nginx }
+    cmds:
+      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} -e XDEBUG_MODE=off php php ./vendor/bin/pint -v --config=pint.json'
+      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} -e XDEBUG_MODE=off php php ./vendor/bin/pint -v --config=pint-test.json tests/'
+
+
+  ##### PHP CONTAINER #####
+
+  php:exec:
+    desc: 'Run a command in the php container, e.g. task php:exec -- id'
+    vars: { USER_STRING_PHP_FPM_NGINX: *user_php_fpm_nginx }
+    preconditions:
+      - sh: test -n '{{.CLI_ARGS}}'
+        msg: 'Needs a command after --'
+    cmds:
+      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} php sh -c "umask 0002 && {{.CLI_ARGS}}"'
+
+  php:shell:
+    desc: Open a shell in the php container
+    vars: { USER_STRING_PHP_FPM_NGINX: *user_php_fpm_nginx }
+    interactive: true
+    cmds:
+      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} php sh -c "umask 0002 && /bin/sh"'
+
+  composer:
+    desc: 'Run Composer in the php container, e.g. task composer -- require --dev laravel/pint'
+    vars: { USER_STRING_PHP_FPM_NGINX: *user_php_fpm_nginx }
+    preconditions:
+      - sh: test -n '{{.CLI_ARGS}}'
+        msg: 'Needs a Composer command after --'
+    cmds:
+      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} -e XDEBUG_MODE=off -e COMPOSER_CACHE_DIR=/tmp/composer-cache php sh -c "umask 0002 && /usr/bin/composer {{.CLI_ARGS}} --no-interaction --no-progress"'
+
+  composer:install:
+    desc: composer install
+    cmds:
+      - task: composer
+        vars: { CLI_ARGS: install }
+
+  composer:update:
+    desc: composer update
+    cmds:
+      - task: composer
+        vars: { CLI_ARGS: update }
+
+
+  ##### NGINX CONTAINER #####
+
+  nginx:exec:
+    desc: 'Run a command in the nginx container, e.g. task nginx:exec -- nginx -t'
+    vars: { USER_STRING_PHP_FPM_NGINX: *user_php_fpm_nginx }
+    preconditions:
+      - sh: test -n '{{.CLI_ARGS}}'
+        msg: 'Needs a command after --'
+    cmds:
+      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} nginx sh -c "umask 0002 && {{.CLI_ARGS}}"'
+
+  nginx:shell:
+    desc: Open a shell in the nginx container
+    vars: { USER_STRING_PHP_FPM_NGINX: *user_php_fpm_nginx }
+    interactive: true
+    cmds:
+      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} nginx sh -c "umask 0002 && /bin/sh"'
+
+
+  ##### OTHER CONTAINERS #####
+
+  postgres:exec:
+    desc: 'Run a command in the postgres container, e.g. task postgres:exec -- psql -U admin'
+    vars: { USER_STRING_OTHER: *user_other }
+    preconditions:
+      - sh: test -n '{{.CLI_ARGS}}'
+        msg: 'Needs a command after --'
+    cmds:
+      - '{{.COMPOSE}} exec {{.USER_STRING_OTHER}} postgres {{.CLI_ARGS}}'
+
+  postgres:shell:
+    desc: Open a shell in the postgres container
+    vars: { USER_STRING_OTHER: *user_other }
+    interactive: true
+    cmds:
+      - '{{.COMPOSE}} exec {{.USER_STRING_OTHER}} postgres /bin/sh'
+
+  redis:exec:
+    desc: 'Run a command in the redis container, e.g. task redis:exec -- redis-cli'
+    vars: { USER_STRING_OTHER: *user_other }
+    preconditions:
+      - sh: test -n '{{.CLI_ARGS}}'
+        msg: 'Needs a command after --'
+    cmds:
+      - '{{.COMPOSE}} exec {{.USER_STRING_OTHER}} redis {{.CLI_ARGS}}'
+
+  redis:shell:
+    desc: Open a shell in the redis container
+    vars: { USER_STRING_OTHER: *user_other }
+    interactive: true
+    cmds:
+      - '{{.COMPOSE}} exec {{.USER_STRING_OTHER}} redis /bin/sh'
+
+
+  ##### BUILD #####
+
+  build:php-dev:
+    desc: Build the php dev image
+    vars: { NO_CACHE_STRING: *no_cache }
+    cmds:
+      - docker build --progress=plain {{.NO_CACHE_STRING}} -f {{.PHP_DOCKERFILE}} --target dev -t {{.PHP_DEV_IMAGE}} ./{{.PHP_DIRECTORY}}
+
+  build:php-prod:
+    desc: Build the php prod image
+    vars: { NO_CACHE_STRING: *no_cache }
+    cmds:
+      - docker build --progress=plain {{.NO_CACHE_STRING}} -f {{.PHP_DOCKERFILE}} --target prod -t {{.PHP_PROD_IMAGE}} ./{{.PHP_DIRECTORY}}
+
+  build:nginx-dev:
+    desc: Build the nginx dev image
+    vars: { NO_CACHE_STRING: *no_cache }
+    cmds:
+      - docker build --progress=plain {{.NO_CACHE_STRING}} -f {{.NGINX_DOCKERFILE}} --target dev -t {{.NGINX_DEV_IMAGE}} .
+
+  build:nginx-prod:
+    desc: Build the nginx prod image
+    vars: { NO_CACHE_STRING: *no_cache }
+    cmds:
+      - docker build --progress=plain {{.NO_CACHE_STRING}} -f {{.NGINX_DOCKERFILE}} --target prod -t {{.NGINX_PROD_IMAGE}} .
