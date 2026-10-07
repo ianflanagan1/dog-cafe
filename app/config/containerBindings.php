@@ -117,6 +117,13 @@ return [
          */
         $loginProvidersConfig = $config->get('loginProviders');
 
+        /**
+         * @var array{
+         *      url: non-empty-string,
+         * }
+         */
+        $appConfig = $config->get('app');
+
         return new LoginService(
             $loginProvidersConfig,
             $appUserRepository,  // TODO: try relying on defaults
@@ -124,6 +131,7 @@ return [
             $favouriteSessionStore,
             $appUserPictureService,
             $auth,
+            $appConfig['url'],
         );
     },
     MapPointsService::class => function (VenueRepository $venueRepository, Config $config): MapPointsService {
