@@ -2,6 +2,7 @@
     "name": "ianf/dog-cafe",
     "type": "project",
     "require": {
+        "php": "^8.4",
         "psr/simple-cache": "^3",
         "psr/container": "^2.0",
         "google/apiclient": "^2"
