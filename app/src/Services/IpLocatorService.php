@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Framework\Http\Request;
 use App\Framework\Support\Curl;
 use App\Framework\Support\Log;
 
@@ -20,16 +19,11 @@ class IpLocatorService
     protected const string FIELDS = 'countryCode,lat,lon'; // Note: lon, not lng
 
     /**
+     * @param non-empty-string $ip
      * @return ?IpLocation
      */
-    public static function find(): ?array
+    public static function find(string $ip): ?array
     {
-        $ip = Request::ip();
-
-        if ($ip === null) {
-            return null;
-        }
-
         $result = Curl::arrayResponse('http://ip-api.com/json/' . $ip . '?fields=' . self::FIELDS);
 
         if ($result === false) {

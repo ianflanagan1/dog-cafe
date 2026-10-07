@@ -32,12 +32,12 @@ readonly class ListController extends Controller
     /**
      * Render a page showing a list of Venues in a particular town according to specified filters.
      */
-    public function listHtml(TownResolver $townResolver, ListVenuePageService $listVenuePageService, string $townStr): ViewParameters
+    public function listHtml(ListRequest $request, TownResolver $townResolver, ListVenuePageService $listVenuePageService, string $townStr): ViewParameters
     {
-        $town = $townResolver->resolve($townStr);
+        $town = $townResolver->resolve($townStr, $request->ip());
 
         /** @var ListValidated $validated */
-        $validated = ListRequest::validate();
+        $validated = $request->validate();
 
         [$totalPages, $venues] = $listVenuePageService->get(
             $town->id,
@@ -91,7 +91,7 @@ readonly class ListController extends Controller
     /**
      * Return list of Venues for lazy-loading the Venues list page.
      */
-    public function listJson(TownRepository $townRepository, ListVenuePageService $listVenuePageService, string $townStr): string
+    public function listJson(ListRequest $request, TownRepository $townRepository, ListVenuePageService $listVenuePageService, string $townStr): string
     {
         $town = filter_var($townStr, FILTER_CALLBACK, [
             'options' => [$townRepository, 'findByNameUrlLower']
@@ -102,7 +102,7 @@ readonly class ListController extends Controller
         }
 
         /** @var ListValidated $validated */
-        $validated = ListRequest::validate();
+        $validated = $request->validate();
 
         [$totalPages, $venues] = $listVenuePageService->get(
             $town->id,

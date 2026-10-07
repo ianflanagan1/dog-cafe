@@ -11,27 +11,45 @@ use App\Framework\Validation\Validator;
  * @phpstan-import-type Validated from StandardTypes
  * @phpstan-import-type ExpectedInputs from Validator
  */
-abstract class FormRequest extends Request
+abstract readonly class FormRequest
 {
     /** @var ExpectedInputs */
     protected const array EXPECTED_INPUTS = [];
+
     public function __construct(
-        protected Validator $filter,
+        protected Request $request,
     ) {
     }
 
     /**
      * @return Validated
      */
-    public static function validate(): array
+    public function validate(): array
     {
         if (empty(static::EXPECTED_INPUTS)) {
             return [];
         }
 
         return Validator::handle(
-            self::getInputs(),
+            $this->request->inputs(),
             static::EXPECTED_INPUTS,
         );
+    }
+
+    /**
+     * @return ?non-empty-string
+     */
+    public function ip(): ?string
+    {
+        return $this->request->ip();
+    }
+
+    /**
+     * @param non-empty-string $key
+     * @return ?non-empty-string
+     */
+    public function formToken(string $key): ?string
+    {
+        return $this->request->formToken($key);
     }
 }

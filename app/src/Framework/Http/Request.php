@@ -9,85 +9,121 @@ use App\Framework\Support\StandardTypes;
 use App\Framework\Support\Str;
 
 /**
+ * Immutable snapshot of the current HTTP request.
+ *
+ * Built once per request by fromGlobals(), the only place superglobals are read. Property names follow PSR-7's
+ * ServerRequestInterface, so an adapter can be added later if PSR-15 middleware is ever needed.
+ *
  * @phpstan-import-type Inputs from StandardTypes
  */
-class Request
+final readonly class Request
 {
+    /**
+     * @param HttpMethod $method
+     * @param non-empty-string $target Path and query string, e.g. `/list/london?page=2`
+     * @param Inputs $query
+     * @param Inputs $parsedBody
+     * @param array<string, string> $headers Lowercase, hyphenated names, e.g. `x-forwarded-proto`
+     * @param array<string, mixed> $serverParams
+     */
+    public function __construct(
+        public HttpMethod $method,
+        public string $target,
+        public array $query = [],
+        public array $parsedBody = [],
+        public array $headers = [],
+        public array $serverParams = [],
+    ) {
+    }
+
+    public static function fromGlobals(): self
+    {
+        $headers = [];
+
+        foreach ($_SERVER as $key => $value) {
+            if (is_string($value) && str_starts_with($key, 'HTTP_')) {
+                $headers[strtolower(str_replace('_', '-', substr($key, 5)))] = $value;
+            }
+        }
+
+        return new self(
+            HttpMethod::from(strtolower($_SERVER['REQUEST_METHOD'])),
+            $_SERVER['REQUEST_URI'] ?: '/',
+            $_GET,
+            $_POST,
+            $headers,
+            $_SERVER,
+        );
+    }
+
+    /**
+     * Request target without the query string, e.g. `/list/london`
+     */
+    public function path(): string
+    {
+        return explode('?', $this->target, 2)[0];
+    }
+
+    public function header(string $name): ?string
+    {
+        return $this->headers[strtolower($name)] ?? null;
+    }
+
     /**
      * @return ?non-empty-string
      */
-    public static function ip(): ?string
+    public function ip(): ?string
     {
-        if (!isset($_SERVER['REMOTE_ADDR'])) {
+        $ip = $this->serverParams['REMOTE_ADDR'] ?? null;
+
+        if (!is_string($ip)) {
             Log::warning('`REMOTE_ADDR` not set');
             return null;
         }
 
-        return Str::nullIfEmpty($_SERVER['REMOTE_ADDR']);
+        return Str::nullIfEmpty($ip);
     }
 
-    public static function isXmlHttpRequest(): bool
+    public function isXmlHttpRequest(): bool
     {
-        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
+        return $this->header('x-requested-with') === 'XMLHttpRequest';
+    }
+
+    public function wantsJson(): bool
+    {
+        return str_contains($this->header('accept') ?? '', 'application/json');
     }
 
     /**
-     * @return non-empty-string
-     */
-    public static function getRequestTarget(): string
-    {
-        return $_SERVER['REQUEST_URI'] ?: '/';
-    }
-
-    public static function getMethod(): HttpMethod
-    {
-        return HttpMethod::from(strtolower($_SERVER['REQUEST_METHOD']));
-    }
-
-    public static function determineInputsType(): int
-    {
-        return self::shouldCheckPost() ? INPUT_POST : INPUT_GET;
-    }
-
-    /**
+     * Body inputs for methods that carry a body, otherwise query string inputs.
+     *
      * @return Inputs
      */
-    public static function getInputs(): array
+    public function inputs(): array
     {
-        return self::shouldCheckPost() ? $_POST : $_GET;
+        return $this->hasBody() ? $this->parsedBody : $this->query;
     }
 
     /**
      * @param non-empty-string $key
      * @return ?non-empty-string
      */
-    public static function getFormToken(string $key): ?string
+    public function formToken(string $key): ?string
     {
-        $token = filter_input(
-            self::determineInputsType(),
-            $key,
-            FILTER_DEFAULT
-        );
+        $token = $this->inputs()[$key] ?? null;
 
-        if (!is_string($token) || empty($token)) {
+        if (!is_string($token) || $token === '') {
             return null;
         }
 
         return $token;
     }
 
-    public static function wantsJson(): bool
+    protected function hasBody(): bool
     {
-        return str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json');
-    }
-
-    protected static function shouldCheckPost(): bool
-    {
-        $method = self::getMethod();
-
-        return $method == HttpMethod::POST
-            || $method == HttpMethod::PUT
-            || $method == HttpMethod::PATCH
-            || $method == HttpMethod::DELETE;
+        return $this->method == HttpMethod::POST
+            || $this->method == HttpMethod::PUT
+            || $this->method == HttpMethod::PATCH
+            || $this->method == HttpMethod::DELETE;
     }
 }

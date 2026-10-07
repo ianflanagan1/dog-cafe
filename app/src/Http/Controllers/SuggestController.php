@@ -41,15 +41,18 @@ readonly class SuggestController extends Controller
      * Handle a posted suggestion. On failure, render the Add Suggestion page with errors and prefilled input.
      * On success, redirect to the success page.
      */
-    public function suggestPost(FormTokenHandler $formTokenHandler, SuggestRepository $suggestRepository): ViewParameters
-    {
-        if (!$formTokenHandler->isValidToken(self::SUGGEST_ROUTE, SuggestRequest::getFormToken('form_token'))) {
+    public function suggestPost(
+        SuggestRequest $request,
+        FormTokenHandler $formTokenHandler,
+        SuggestRepository $suggestRepository,
+    ): ViewParameters {
+        if (!$formTokenHandler->isValidToken(self::SUGGEST_ROUTE, $request->formToken('form_token'))) {
             Response::redirect(self::SUGGEST_ROUTE);
         }
 
         try {
             /** @var SuggestValidated $validated */
-            $validated = SuggestRequest::validate();
+            $validated = $request->validate();
 
         } catch (InputValidationException $e) {
             return $this->render(

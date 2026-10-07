@@ -7,6 +7,7 @@ namespace Tests\Unit\Framework\Routing;
 use App\Framework\Cache\RedisCache;
 use App\Framework\Container\Container;
 use App\Framework\Http\HttpMethod;
+use App\Framework\Http\Request;
 use App\Framework\Routing\ActionExecutor;
 use App\Framework\Routing\Attributes\Delete;
 use App\Framework\Routing\Attributes\Get;
@@ -209,7 +210,7 @@ class RouteRegistryTest extends TestCase
 
         $this->routeRegistry->start([]);
         $this->expectException(RouteNotFoundException::class);
-        $this->routeRegistry->resolve('/non-existent', HttpMethod::GET);
+        $this->routeRegistry->resolve(new Request(HttpMethod::GET, '/non-existent'));
     }
 
     public function test_resolving_non_existent_route_from_cache_throws(): void
@@ -224,7 +225,7 @@ class RouteRegistryTest extends TestCase
 
         $this->routeRegistry->start([]);
         $this->expectException(RouteNotFoundException::class);
-        $this->routeRegistry->resolve('/non-existent', HttpMethod::GET);
+        $this->routeRegistry->resolve(new Request(HttpMethod::GET, '/non-existent'));
     }
 
     public function test_resolve_existing_route_with_wrong_method_without_cache_throws(): void
@@ -240,7 +241,7 @@ class RouteRegistryTest extends TestCase
 
         $this->routeRegistry->start([SingleMethodWithMultipleMethodsController::class]);
         $this->expectException(RouteNotFoundException::class);
-        $this->routeRegistry->resolve('/abc', HttpMethod::PUT);
+        $this->routeRegistry->resolve(new Request(HttpMethod::PUT, '/abc'));
     }
 
     public function test_resolve_existing_route_with_wrong_method_from_cache_throws(): void
@@ -264,7 +265,7 @@ class RouteRegistryTest extends TestCase
 
         $this->routeRegistry->start([]);
         $this->expectException(RouteNotFoundException::class);
-        $this->routeRegistry->resolve('/abc', HttpMethod::POST);
+        $this->routeRegistry->resolve(new Request(HttpMethod::POST, '/abc'));
     }
 
     /**
@@ -649,7 +650,7 @@ class RouteRegistryTest extends TestCase
                 $this->expectException(get_class($route['expected']));
             }
 
-            $actionable = $this->routeRegistry->resolve($route['uri'], $route['method']);
+            $actionable = $this->routeRegistry->resolve(new Request($route['method'], $route['uri']));
 
             if (! $route['expected'] instanceof Exception) {
                 $this->assertSame($route['expected'], $actionable);
@@ -689,7 +690,7 @@ class RouteRegistryTest extends TestCase
                 $this->expectException(get_class($route['expected']));
             }
 
-            $actionable = $this->routeRegistry->resolve($route['uri'], $route['method']);
+            $actionable = $this->routeRegistry->resolve(new Request($route['method'], $route['uri']));
 
             if (! $route['expected'] instanceof Exception) {
                 $this->assertSame($route['expected'], $actionable);

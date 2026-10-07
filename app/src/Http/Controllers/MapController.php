@@ -24,12 +24,12 @@ readonly class MapController extends Controller
     /**
      * Render map page, starting centred on the resolved town.
      */
-    public function map(TownResolver $townResolver, string $townStr): ViewParameters
+    public function map(MapRequest $request, TownResolver $townResolver, string $townStr): ViewParameters
     {
-        $town = $townResolver->resolve($townStr);
+        $town = $townResolver->resolve($townStr, $request->ip());
 
         /** @var MapValidated $validated */
-        $validated = MapRequest::validate();
+        $validated = $request->validate();
 
         $isType = fn (VenueType $t): bool => in_array($t, $validated['types'], true);
 
@@ -59,10 +59,10 @@ readonly class MapController extends Controller
     /**
      * Return Venues (single and clustered points) for a given map rectangle and filters.
      */
-    public function searchMap(MapPointsService $mapPointsService): string
+    public function searchMap(SearchMapRequest $request, MapPointsService $mapPointsService): string
     {
         /** @var SearchMapValidated $validated */
-        $validated = SearchMapRequest::validate();
+        $validated = $request->validate();
 
         $points = $mapPointsService->get(
             $validated['lat1'],

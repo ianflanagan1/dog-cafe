@@ -37,6 +37,7 @@ readonly class FavouriteController extends Controller
      * Render a page showing a list of Venues favourited by the logged-in user.
      */
     public function favsHtml(
+        ListRequest $request,
         Auth $auth,
         VenueRepository $venueRepository,
         FavouriteSessionStore $favouriteSessionStore,
@@ -44,7 +45,7 @@ readonly class FavouriteController extends Controller
         $auth->guard(true);
 
         /** @var ListValidated $validated */
-        $validated = ListRequest::validate();
+        $validated = $request->validate();
 
         [$totalPages, $venues] = $venueRepository->getVenuePageRawForFavs(
             $favouriteSessionStore->getAll(),
@@ -92,6 +93,7 @@ readonly class FavouriteController extends Controller
      * Return list of Venues for lazy-loading the Favourites page for the logged-in user.
      */
     public function fansJson(
+        ListRequest $request,
         Auth $auth,
         VenueRepository $venueRepository,
         FavouriteSessionStore $favouriteSessionStore,
@@ -99,7 +101,7 @@ readonly class FavouriteController extends Controller
         $auth->guard();
 
         /** @var ListValidated $validated */
-        $validated = ListRequest::validate();
+        $validated = $request->validate();
 
         [$totalPages, $venues] = $venueRepository->getVenuePageRawForFavs(
             $favouriteSessionStore->getAll(),
@@ -125,6 +127,7 @@ readonly class FavouriteController extends Controller
      * Add a favourite Venue for the logged-in user.
      */
     public function favAdd(
+        FavRequest $request,
         Auth $auth,
         FavouriteSessionStore $favouriteSessionStore,
         VenueRepository $venueRepository,
@@ -132,7 +135,7 @@ readonly class FavouriteController extends Controller
         $auth->guard();
 
         /** @var FavValidated $validated */
-        $validated = FavRequest::validate();
+        $validated = $request->validate();
         $id = $venueRepository->findIdByExtId($validated['ext_id']);
 
         if ($id === null) {
