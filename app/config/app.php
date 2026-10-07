@@ -15,7 +15,7 @@ return [
         'password'  => trim(getenv('POSTGRES_PASSWORD') ?: ''),
     ],
     'redis' => [
-        'host'      => trim(getenv('REDIS_HOST') ?: 'dog-cafe-redis'),
+        'host'      => trim(getenv('REDIS_HOST') ?: 'dog-cafe-cache'),
         'port'      => (int) trim(getenv('REDIS_PORT') ?: '6379'),
         'password'  => trim(getenv('REDIS_PASSWORD') ?: ''),
     ],
