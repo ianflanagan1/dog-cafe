@@ -40,7 +40,7 @@ services:
     networks:
       - public
     ports:
-      - ${HTTP_PORT:-8090}:80
+      - ${HTTP_PORT:-8090}:80  # COUPLED:dev-origin. default = app/.env.example HTTP_PORT
       # - 433:433
 
   php:

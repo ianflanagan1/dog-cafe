@@ -10,6 +10,7 @@ vars:
   PHP_DIRECTORY: app
   DEPLOY_DIRECTORY: deploy
 
+  # COUPLED:image-namespace. = docker-hub:account (docs/external/docker-hub.md)
   IMAGE_NAMESPACE: ianflanagan1
 
   PHP_DOCKERFILE: '{{.DEPLOY_DIRECTORY}}/php/Dockerfile'

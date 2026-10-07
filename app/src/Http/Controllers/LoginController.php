@@ -18,6 +18,7 @@ use App\Services\LoginService;
  */
 readonly class LoginController extends Controller
 {
+    // COUPLED:oauth-redirect-paths. = google-console and discord-portal redirect URI paths (docs/external/); ⊆ nginx:PHP location routes
     protected const string REDIRECT_ROUTE_GOOGLE  = '/redirect-google-login';
     protected const string REDIRECT_ROUTE_DISCORD = '/redirect-discord-login';
 
