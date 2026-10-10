@@ -119,7 +119,7 @@ final readonly class Request
         return $token;
     }
 
-    protected function hasBody(): bool
+    private function hasBody(): bool
     {
         return $this->method == HttpMethod::POST
             || $this->method == HttpMethod::PUT
