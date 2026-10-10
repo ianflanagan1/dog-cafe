@@ -46,7 +46,7 @@ readonly class SuggestController extends Controller
         SuggestRepository $suggestRepository,
     ): Response {
         if (!$formTokenHandler->isValidToken(self::SUGGEST_ROUTE, $request->formToken('form_token'))) {
-            return Response::redirect(302, self::SUGGEST_ROUTE);
+            return Response::redirect(303, self::SUGGEST_ROUTE);
         }
 
         try {
