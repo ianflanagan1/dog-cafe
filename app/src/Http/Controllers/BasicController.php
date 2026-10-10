@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Framework\Http\Controller;
-use App\Framework\Http\Response\Response;
+use App\Framework\Http\Response;
 use App\Framework\Routing\Attributes\Get;
 
 readonly class BasicController extends Controller
@@ -14,11 +14,11 @@ readonly class BasicController extends Controller
     /**
      * Redirect to external documentation.
      */
-    public function docs(): void
+    public function docs(): Response
     {
-        Response::redirect(
-            'https://guiltless-pheasant-a99.notion.site/URLS-5bb81775fcbd4fbdac1910142f785f9f',
+        return Response::redirect(
             301,
+            'https://guiltless-pheasant-a99.notion.site/URLS-5bb81775fcbd4fbdac1910142f785f9f',
         );
     }
 }

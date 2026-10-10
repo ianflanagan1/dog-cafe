@@ -7,9 +7,9 @@ namespace App\Http\Controllers;
 use App\Enums\VenueType;
 use App\Framework\Errors\NotFoundException;
 use App\Framework\Http\Controller;
-use App\Framework\Http\Response\Response;
+use App\Framework\Http\Response;
 use App\Framework\Routing\Attributes\Get;
-use App\Framework\View\ViewParameters;
+use App\Framework\View\ViewRenderer;
 use App\Http\DTOs\ListPageUrls;
 use App\Http\FormRequests\ListRequest;
 use App\Models\Venue;
@@ -32,8 +32,13 @@ readonly class ListController extends Controller
     /**
      * Render a page showing a list of Venues in a particular town according to specified filters.
      */
-    public function listHtml(ListRequest $request, TownResolver $townResolver, ListVenuePageService $listVenuePageService, string $townStr): ViewParameters
-    {
+    public function listHtml(
+        ListRequest $request,
+        ViewRenderer $viewRenderer,
+        TownResolver $townResolver,
+        ListVenuePageService $listVenuePageService,
+        string $townStr,
+    ): Response {
         $town = $townResolver->resolve($townStr, $request->ip());
 
         /** @var ListValidated $validated */
@@ -60,19 +65,18 @@ readonly class ListController extends Controller
 
         $isType = fn (VenueType $t): bool => in_array($t, $validated['types'], true);
 
-        return new ViewParameters(
-            'main',
-            'list',
-            'list',
-            [
+        return $viewRenderer->render(
+            status: 200,
+            page: 'list',
+            layoutParameters: [
                 'search'    => true,
                 'canonical' => $urls->canonical,
             ],
-            [
+            headParameters: [
                 'urls'      => $urls,
                 'pageTitle' => "{$town->name}'s Dog-Friendly Cafes!",
             ],
-            [
+            bodyParameters: [
                 'page'          => $validated['page'],
                 'totalPages'    => $totalPages,
                 'town'          => $town,
@@ -83,7 +87,6 @@ readonly class ListController extends Controller
                 'urls'          => $urls,
                 'venues'        => $venues,
             ],
-            200,
         );
     }
 
@@ -91,7 +94,7 @@ readonly class ListController extends Controller
     /**
      * Return list of Venues for lazy-loading the Venues list page.
      */
-    public function listJson(ListRequest $request, TownRepository $townRepository, ListVenuePageService $listVenuePageService, string $townStr): string
+    public function listJson(ListRequest $request, TownRepository $townRepository, ListVenuePageService $listVenuePageService, string $townStr): Response
     {
         $town = filter_var($townStr, FILTER_CALLBACK, [
             'options' => [$townRepository, 'findByNameUrlLower']
@@ -113,10 +116,10 @@ readonly class ListController extends Controller
             $validated['order_by'],
         );
 
-        return Response::json([
+        return Response::json(200, [
             'items'         => array_map(fn (array $v): array => ListVenuePageService::processForJson($v), $venues),
             'totalPages'    => $totalPages,
             'timestamp'     => $validated['timestamp'],
-        ], 200);
+        ]);
     }
 }

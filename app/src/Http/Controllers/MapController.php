@@ -6,9 +6,9 @@ namespace App\Http\Controllers;
 
 use App\Enums\VenueType;
 use App\Framework\Http\Controller;
-use App\Framework\Http\Response\Response;
+use App\Framework\Http\Response;
 use App\Framework\Routing\Attributes\Get;
-use App\Framework\View\ViewParameters;
+use App\Framework\View\ViewRenderer;
 use App\Http\FormRequests\MapRequest;
 use App\Http\FormRequests\SearchMapRequest;
 use App\MapPoints\MapPointsService;
@@ -24,7 +24,7 @@ readonly class MapController extends Controller
     /**
      * Render map page, starting centred on the resolved town.
      */
-    public function map(MapRequest $request, TownResolver $townResolver, string $townStr): ViewParameters
+    public function map(MapRequest $request, ViewRenderer $viewRenderer, TownResolver $townResolver, string $townStr): Response
     {
         $town = $townResolver->resolve($townStr, $request->ip());
 
@@ -33,25 +33,23 @@ readonly class MapController extends Controller
 
         $isType = fn (VenueType $t): bool => in_array($t, $validated['types'], true);
 
-        return new ViewParameters(
-            'main',
-            'map',
-            'map',
-            [
+        return $viewRenderer->render(
+            status: 200,
+            page: 'map',
+            layoutParameters: [
                 'search'    => true,
                 'canonical' => '/map',
             ],
-            [
+            headParameters: [
                 'canonical' => '/map',
             ],
-            [
+            bodyParameters: [
                 'town'          => $town,
                 'cafe'          => $isType(VenueType::Cafe),
                 'restaurant'    => $isType(VenueType::Restaurant),
                 'bar'           => $isType(VenueType::Bar),
                 'open_now'      => $validated['open_now'],
             ],
-            200,
         );
     }
 
@@ -59,7 +57,7 @@ readonly class MapController extends Controller
     /**
      * Return Venues (single and clustered points) for a given map rectangle and filters.
      */
-    public function searchMap(SearchMapRequest $request, MapPointsService $mapPointsService): string
+    public function searchMap(SearchMapRequest $request, MapPointsService $mapPointsService): Response
     {
         /** @var SearchMapValidated $validated */
         $validated = $request->validate();
@@ -74,9 +72,9 @@ readonly class MapController extends Controller
             $validated['zoom'],
         );
 
-        return Response::json([
+        return Response::json(200, [
             'points'    => $points,
             'timestamp' => $validated['timestamp'],
-        ], 200);
+        ]);
     }
 }

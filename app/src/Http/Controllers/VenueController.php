@@ -7,11 +7,11 @@ namespace App\Http\Controllers;
 use App\Enums\Locality;
 use App\Framework\Errors\NotFoundException;
 use App\Framework\Http\Controller;
-use App\Framework\Http\Response\Response;
+use App\Framework\Http\Response;
 use App\Framework\Routing\Attributes\Get;
 use App\Framework\Routing\RouteNotFoundException;
 use App\Framework\Session\Auth;
-use App\Framework\View\ViewParameters;
+use App\Framework\View\ViewRenderer;
 use App\Http\FormRequests\VenueShortRequest;
 use App\Models\Venue;
 use App\Repositories\VenueHydrator;
@@ -28,7 +28,7 @@ readonly class VenueController extends Controller
     /**
      * Return the minimal details of a venue, when the user selects a Venue on the map.
      */
-    public function venueMinimal(VenueShortRequest $request, VenueRepository $venueRepository): string
+    public function venueMinimal(VenueShortRequest $request, VenueRepository $venueRepository): Response
     {
         /** @var VenueShortValidated $validated */
         $validated = $request->validate();
@@ -42,9 +42,9 @@ readonly class VenueController extends Controller
         $venue = VenueHydrator::processTypes($venue);
         $venue = VenueHydrator::processOpeningTimes($venue, Locality::UnitedKingdom);
 
-        return Response::json([
+        return Response::json(200, [
             'venue' => $venue,
-        ], 200);
+        ]);
     }
 
     #[Get('/venue/:venueReference')]
@@ -52,11 +52,12 @@ readonly class VenueController extends Controller
      * Render a details page for a particular Venue.
      */
     public function venueFull(
+        ViewRenderer $viewRenderer,
         Auth $auth,
         VenueRepository $venueRepository,
         FavouriteSessionStore $favouriteSessionStore,
         string $venueReference,
-    ): ViewParameters {
+    ): Response {
         $venue = null;
 
         // If reference fits the pattern of an external ID, check database for it
@@ -82,23 +83,21 @@ readonly class VenueController extends Controller
 
         $canonical = '/venue/' . $venue['human_url'];
 
-        return new ViewParameters(
-            'main',
-            'venue',
-            'venue',
-            [
+        return $viewRenderer->render(
+            status: 200,
+            page: 'venue',
+            layoutParameters: [
                 'search'    => true,
                 'canonical' => $canonical,
             ],
-            [
+            headParameters: [
                 'canonical' => $canonical,
                 'name'      => $venue['name'],
             ],
-            [
+            bodyParameters: [
                 'venue'             => $venue,
                 'loginRedirectUrl'  => $auth->isLoggedIn() ? null : urlencode($canonical),
             ],
-            200,
         );
     }
 }

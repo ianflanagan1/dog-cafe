@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Framework\Routing;
 
 use App\Framework\Container\Container;
-use App\Framework\View\ViewParameters;
+use App\Framework\Http\Response;
 
 /**
  * Class name, method name, parameters
@@ -23,11 +23,11 @@ class ActionExecutor
 
     /**
      * @param Actionable $actionable
-     * @return ViewParameters|string
+     * @return Response
      */
-    public function handle(array $actionable): ViewParameters|string
+    public function handle(array $actionable): Response
     {
-        /** @var ViewParameters|string $result */
+        /** @var Response $result */
         $result = $this->container->call($actionable[0], $actionable[1], $actionable[2]);
 
         return $result;

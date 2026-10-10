@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Framework\Http\Controller;
-use App\Framework\Http\Response\Response;
+use App\Framework\Http\Response;
 use App\Framework\Routing\Attributes\Get;
-use App\Framework\View\ViewParameters;
+use App\Framework\View\ViewRenderer;
 use App\Http\FormRequests\LoginRedirectRequest;
 use App\Http\FormRequests\LoginRequest;
 use App\Services\LoginService;
@@ -26,7 +26,7 @@ readonly class LoginController extends Controller
     /**
      * Render login page.
      */
-    public function login(LoginRequest $request, LoginService $loginService): ViewParameters
+    public function login(LoginRequest $request, ViewRenderer $viewRenderer, LoginService $loginService): Response
     {
         /** @var LoginValidated $validated */
         $validated = $request->validate();
@@ -34,22 +34,20 @@ readonly class LoginController extends Controller
         // Store the route to return to after successful login
         $loginService->storePreLoginLocation($validated['location']);
 
-        return new ViewParameters(
-            'main',
-            'login',
-            'login',
-            [
+        return $viewRenderer->render(
+            status: 200,
+            page: 'login',
+            layoutParameters: [
                 'search'    => false,
                 'canonical' => '/login',
             ],
-            [
+            headParameters: [
                 'canonical' => '/login',
             ],
-            [
+            bodyParameters: [
                 'urlGoogle'     => $loginService->getLoginUrlGoogle(self::REDIRECT_ROUTE_GOOGLE),
                 'urlDiscord'    => $loginService->getLoginUrlDiscord(self::REDIRECT_ROUTE_DISCORD),
             ],
-            200,
         );
     }
 
@@ -57,25 +55,25 @@ readonly class LoginController extends Controller
     /**
      * Handle to callback from Google OAuth.
      */
-    public function redirectGoogleLogin(LoginRedirectRequest $request, LoginService $loginService): void
+    public function redirectGoogleLogin(LoginRedirectRequest $request, LoginService $loginService): Response
     {
         /** @var LoginRedirectValidated $validated */
         $validated = $request->validate();
 
         $loginService->processLoginGoogle($validated['code'], self::REDIRECT_ROUTE_GOOGLE);
-        Response::redirect($loginService->getPreLoginLocation(), 303);
+        return Response::redirect(303, $loginService->getPreLoginLocation());
     }
 
     #[Get(self::REDIRECT_ROUTE_DISCORD)]
     /**
      * Handle to callback from Discord OAuth.
      */
-    public function redirectDiscordLogin(LoginRedirectRequest $request, LoginService $loginService): void
+    public function redirectDiscordLogin(LoginRedirectRequest $request, LoginService $loginService): Response
     {
         /** @var LoginRedirectValidated $validated */
         $validated = $request->validate();
 
         $loginService->processLoginDiscord($validated['code'], self::REDIRECT_ROUTE_DISCORD);
-        Response::redirect($loginService->getPreLoginLocation(), 303);
+        return Response::redirect(303, $loginService->getPreLoginLocation());
     }
 }
