@@ -30,7 +30,11 @@ class MinStringRule implements RuleInterface
 
         if (!is_string($value) || strlen($value) < $this->min) {
             $min = $this->min;
-            $min .= $min > 1 ? ' characters' : ' character';
+
+            $min .= $min > 1
+                ? ' characters'
+                : ' character';
+
             return new Error(ErrorCode::ParameterTooShort, ['field' => $field, 'parameter' => $min]);
         }
 

@@ -37,7 +37,10 @@ readonly class RedisCache implements CacheInterface
     public function get(string $key, mixed $default = null): mixed
     {
         $value = $this->redis->get($key);
-        return $value === false ? $default : $value;
+
+        return $value === false
+            ? $default
+            : $value;
     }
 
     /**
@@ -89,7 +92,9 @@ readonly class RedisCache implements CacheInterface
         $results = [];
 
         foreach ($values as $index => $value) {
-            $results[$keys[$index]] = $value === false ? $default : $value;
+            $results[$keys[$index]] = $value === false
+                ? $default
+                : $value;
         }
 
         return $results;

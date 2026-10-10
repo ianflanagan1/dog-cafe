@@ -29,7 +29,9 @@ class FilePermissions
         for ($i = 2; $i >= 0; $i--) {
             $bits = ($permissions >> ($i * 3)) & 0b111;
             foreach ($masks as $mask => $char) {
-                $symbolic .= ($bits & $mask) ? $char : '-';
+                $symbolic .= ($bits & $mask)
+                    ? $char
+                    : '-';
             }
         }
 
