@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+#
+# Runs Pint in check mode on staged PHP files, in the php container.
+# Install with: task hooks:install
+# Bypass once with: git commit --no-verify
+
+set -euo pipefail
+
+COMPOSE=(docker compose -f ./compose.yaml --env-file ./app/.env)
+PINT=(exec -T --user "65532:$(id -g)" -e XDEBUG_MODE=off php php ./vendor/bin/pint --test)
+
+src_files=()
+test_files=()
+while IFS= read -r -d '' file; do
+    file="${file#app/}"
+    case "$file" in
+        tests/*) test_files+=("$file") ;;
+        *) src_files+=("$file") ;;
+    esac
+done < <(git diff --cached --name-only --diff-filter=ACMR -z -- 'app/*.php')
+
+if [ ${#src_files[@]} -eq 0 ] && [ ${#test_files[@]} -eq 0 ]; then
+    exit 0
+fi
+
+if ! "${COMPOSE[@]}" ps --status running --services | grep -qx php; then
+    echo "pre-commit: the php container isn't running, so Pint can't check staged files." >&2
+    echo "Start it with 'task up:detach', or skip the check with 'git commit --no-verify'." >&2
+    exit 1
+fi
+
+status=0
+if [ ${#src_files[@]} -gt 0 ]; then
+    "${COMPOSE[@]}" "${PINT[@]}" --config=pint.json "${src_files[@]}" || status=1
+fi
+if [ ${#test_files[@]} -gt 0 ]; then
+    "${COMPOSE[@]}" "${PINT[@]}" --config=pint-test.json "${test_files[@]}" || status=1
+fi
+
+if [ $status -ne 0 ]; then
+    echo "pre-commit: Pint found style issues. Run 'task pint', review, stage the fixes and commit again." >&2
+fi
+exit $status

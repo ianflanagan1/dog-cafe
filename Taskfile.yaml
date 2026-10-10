@@ -98,6 +98,12 @@ tasks:
       - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} -e XDEBUG_MODE=off php php ./vendor/bin/pint -v --config=pint-test.json tests/'
 
 
+  hooks:install:
+    desc: Use the git hooks in scripts/git-hooks (pre-commit runs Pint)
+    cmds:
+      - git config core.hooksPath scripts/git-hooks
+
+
   ##### PHP CONTAINER #####
 
   php:exec:
