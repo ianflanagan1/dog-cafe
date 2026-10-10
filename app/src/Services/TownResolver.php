@@ -64,7 +64,9 @@ readonly class TownResolver
         }
 
         // Otherwise, for UK users, try to get IP address and return closest town
-        $location = $ip !== null ? IpLocatorService::find($ip) : null;
+        $location = $ip !== null
+            ? IpLocatorService::find($ip)
+            : null;
 
         if ($location !== null && IpLocatorService::isInServedArea($location['countryCode'])) {
             $town = $this->townGeoService->getClosestTown($location['lat'], $location['lng']);

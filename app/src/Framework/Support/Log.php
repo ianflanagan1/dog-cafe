@@ -138,7 +138,10 @@ class Log
         $indent = str_repeat('  ', $depth + 1);
 
         foreach ($array as $key => $val) {
-            $formattedKey = is_int($key) ? $key : "'$key'";
+            $formattedKey = is_int($key)
+                ? $key
+                : "'$key'";
+
             $output .= "$indent [$formattedKey] => ";
 
             if (is_array($val)) {

@@ -30,7 +30,11 @@ class MaxStringRule implements RuleInterface
 
         if (strlen($value) > $this->max) {
             $max = $this->max;
-            $max .= $max > 1 ? ' characters' : ' character';
+
+            $max .= $max > 1
+                ? ' characters'
+                : ' character';
+
             return new Error(ErrorCode::ParameterTooLong, ['field' => $field, 'parameter' => $max]);
         }
 
