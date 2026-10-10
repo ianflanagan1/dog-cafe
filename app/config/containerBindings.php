@@ -41,7 +41,7 @@ return [
         $dbConfig = $config->get('dbCore');
 
         // This is moved outside the Database class to aid unit testing
-        $pdoFactory = function (array $config, array $defaultOptions): PDO {
+        $pdoFactory = function (#[SensitiveParameter] array $config, array $defaultOptions): PDO {
             try {
                 $pdo = new PDO(
                     sprintf(

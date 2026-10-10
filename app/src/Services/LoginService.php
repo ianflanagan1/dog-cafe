@@ -13,6 +13,7 @@ use App\Repositories\AppUserRepository;
 use App\Session\FavouriteSessionStore;
 use Google\Client;
 use Google\Service\Oauth2;
+use SensitiveParameter;
 
 /**
  * @phpstan-import-type PosInt from StandardTypes
@@ -39,7 +40,7 @@ class LoginService
      * @param non-empty-string $appUrl Base URL without trailing slash, e.g. `https://example.com`
      */
     public function __construct(
-        protected array $config,
+        #[SensitiveParameter] protected array $config,
         protected AppUserRepository $appUserRepository,
         protected Session $session,
         protected FavouriteSessionStore $favouriteSessionStore,
@@ -84,7 +85,7 @@ class LoginService
      * @param non-empty-string $route
      * @return bool
      */
-    public function processLoginGoogle(mixed $code, string $route): bool
+    public function processLoginGoogle(#[SensitiveParameter] mixed $code, string $route): bool
     {
         if (!self::validateCode($code)) {
             return false;
@@ -149,7 +150,7 @@ class LoginService
      * @param non-empty-string $route
      * @return bool
      */
-    public function processLoginDiscord(mixed $code, string $route): bool
+    public function processLoginDiscord(#[SensitiveParameter] mixed $code, string $route): bool
     {
         if (!self::validateCode($code)) {
             return false;
@@ -337,7 +338,7 @@ class LoginService
         return $id;
     }
 
-    protected static function validateCode(mixed $code): bool
+    protected static function validateCode(#[SensitiveParameter] mixed $code): bool
     {
         if (!is_string($code) || empty($code)) {
             Log::error('`code` invalid', $code);

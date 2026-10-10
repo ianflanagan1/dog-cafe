@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Framework\Support;
 
+use SensitiveParameter;
+
 /**
  * @phpstan-type Headers array<non-empty-string>
  * @phpstan-type Post array<string, ?scalar>
@@ -16,7 +18,7 @@ class Curl
      * @param Post $payload
      * @return array<mixed>|false
      */
-    public static function arrayResponse(string $url, array $headers = [], array $payload = []): array|false
+    public static function arrayResponse(string $url, #[SensitiveParameter] array $headers = [], #[SensitiveParameter] array $payload = []): array|false
     {
         $res = self::stringResponse($url, $headers, $payload);
 
@@ -40,7 +42,7 @@ class Curl
      * @param Post $payload
      * @return non-empty-string|false
      */
-    public static function stringResponse(string $url, array $headers = [], array $payload = []): string|false
+    public static function stringResponse(string $url, #[SensitiveParameter] array $headers = [], #[SensitiveParameter] array $payload = []): string|false
     {
         /** @var string|false $res */
         $res = self::curl($url, $headers, $payload);
@@ -64,7 +66,7 @@ class Curl
      * @param ?resource $fileHandle
      * @return bool
      */
-    public static function fileResponse(string $url, array $headers = [], array $post = [], mixed $fileHandle = null): bool
+    public static function fileResponse(string $url, #[SensitiveParameter] array $headers = [], #[SensitiveParameter] array $post = [], mixed $fileHandle = null): bool
     {
         /** @var bool $res */
         $res = Curl::curl($url, $headers, $post, $fileHandle);
@@ -79,7 +81,7 @@ class Curl
      * @param ?resource $fileHandle
      * @return string|bool Returns string if content is returned, true if written to file (when $fileHandle is provided), or false on error.
      */
-    public static function curl(string $url, array $headers = [], array $post = [], mixed $fileHandle = null): string|bool
+    public static function curl(string $url, #[SensitiveParameter] array $headers = [], #[SensitiveParameter] array $post = [], mixed $fileHandle = null): string|bool
     {
         $handle = curl_init();
 

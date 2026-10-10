@@ -10,6 +10,7 @@ use App\Framework\Support\StandardTypes;
 use PDO;
 use PDOException;
 use RuntimeException;
+use SensitiveParameter;
 use stdClass;
 
 /**
@@ -43,7 +44,7 @@ class Database
      * @param callable $pdoFactory
      */
     public function __construct(
-        protected array $config,
+        #[SensitiveParameter] protected array $config,
         callable $pdoFactory,
     ) {
         $this->pdoFactory = $pdoFactory;

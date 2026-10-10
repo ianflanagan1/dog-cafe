@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Framework\Session;
 
+use SensitiveParameter;
+
 readonly class FormTokenHandler
 {
     protected const int MAX_TOKENS = 10;
@@ -18,7 +20,7 @@ readonly class FormTokenHandler
      * @param ?non-empty-string $token
      * @return bool
      */
-    public function isValidToken(string $key, ?string $token): bool
+    public function isValidToken(string $key, #[SensitiveParameter] ?string $token): bool
     {
         if ($token === null) {
             return false;
