@@ -1,5 +1,5 @@
-# COUPLED:php-version. = docker:minimal-base FROM tag; must satisfy composer.json:require.php (^8.4)
-FROM php:8.4-fpm-bookworm AS builder
+# COUPLED:php-version. = docker:minimal-base FROM tag; must satisfy composer.json:require.php (^8.5)
+FROM php:8.5-fpm-bookworm AS builder
 
 RUN mkdir -p \
         /app \
@@ -22,7 +22,6 @@ RUN apt-get update \
         unzip \
     && docker-php-ext-install -j$(nproc) \
         bcmath \
-        opcache \
         pdo_pgsql \
         pgsql \
         zip \
@@ -98,8 +97,8 @@ RUN find vendor/ \
         \) -delete
 
 
-# COUPLED:php-version. = docker:builder FROM tag; must satisfy composer.json:require.php (^8.4)
-FROM php:8.4-fpm-bookworm AS minimal-base
+# COUPLED:php-version. = docker:builder FROM tag; must satisfy composer.json:require.php (^8.5)
+FROM php:8.5-fpm-bookworm AS minimal-base
 
 ENV HOME=/app \
     LC_ALL=C.UTF-8 \
