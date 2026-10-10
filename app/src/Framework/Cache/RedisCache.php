@@ -102,7 +102,7 @@ readonly class RedisCache implements CacheInterface
 
     /**
      * @param iterable<non-empty-string, mixed> $values
-     * @param null|int|\DateInterval $ttl
+     * @param null|int|DateInterval $ttl
      * @return bool
      */
     public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
