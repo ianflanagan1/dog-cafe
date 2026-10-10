@@ -43,6 +43,31 @@ tasks:
     silent: true
 
 
+  ##### SETUP #####
+
+  setup:
+    desc: Get a fresh clone running (safe to re-run)
+    cmds:
+      - task: env:create
+      - task: hooks:install
+      - task: up:detach
+      - task: composer:install
+
+  env:create:
+    desc: Create app/.env from app/.env.example if it doesn't exist
+    status:
+      - test -f {{.PHP_DIRECTORY}}/.env
+    cmds:
+      - cp {{.PHP_DIRECTORY}}/.env.example {{.PHP_DIRECTORY}}/.env
+
+  hooks:install:
+    desc: Use the git hooks in scripts/git-hooks (pre-commit runs Pint)
+    status:
+      - test "$(git config core.hooksPath)" = scripts/git-hooks
+    cmds:
+      - git config core.hooksPath scripts/git-hooks
+
+
   ##### DOCKER COMPOSE #####
 
   up:
@@ -96,12 +121,6 @@ tasks:
     cmds:
       - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} -e XDEBUG_MODE=off php php ./vendor/bin/pint -v --config=pint.json'
       - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} -e XDEBUG_MODE=off php php ./vendor/bin/pint -v --config=pint-test.json tests/'
-
-
-  hooks:install:
-    desc: Use the git hooks in scripts/git-hooks (pre-commit runs Pint)
-    cmds:
-      - git config core.hooksPath scripts/git-hooks
 
 
   ##### PHP CONTAINER #####
