@@ -119,27 +119,22 @@ class Curl
             $options[CURLOPT_RETURNTRANSFER] = true;
         }
 
-        try {
-            curl_setopt_array($handle, $options);
+        curl_setopt_array($handle, $options);
 
-            $res = curl_exec($handle);
+        $res = curl_exec($handle);
 
-            if ($res === false) {
-                Log::error("curl_exec failed for {$url}: " . curl_error($handle));
-                return false;
-            }
-
-            $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-
-            if ($httpCode >= 400) {
-                Log::error("Download returned HTTP {$httpCode} for {$url}", $res);
-                return false;
-            }
-
-            return $res;
-
-        } finally {
-            curl_close($handle);
+        if ($res === false) {
+            Log::error("curl_exec failed for {$url}: " . curl_error($handle));
+            return false;
         }
+
+        $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+
+        if ($httpCode >= 400) {
+            Log::error("Download returned HTTP {$httpCode} for {$url}", $res);
+            return false;
+        }
+
+        return $res;
     }
 }
