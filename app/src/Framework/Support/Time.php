@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Framework\Support;
 
+use DateTime;
+
 class Time
 {
     /**
@@ -29,7 +31,7 @@ class Time
      */
     public static function militaryToCivilianTime(string $time): string
     {
-        $time = new \DateTime($time);
+        $time = new DateTime($time);
         $time = $time->format('g:i a');
 
         // g - 12-hour format of an hour (1 to 12)

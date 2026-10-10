@@ -6,6 +6,7 @@ namespace Tests\Unit\Framework\Container;
 
 use App\Framework\Container\Container;
 use App\Framework\Container\ContainerException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -374,7 +375,7 @@ class ContainerTest extends TestCase
      * @param  non-empty-string  $idToTest
      * @param  class-string  $expectedClass
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('cases_to_test_set_and_get')]
+    #[DataProvider('cases_to_test_set_and_get')]
     public function test_set_and_get(array $instructions, string $idToTest, string $expectedClass): void
     {
         $container = new Container();

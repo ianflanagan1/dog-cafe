@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Framework\Routing;
 
-class RouteNotFoundException extends \Exception
+use Exception;
+
+class RouteNotFoundException extends Exception
 {
     public function __construct()
     {

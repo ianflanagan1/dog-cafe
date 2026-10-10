@@ -12,6 +12,14 @@
         },
         "nullable_type_declaration_for_default_null_value": true,
         "no_spaces_around_offset": false,
-        "ordered_class_elements": false
+        "ordered_class_elements": false,
+        "global_namespace_import": {
+            "import_classes": true,
+            "import_constants": false,
+            "import_functions": false
+        },
+        "fully_qualified_strict_types": {
+            "import_symbols": true
+        }
     }
 }
