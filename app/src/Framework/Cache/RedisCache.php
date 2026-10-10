@@ -9,6 +9,7 @@ use DateTime;
 use InvalidArgumentException;
 use Psr\SimpleCache\CacheInterface;
 use Redis;
+use SensitiveParameter;
 use Stringable;
 
 readonly class RedisCache implements CacheInterface
@@ -23,7 +24,7 @@ readonly class RedisCache implements CacheInterface
      */
     public function __construct(
         protected Redis $redis,
-        array $config
+        #[SensitiveParameter] array $config
     ) {
         $this->redis->connect((string) $config['host'], $config['port']);
         $this->redis->auth((string) $config['password']);

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Framework\Session;
 
+use SensitiveParameter;
+
 class Session implements SessionInterface
 {
     protected const string FLASH_NAME = 'flash';
@@ -18,7 +20,7 @@ class Session implements SessionInterface
      * } $redisConfig
      */
     public function __construct(
-        protected readonly array $redisConfig
+        #[SensitiveParameter] protected readonly array $redisConfig
     ) {
     }
 
