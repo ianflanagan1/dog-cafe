@@ -8,12 +8,12 @@ use App\Enums\Locality;
 use App\Framework\Errors\NotFoundException;
 use App\Framework\Errors\SystemException;
 use App\Framework\Http\Controller;
-use App\Framework\Http\Response\Response;
+use App\Framework\Http\Response;
 use App\Framework\Routing\Attributes\Delete;
 use App\Framework\Routing\Attributes\Get;
 use App\Framework\Routing\Attributes\Post;
 use App\Framework\Session\Auth;
-use App\Framework\View\ViewParameters;
+use App\Framework\View\ViewRenderer;
 use App\Http\DTOs\ListPageUrls;
 use App\Http\FormRequests\FavRequest;
 use App\Http\FormRequests\ListRequest;
@@ -38,10 +38,11 @@ readonly class FavouriteController extends Controller
      */
     public function favsHtml(
         ListRequest $request,
+        ViewRenderer $viewRenderer,
         Auth $auth,
         VenueRepository $venueRepository,
         FavouriteSessionStore $favouriteSessionStore,
-    ): ViewParameters {
+    ): Response {
         $auth->guard(true);
 
         /** @var ListValidated $validated */
@@ -67,24 +68,22 @@ readonly class FavouriteController extends Controller
         $venues = array_map(fn (array $v): array => VenueHydrator::processTypes($v), $venues);
         $venues = array_map(fn (array $v): array => VenueHydrator::processOpeningTimes($v, Locality::UnitedKingdom), $venues);
 
-        return new ViewParameters(
-            'main',
-            'favs',
-            'favs',
-            [
+        return $viewRenderer->render(
+            status: 200,
+            page: 'favs',
+            layoutParameters: [
                 'search'    => false,
                 'canonical' => $urls->canonical,
             ],
-            [
+            headParameters: [
                 'urls'      => $urls,
             ],
-            [
+            bodyParameters: [
                 'page'          => $validated['page'],
                 'totalPages'    => $totalPages,
                 'urls'          => $urls,
                 'venues'        => $venues,
             ],
-            200,
         );
     }
 
@@ -97,7 +96,7 @@ readonly class FavouriteController extends Controller
         Auth $auth,
         VenueRepository $venueRepository,
         FavouriteSessionStore $favouriteSessionStore,
-    ): string {
+    ): Response {
         $auth->guard();
 
         /** @var ListValidated $validated */
@@ -115,11 +114,11 @@ readonly class FavouriteController extends Controller
         $venues = array_map(fn (array $v): array => VenueHydrator::processTypes($v), $venues);
         $venues = array_map(fn (array $v): array => VenueHydrator::processOpeningTimes($v, Locality::UnitedKingdom), $venues);
 
-        return Response::json([
+        return Response::json(200, [
             'items'         => $venues,
             'totalPages'    => $totalPages,
             'timestamp'     => $validated['timestamp'],
-        ], 200);
+        ]);
     }
 
     #[Post('/api/v1/favs')]
@@ -131,7 +130,7 @@ readonly class FavouriteController extends Controller
         Auth $auth,
         FavouriteSessionStore $favouriteSessionStore,
         VenueRepository $venueRepository,
-    ): string {
+    ): Response {
         $auth->guard();
 
         /** @var FavValidated $validated */
@@ -146,7 +145,7 @@ readonly class FavouriteController extends Controller
             throw new SystemException();
         }
 
-        return Response::json(['success' => true], 201);
+        return Response::json(201, ['success' => true]);
     }
 
     #[Delete('/api/v1/favs/:extId')]
@@ -158,7 +157,7 @@ readonly class FavouriteController extends Controller
         FavouriteSessionStore $favouriteSessionStore,
         VenueRepository $venueRepository,
         string $extId,
-    ): string {
+    ): Response {
         $auth->guard();
 
         if (!Venue::stringMightBeExtId($extId)) {
@@ -175,6 +174,6 @@ readonly class FavouriteController extends Controller
 
         $favouriteSessionStore->delete($id);
 
-        return Response::empty();
+        return Response::noContent();
     }
 }

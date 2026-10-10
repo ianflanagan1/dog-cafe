@@ -6,13 +6,13 @@ namespace App\Http\Controllers;
 
 use App\Framework\Http\Controller;
 use App\Framework\Http\Request;
-use App\Framework\Http\Response\Response;
+use App\Framework\Http\Response;
 use App\Framework\Routing\Attributes\Delete;
 use App\Framework\Routing\Attributes\Get;
 use App\Framework\Routing\Attributes\Post;
 use App\Framework\Session\Auth;
 use App\Framework\Session\FormTokenHandler;
-use App\Framework\View\ViewParameters;
+use App\Framework\View\ViewRenderer;
 use App\Services\AppUserDeletionService;
 
 readonly class AccountManagementController extends Controller
@@ -24,58 +24,57 @@ readonly class AccountManagementController extends Controller
     /**
      * Render account management page.
      */
-    public function settings(Auth $auth, FormTokenHandler $formTokenHandler): ViewParameters
+    public function settings(ViewRenderer $viewRenderer, Auth $auth, FormTokenHandler $formTokenHandler): Response
     {
         $auth->guard(true);
 
-        return new ViewParameters(
-            'main',
-            'settings',
-            'settings',
-            [
+        return $viewRenderer->render(
+            status: 200,
+            page: 'settings',
+            layoutParameters: [
                 'search'    => false,
                 'canonical' => '/settings',
             ],
-            [
+            headParameters: [
                 'canonical' => '/settings',
             ],
-            [
+            bodyParameters: [
               'logoutFormToken' => $formTokenHandler->createToken(self::LOGOUT_KEY),
               'deleteFormToken' => $formTokenHandler->createToken(self::LOGOUT_KEY),
             ],
-            200,
         );
     }
 
     #[Post('/logout')]
-    public function logout(Request $request, Auth $auth, FormTokenHandler $formTokenHandler): void
+    public function logout(Request $request, ViewRenderer $viewRenderer, Auth $auth, FormTokenHandler $formTokenHandler): Response
     {
         $auth->guard(true);
 
         if (!$formTokenHandler->isValidToken(self::LOGOUT_KEY, $request->formToken('logout_form_token'))) {
-            Response::htmlError(403);
+            return $viewRenderer->error(403);
         }
 
         $auth->logout();
 
-        Response::redirect('/', 303);
+        return Response::redirect(303, '/');
     }
 
     #[Delete('/account')]
     public function deleteAccount(
         Request $request,
+        ViewRenderer $viewRenderer,
         Auth $auth,
         FormTokenHandler $formTokenHandler,
-        AppUserDeletionService $appUserDeletionService
-    ): string {
+        AppUserDeletionService $appUserDeletionService,
+    ): Response {
         $auth->guard(true);
 
         if (!$formTokenHandler->isValidToken(self::DELETE_KEY, $request->formToken('delete_form_token'))) {
-            Response::htmlError(403);
+            return $viewRenderer->error(403);
         }
 
         $appUserDeletionService->handle();
 
-        return Response::empty();
+        return Response::noContent();
     }
 }
