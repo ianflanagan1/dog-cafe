@@ -56,6 +56,19 @@ task phpstan
 ```
 task test
 ```
+
+## Code Style
+
+```
+task pint
+```
+
+To check staged PHP files with Pint before each commit, install the git hooks once per clone:
+```
+task hooks:install
+```
+The hook needs the dev stack running. Skip it for one commit with `git commit --no-verify`.
+
 ## Project Structure
 
 ```
