@@ -23,7 +23,7 @@ $e = fn (mixed $value): string => HtmlEscaper::html($value);
     </div>
     <div>
       <form id="delete-account-form" method="POST" action="/account">
-        <input type="hidden" name="delete_form_token" value="<?= $e($p['logoutFormToken']) ?>"/>
+        <input type="hidden" name="delete_form_token" value="<?= $e($p['deleteFormToken']) ?>"/>
         <button type="submit" aria-label="Delete account" class="link-style">Delete Account</button>
       </form>
     </div>

@@ -40,7 +40,7 @@ readonly class AccountManagementController extends Controller
             ],
             bodyParameters: [
               'logoutFormToken' => $formTokenHandler->createToken(self::LOGOUT_KEY),
-              'deleteFormToken' => $formTokenHandler->createToken(self::LOGOUT_KEY),
+              'deleteFormToken' => $formTokenHandler->createToken(self::DELETE_KEY),
             ],
         );
     }
