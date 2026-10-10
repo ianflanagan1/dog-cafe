@@ -14,9 +14,9 @@ function post(url, parameters, callback)
     xhr(url, callback, 'POST', formData);
 }
 
-function del(url, callback)
+function del(url, callback, body = null)
 {
-    xhr(url, callback, 'DELETE');
+    xhr(url, callback, 'DELETE', body);
 }
 
 function xhr(url, callback, method = 'GET', body = null)

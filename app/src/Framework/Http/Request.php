@@ -7,6 +7,7 @@ namespace App\Framework\Http;
 use App\Framework\Support\Log;
 use App\Framework\Support\StandardTypes;
 use App\Framework\Support\Str;
+use RequestParseBodyException;
 
 /**
  * Immutable snapshot of the current HTTP request.
@@ -46,11 +47,13 @@ final readonly class Request
             }
         }
 
+        $method = HttpMethod::from(strtolower($_SERVER['REQUEST_METHOD']));
+
         return new self(
-            HttpMethod::from(strtolower($_SERVER['REQUEST_METHOD'])),
+            $method,
             $_SERVER['REQUEST_URI'] ?: '/',
             $_GET,
-            $_POST,
+            self::parseBodyFromGlobals($method),
             $headers,
             $_SERVER,
         );
@@ -117,6 +120,32 @@ final readonly class Request
         }
 
         return $token;
+    }
+
+    /**
+     * PHP only populates $_POST for POST, so form bodies of other methods are parsed on demand.
+     *
+     * @return Inputs
+     */
+    private static function parseBodyFromGlobals(HttpMethod $method): array
+    {
+        if ($method === HttpMethod::POST) {
+            return $_POST;
+        }
+
+        if ($method !== HttpMethod::PUT && $method !== HttpMethod::PATCH && $method !== HttpMethod::DELETE) {
+            return [];
+        }
+
+        try {
+            [$parsedBody] = request_parse_body();
+        } catch (RequestParseBodyException) { // @phpstan-ignore catch.neverThrown (PHPStan's stub for request_parse_body() lacks @throws)
+            // Body missing, malformed, or not form-encoded
+            return [];
+        }
+
+        /** @var Inputs $parsedBody */
+        return $parsedBody;
     }
 
     private function hasBody(): bool
