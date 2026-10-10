@@ -31,10 +31,10 @@ Install:
 ```
 git clone git@github.com:ianflanagan1/dog-cafe.git
 cd dog-cafe
-cp app/.env.example app/.env
-task up:detach
-task composer:install
+task setup
 ```
+`task setup` creates `app/.env` from `app/.env.example`, installs the git hooks, starts the dev stack and runs `composer install`. Each step is skipped if it's already done, so it's safe to re-run.
+
 Access in a browser at `http://localhost:8090`.
 
 If your user is added to the `docker` group, `sudo` is not required for `task` commands.
@@ -63,11 +63,7 @@ task test
 task pint
 ```
 
-To check staged PHP files with Pint before each commit, install the git hooks once per clone:
-```
-task hooks:install
-```
-The hook needs the dev stack running. Skip it for one commit with `git commit --no-verify`.
+A pre-commit hook (installed by `task setup`) checks staged PHP files with Pint. It needs the dev stack running. Skip it for one commit with `git commit --no-verify`.
 
 ## Project Structure
 
