@@ -23,6 +23,11 @@ vars:
 
   COMPOSE: docker compose -f ./compose.yaml --env-file ./{{.PHP_DIRECTORY}}/.env
 
+  # Extra php.ini layers (deploy/php/), mounted outside conf.d so only these commands load them.
+  # The leading colon keeps the default conf.d (php.dev.ini) and adds the named directory after it.
+  PHPUNIT_INI: -e PHP_INI_SCAN_DIR=:/usr/local/etc/php/conf.d-phpunit
+  TOOLING_INI: -e PHP_INI_SCAN_DIR=:/usr/local/etc/php/conf.d-tooling
+
   PHP_FPM_NGINX_USER: '65532'
   GID:
     sh: id -g
@@ -107,20 +112,20 @@ tasks:
     desc: 'Run PHPUnit, e.g. task test -- tests/Unit/ContainerTest.php'
     vars: { USER_STRING_PHP_FPM_NGINX: *user_php_fpm_nginx }
     cmds:
-      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} php php ./vendor/bin/phpunit --configuration phpunit.xml --testdox {{.CLI_ARGS}}'
+      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} {{.PHPUNIT_INI}} php php ./vendor/bin/phpunit --configuration phpunit.xml --testdox {{.CLI_ARGS}}'
 
   phpstan:
     desc: Run PHPStan
     vars: { USER_STRING_PHP_FPM_NGINX: *user_php_fpm_nginx }
     cmds:
-      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} -e XDEBUG_MODE=off php php ./vendor/bin/phpstan analyse --no-progress --memory-limit=1G --configuration=phpstan.neon {{.CLI_ARGS}}'
+      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} {{.TOOLING_INI}} -e XDEBUG_MODE=off php php ./vendor/bin/phpstan analyse --no-progress --memory-limit=1G --configuration=phpstan.neon {{.CLI_ARGS}}'
 
   pint:
     desc: Run Pint on src and tests
     vars: { USER_STRING_PHP_FPM_NGINX: *user_php_fpm_nginx }
     cmds:
-      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} -e XDEBUG_MODE=off php php ./vendor/bin/pint -v --config=pint.json'
-      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} -e XDEBUG_MODE=off php php ./vendor/bin/pint -v --config=pint-test.json tests/'
+      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} {{.TOOLING_INI}} -e XDEBUG_MODE=off php php ./vendor/bin/pint -v --config=pint.json'
+      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} {{.TOOLING_INI}} -e XDEBUG_MODE=off php php ./vendor/bin/pint -v --config=pint-test.json tests/'
 
 
   ##### PHP CONTAINER #####
@@ -148,7 +153,7 @@ tasks:
       - sh: test -n '{{.CLI_ARGS}}'
         msg: 'Needs a Composer command after --'
     cmds:
-      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} -e XDEBUG_MODE=off -e COMPOSER_CACHE_DIR=/tmp/composer-cache php sh -c "umask 0002 && /usr/bin/composer {{.CLI_ARGS}} --no-interaction --no-progress"'
+      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} {{.TOOLING_INI}} -e XDEBUG_MODE=off -e COMPOSER_CACHE_DIR=/tmp/composer-cache php sh -c "umask 0002 && /usr/bin/composer {{.CLI_ARGS}} --no-interaction --no-progress"'
 
   composer:install:
     desc: composer install
@@ -229,7 +234,7 @@ tasks:
     desc: Build the php prod image
     vars: { NO_CACHE_STRING: *no_cache }
     cmds:
-      - docker build --progress=plain {{.NO_CACHE_STRING}} -f {{.PHP_DOCKERFILE}} --target prod -t {{.PHP_PROD_IMAGE}} ./{{.PHP_DIRECTORY}}
+      - docker build --progress=plain {{.NO_CACHE_STRING}} -f {{.PHP_DOCKERFILE}} --target prod --build-context deploy=./{{.DEPLOY_DIRECTORY}} -t {{.PHP_PROD_IMAGE}} ./{{.PHP_DIRECTORY}}
 
   build:nginx-dev:
     desc: Build the nginx dev image

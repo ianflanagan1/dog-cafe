@@ -7,7 +7,7 @@
 set -euo pipefail
 
 COMPOSE=(docker compose -f ./compose.yaml --env-file ./app/.env)
-PINT=(exec -T --user "65532:$(id -g)" -e XDEBUG_MODE=off php php ./vendor/bin/pint --test)
+PINT=(exec -T --user "65532:$(id -g)" -e PHP_INI_SCAN_DIR=:/usr/local/etc/php/conf.d-tooling -e XDEBUG_MODE=off php php ./vendor/bin/pint --test)
 
 src_files=()
 test_files=()
