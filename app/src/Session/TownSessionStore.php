@@ -31,11 +31,6 @@ final readonly class TownSessionStore
         $this->session->put(self::SESSION_KEY_SEARCH_TOWN, $town);
     }
 
-    public function deleteLastSpecifiedTown(): void
-    {
-        $this->session->forget(self::SESSION_KEY_SEARCH_TOWN);
-    }
-
     public function findLastSpecifiedTown(): ?Town
     {
         return $this->findTownFromSession(self::SESSION_KEY_SEARCH_TOWN);
@@ -46,11 +41,6 @@ final readonly class TownSessionStore
     public function saveIpTown(Town $town): void
     {
         $this->session->put(self::SESSION_KEY_IP_TOWN, $town);
-    }
-
-    public function deleteIpTown(): void
-    {
-        $this->session->forget(self::SESSION_KEY_IP_TOWN);
     }
 
     public function findIpTown(): ?Town

@@ -167,51 +167,6 @@ final class File
     }
 
     /**
-     * Moves a file by copying and then deleting the original.
-     *
-     * This is intended for moving files across filesystems or partitions where `rename()` would fail.
-     *
-     * @param non-empty-string $source
-     * @param non-empty-string $target
-     * @param bool $overwrite
-     * @param Permissions $mkdirPermissions
-     * @return bool
-     */
-    #[NoDiscard]
-    public static function move(string $source, string $target, bool $overwrite = false, int $mkdirPermissions = 0700): bool
-    {
-        if (!self::ensureReadable($source)) {
-            return false;
-        }
-
-        if (!self::ensureTargetWritable($target, $overwrite, $mkdirPermissions)) {
-            return false;
-        }
-
-        $oldPermissions = fileperms($source) & 0777;
-
-        error_clear_last();
-
-        if (!copy($source, $target)) {
-            $error = error_get_last();
-            Log::error("copy failed: {$source} → {$target}" . ($error ? ' - ' . $error['message'] : ''));
-            return false;
-        }
-
-        if (!self::setPermissions($target, $oldPermissions)) {
-            return false;
-        }
-
-        // Verify post-condition
-        if (!self::delete($source)) {
-            Log::error("Failed to delete source file after move: {$source}");
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * @param non-empty-string $location
      * @param NonNegInt $permissions
      * @return bool

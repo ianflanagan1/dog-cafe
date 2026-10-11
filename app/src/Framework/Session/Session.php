@@ -9,8 +9,6 @@ use SensitiveParameter;
 
 class Session implements SessionInterface
 {
-    protected const string FLASH_NAME = 'flash';
-
     private bool $started = false;
     private bool $closed = false;
 
@@ -65,13 +63,6 @@ class Session implements SessionInterface
     }
 
     #[Override]
-    public function forget(string $key): void
-    {
-        $this->startForWriting();
-        unset($_SESSION[$key]);
-    }
-
-    #[Override]
     public function close(): void
     {
         if ($this->isActive()) {
@@ -113,31 +104,6 @@ class Session implements SessionInterface
         }
     }
 
-    #[Override]
-    public function flash(string $key, array $messages): void
-    {
-        $this->startForWriting();
-
-        $flashes = self::flashes();
-        $flashes[$key] = $messages;
-
-        $_SESSION[self::FLASH_NAME] = $flashes;
-    }
-
-    #[Override]
-    public function getFlash(string $key): array
-    {
-        $this->startForWriting();
-
-        $flashes = self::flashes();
-        $messages = $flashes[$key] ?? [];
-
-        unset($flashes[$key]);
-        $_SESSION[self::FLASH_NAME] = $flashes;
-
-        return $messages;
-    }
-
     /**
      * @return array<string, mixed>
      */
@@ -156,19 +122,6 @@ class Session implements SessionInterface
     protected function sendCookie(string $name, string $value, array $options): void
     {
         setcookie($name, $value, $options);
-    }
-
-    /**
-     * @return array<string, list<string>>
-     */
-    protected static function flashes(): array
-    {
-        $flashes = $_SESSION[self::FLASH_NAME] ?? [];
-
-        assert(is_array($flashes), 'Flash messages must be an array');
-
-        /** @var array<string, list<string>> */
-        return $flashes;
     }
 
     private function start(bool $readAndClose): void

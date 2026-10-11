@@ -64,20 +64,6 @@ readonly class SessionListManager
      * @param mixed $value
      * @return bool
      */
-    public function hasValue(string $key, mixed $value): bool
-    {
-        $list = $this->getAllValues($key);
-
-        return array_search($value, $list, true) === false
-            ? false
-            : true;
-    }
-
-    /**
-     * @param non-empty-string $key
-     * @param mixed $value
-     * @return bool
-     */
     public function consumeValue(string $key, mixed $value): bool
     {
         $list = $this->getAllValues($key);

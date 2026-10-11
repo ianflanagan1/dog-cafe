@@ -25,14 +25,4 @@ final class HtmlEscaper
         Log::error('Couldn\'t escape value', $value);
         return '[invalid]';
     }
-
-    public static function url(string $value): string
-    {
-        return rawurlencode($value);
-    }
-
-    public static function json(mixed $data): string
-    {
-        return json_encode($data, JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_AMP);
-    }
 }

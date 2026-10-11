@@ -105,27 +105,6 @@ final readonly class GenericRepository
     }
 
     /**
-     * @param non-empty-string $selectColumn
-     * @param non-empty-string $table
-     * @param non-empty-string $where
-     * @param ?scalar $parameter
-     * @return list<?scalar>
-     */
-    public function fetchValues(string $selectColumn, string $table, string $where, bool|float|int|string|null $parameter): array
-    {
-        /** @var list<?scalar> */
-
-        $res = $this->database->fetchAllColumn(
-            "SELECT {$selectColumn}
-            FROM {$table}
-            WHERE {$where} = ?",
-            [$parameter],
-        );
-
-        return $res;
-    }
-
-    /**
      * @param non-empty-string $columns
      * @param non-empty-string $table
      * @param non-empty-string $where

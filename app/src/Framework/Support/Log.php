@@ -14,16 +14,6 @@ final class Log
     private const int PRETTIFY_SIZE_LIMIT = 5000;
     private const string UNSET_DUMP = '__LOG_INTERNAL_UNSET_DUMP__';
 
-    public static function info(string $message, mixed $dump = self::UNSET_DUMP): void
-    {
-        self::writeStdOut('INFO', $message, $dump);
-    }
-
-    public static function debug(string $message, mixed $dump = self::UNSET_DUMP): void
-    {
-        self::writeStdOut('DEBUG', $message, $dump);
-    }
-
     public static function warning(string $message, mixed $dump = self::UNSET_DUMP): void
     {
         self::writeStdErr('WARNING', $message, $dump);
@@ -40,11 +30,6 @@ final class Log
         $trace = $exception->getTraceAsString();
 
         self::writeStdErr('EXCEPTION', $message . PHP_EOL . $trace);
-    }
-
-    private static function writeStdOut(string $level, string $message, mixed $dump = self::UNSET_DUMP): void
-    {
-        self::write($level, $message, $dump, 'php://stdout');
     }
 
     private static function writeStdErr(string $level, string $message, mixed $dump = self::UNSET_DUMP): void

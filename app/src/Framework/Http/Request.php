@@ -101,11 +101,6 @@ final readonly class Request
         return Str::nullIfEmpty($ip);
     }
 
-    public function isXmlHttpRequest(): bool
-    {
-        return $this->header('x-requested-with') === 'XMLHttpRequest';
-    }
-
     public function wantsJson(): bool
     {
         return str_contains($this->header('accept') ?? '', 'application/json');
