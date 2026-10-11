@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Framework\Support;
 
+use CurlSharePersistentHandle;
 use NoDiscard;
 use SensitiveParameter;
 
@@ -108,6 +109,7 @@ final class Curl
             CURLOPT_CONNECTTIMEOUT  => 5,
             CURLOPT_TIMEOUT         => 30,
             CURLOPT_HEADER          => false,   // Output only contains body
+            CURLOPT_SHARE           => self::persistentShare(),
         ];
 
         if (!empty($headers)) {
@@ -145,5 +147,18 @@ final class Curl
         }
 
         return $res;
+    }
+
+    /**
+     * DNS cache, connections and TLS sessions shared by every request this worker makes, so repeat calls to the same
+     * host skip the lookup and handshake. Cookies are deliberately not shared between users' requests.
+     */
+    private static function persistentShare(): CurlSharePersistentHandle
+    {
+        return curl_share_init_persistent([
+            CURL_LOCK_DATA_DNS,
+            CURL_LOCK_DATA_CONNECT,
+            CURL_LOCK_DATA_SSL_SESSION,
+        ]);
     }
 }
