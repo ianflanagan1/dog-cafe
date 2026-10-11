@@ -18,25 +18,9 @@ final class InputValidationException extends Exception
      * @param non-empty-list<Error> $errors
      */
     public function __construct(
-        protected readonly array $inputs,
-        protected readonly array $errors,
+        public readonly array $inputs,
+        public readonly array $errors,
     ) {
         parent::__construct("Input validation failed", 422);
-    }
-
-    /**
-     * @return Inputs
-     */
-    public function getInputs(): array
-    {
-        return $this->inputs;
-    }
-
-    /**
-     * @return non-empty-list<Error>
-     */
-    public function getErrors(): array
-    {
-        return $this->errors;
     }
 }

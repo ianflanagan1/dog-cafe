@@ -54,7 +54,7 @@ final readonly class SuggestController extends Controller
             $validated = $request->validate();
 
         } catch (InputValidationException $e) {
-            return $this->renderSuggestPage($viewRenderer, $formTokenHandler, 422, $e->getInputs(), $e->getErrors());
+            return $this->renderSuggestPage($viewRenderer, $formTokenHandler, 422, $e->inputs, $e->errors);
         }
 
         $suggestRepository->add($validated['suggest']);
