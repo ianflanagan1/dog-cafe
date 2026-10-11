@@ -97,7 +97,7 @@ final readonly class ListController extends Controller
     public function listJson(ListRequest $request, TownRepository $townRepository, ListVenuePageService $listVenuePageService, string $townStr): Response
     {
         $town = filter_var($townStr, FILTER_CALLBACK, [
-            'options' => [$townRepository, 'findByNameUrlLower']
+            'options' => $townRepository->findByNameUrlLower(...),
         ]);
 
         if ($town === false) {

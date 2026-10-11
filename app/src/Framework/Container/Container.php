@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Framework\Container;
 
-use Closure;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionFunction;
@@ -118,7 +117,7 @@ final class Container implements ContainerInterface
 
         $reflection = is_array($instruction)
                 ? new ReflectionMethod($instruction[0], $instruction[1])
-                : new ReflectionFunction(Closure::fromCallable($instruction));
+                : new ReflectionFunction($instruction(...));
 
         $args = $this->buildDependencies($reflection->getParameters(), $loopTracker);
         $instance = $instruction(...$args);
@@ -180,7 +179,7 @@ final class Container implements ContainerInterface
             return [];
         }
 
-        if ($parameters[array_key_last($parameters)]->isVariadic()) {
+        if (array_last($parameters)->isVariadic()) {
             array_pop($parameters);
         }
 

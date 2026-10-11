@@ -8,6 +8,7 @@ use App\Framework\Errors\Error;
 use App\Framework\Errors\ErrorCode;
 use App\Framework\Support\StandardTypes;
 use JsonException;
+use NoDiscard;
 use RuntimeException;
 
 /**
@@ -33,13 +34,12 @@ final readonly class Response
     ) {
     }
 
+    #[NoDiscard]
     public function withHeader(string $name, string $value): self
     {
-        return new self(
-            $this->status,
-            [...$this->headers, strtolower($name) => $value],
-            $this->body,
-        );
+        return clone($this, [
+            'headers' => [...$this->headers, strtolower($name) => $value],
+        ]);
     }
 
     /**
