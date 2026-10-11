@@ -40,7 +40,7 @@ class MaxStringRuleTest extends TestCase
     #[DataProvider('cases_to_test_rule_passes')]
     public function test_rule_passes(int $limit, string $value): void
     {
-        $result = (new MaxStringRule($limit))->validate(self::FIELD, $value);
+        $result = new MaxStringRule($limit)->validate(self::FIELD, $value);
 
         $this->assertNull($result);
     }
@@ -67,7 +67,7 @@ class MaxStringRuleTest extends TestCase
     #[DataProvider('cases_to_test_rule_fails')]
     public function test_rule_fails(int $limit, string $value): void
     {
-        $result = (new MaxStringRule($limit))->validate(self::FIELD, $value);
+        $result = new MaxStringRule($limit)->validate(self::FIELD, $value);
 
         $this->assertInstanceOf(Error::class, $result);
         $this->assertSame(ErrorCode::ParameterTooLong, $result->code);

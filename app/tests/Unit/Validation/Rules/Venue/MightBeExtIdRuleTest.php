@@ -34,7 +34,7 @@ class MightBeExtIdRuleTest extends TestCase
     #[DataProvider('cases_to_test_rule_passes')]
     public function test_rule_passes(string $value): void
     {
-        $result = (new MightBeExtIdRule())->validate(self::FIELD, $value);
+        $result = new MightBeExtIdRule()->validate(self::FIELD, $value);
 
         $this->assertNull($result);
     }
@@ -65,7 +65,7 @@ class MightBeExtIdRuleTest extends TestCase
     #[DataProvider('cases_to_test_rule_fails')]
     public function test_rule_fails(string $value): void
     {
-        $result = (new MightBeExtIdRule())->validate(self::FIELD, $value);
+        $result = new MightBeExtIdRule()->validate(self::FIELD, $value);
 
         $this->assertInstanceOf(Error::class, $result);
         $this->assertSame(ErrorCode::ParameterInvalidValue, $result->code);

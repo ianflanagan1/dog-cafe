@@ -64,7 +64,7 @@ final class Database
             $executed = $statement->execute($values);
 
             if ($executed === false) {
-                throw new RuntimeException("Failed to execute action query");
+                throw new RuntimeException('Failed to execute action query');
             }
 
             $rows = $statement->rowCount();
@@ -91,7 +91,7 @@ final class Database
             $executed = $statement->execute($values);
 
             if ($executed === false) {
-                throw new RuntimeException("Failed to execute fetch query");
+                throw new RuntimeException('Failed to execute fetch query');
             }
 
             $res = $statement->fetch($mode);
@@ -109,7 +109,7 @@ final class Database
             '$res must be an array or an instance of stdClass'
         );
 
-        /** @var array<string|int, mixed>|stdClass $res */
+        /** @var array<string|int, mixed>|stdClass */
 
         return $res;
     }
@@ -129,7 +129,7 @@ final class Database
             $executed = $statement->execute($values);
 
             if ($executed === false) {
-                throw new RuntimeException("Failed to execute fetchAll query");
+                throw new RuntimeException('Failed to execute fetchAll query');
             }
 
             $res = $statement->fetchAll($mode);
@@ -156,7 +156,7 @@ final class Database
             $executed = $statement->execute($values);
 
             if ($executed === false) {
-                throw new RuntimeException("Failed to execute fetchColumn query");
+                throw new RuntimeException('Failed to execute fetchColumn query');
             }
 
             $res = $statement->fetchColumn($column);
@@ -183,7 +183,7 @@ final class Database
             $executed = $statement->execute($values);
 
             if ($executed === false) {
-                throw new RuntimeException("Failed to execute fetchAllColumn query");
+                throw new RuntimeException('Failed to execute fetchAllColumn query');
             }
 
             $res = $statement->fetchAll(PDO::FETCH_COLUMN, $column);
@@ -191,6 +191,8 @@ final class Database
         } catch (PDOException $e) {
             self::error($e, $sql);
         }
+
+        assert(array_is_list($res), 'FETCH_COLUMN must return a list');
 
         return $res;
     }
@@ -209,7 +211,7 @@ final class Database
             $executed = $statement->execute($values);
 
             if ($executed === false) {
-                throw new RuntimeException("Failed to execute insert query");
+                throw new RuntimeException('Failed to execute insert query');
             }
 
             $id = $this->connect()->lastInsertId();
@@ -219,7 +221,7 @@ final class Database
         }
 
         if ($id === '' || $id === false) {
-            throw new RuntimeException("Insert did not produce an ID");
+            throw new RuntimeException('Insert did not produce an ID');
         }
 
         assert(ctype_digit($id), 'ID must be an integer');

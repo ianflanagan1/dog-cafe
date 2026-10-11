@@ -108,7 +108,7 @@ final readonly class VenueRepository
      */
     public function findFullByExtId(string $extId): ?array
     {
-        /** @phpstan-var VenueFullFromDatabase $res */
+        /** @phpstan-var ?VenueFullFromDatabase */
         $res = $this->findByExtId($extId, self::COLUMNS_FULL);
         return $res;
     }
@@ -119,18 +119,18 @@ final readonly class VenueRepository
      */
     public function findMinimalByExtId(string $extId): ?array
     {
-        /** @phpstan-var VenueMinimalFromDatabase $res */
+        /** @phpstan-var ?VenueMinimalFromDatabase */
         $res = $this->findByExtId($extId, self::COLUMNS_MINIMAL);
         return $res;
     }
 
     /**
      * @param non-empty-string $humanUrl
-     * @return VenueFullFromDatabase
+     * @return ?VenueFullFromDatabase
      */
     public function findFullByHumanUrl(string $humanUrl): ?array
     {
-        /** @phpstan-var VenueFullFromDatabase $res */
+        /** @phpstan-var ?VenueFullFromDatabase */
 
         $res = $this->genericRepository->findRow(
             self::COLUMNS_FULL,
@@ -173,7 +173,7 @@ final readonly class VenueRepository
      */
     public function fetch(int $page, int $pageSize, SqlWhere $where, VenueOrderBy $orderBy): array
     {
-        /** @phpstan-var list<VenueMinimalFromDatabase> $res */
+        /** @phpstan-var list<VenueMinimalFromDatabase> */
 
         $res = $this->genericRepository->fetchRowsWithSqlWhere(
             self::COLUMNS_MINIMAL,
@@ -276,7 +276,7 @@ final readonly class VenueRepository
          *     ext_id: non-empty-string,
          *     lat: string,
          *     lng: string,
-         * }> $items
+         * }>
          */
 
         $items = $this->genericRepository->fetchRowsWithSqlWhere(
@@ -296,7 +296,7 @@ final readonly class VenueRepository
          *     ext_id: non-empty-string,
          *     lat: float,
          *     lng: float,
-         * }> $items
+         * }>
          */
 
         return $items;
@@ -349,7 +349,7 @@ final readonly class VenueRepository
      */
     private function findByExtId(string $extId, string $columns): ?array
     {
-        /** @phpstan-var VenueFullFromDatabase|VenueMinimalFromDatabase|null $res */
+        /** @phpstan-var VenueFullFromDatabase|VenueMinimalFromDatabase|null */
 
         $res = $this->genericRepository->findRow(
             $columns,

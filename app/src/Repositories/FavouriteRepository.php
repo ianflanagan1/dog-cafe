@@ -68,7 +68,7 @@ final readonly class FavouriteRepository
      */
     public function fetchForUser(int $appUserId): array
     {
-        /** @var FavouritesArray $res */
+        /** @var FavouritesArray */
 
         $res =  $this->database->fetchAllColumn(
             'SELECT venue_id FROM favourite WHERE app_user_id = ?',

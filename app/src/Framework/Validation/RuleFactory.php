@@ -19,7 +19,9 @@ final class RuleFactory
 {
     public static function fromString(string $rule, string $type): RuleInterface
     {
-        [$name, $parameter] = array_pad(explode(':', $rule, 2), 2, null);
+        $parts = explode(':', $rule, 2);
+        $name = $parts[0];
+        $parameter = $parts[1] ?? null;
 
         switch (strtolower($name)) {
             case 'required': return new RequiredRule();

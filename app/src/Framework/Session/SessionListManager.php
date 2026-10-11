@@ -31,8 +31,8 @@ readonly class SessionListManager
         $res = $this->session->get($key);
 
         assert(
-            $res === null || is_array($res),
-            'List must be null or array'
+            $res === null || (is_array($res) && array_is_list($res)),
+            'List must be null or list'
         );
 
         return is_array($res)

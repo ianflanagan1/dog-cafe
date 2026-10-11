@@ -28,7 +28,7 @@ final readonly class LoginController extends Controller
      */
     public function login(LoginRequest $request, ViewRenderer $viewRenderer, LoginService $loginService): Response
     {
-        /** @var LoginValidated $validated */
+        /** @var LoginValidated */
         $validated = $request->validate();
 
         // Store the route to return to after successful login
@@ -57,7 +57,7 @@ final readonly class LoginController extends Controller
      */
     public function redirectGoogleLogin(LoginRedirectRequest $request, LoginService $loginService): Response
     {
-        /** @var LoginRedirectValidated $validated */
+        /** @var LoginRedirectValidated */
         $validated = $request->validate();
 
         $loginService->processLoginGoogle($validated['code'], self::REDIRECT_ROUTE_GOOGLE);
@@ -70,7 +70,7 @@ final readonly class LoginController extends Controller
      */
     public function redirectDiscordLogin(LoginRedirectRequest $request, LoginService $loginService): Response
     {
-        /** @var LoginRedirectValidated $validated */
+        /** @var LoginRedirectValidated */
         $validated = $request->validate();
 
         $loginService->processLoginDiscord($validated['code'], self::REDIRECT_ROUTE_DISCORD);

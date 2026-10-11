@@ -47,7 +47,6 @@ use App\Models\Venue;
  */
 final class MapPointsBuilder
 {
-    protected const int CLUSTER_CATCHMENT_PIXELS = 45;
     private const int LAT_DECIMALS = 6;
     private const int LNG_DECIMALS = 6;
     private const float CLUSTER_BORDER_FACTOR = 0.02;
@@ -97,7 +96,7 @@ final class MapPointsBuilder
                 '$venues and $metadata must be non-empty when $index !== null'
             );
 
-            /** @var int<2, max> $count */
+            /** @var int<2, max> */
             $count = count($metadata[$index]['links']) + 1;
             [$latMin, $latMax, $lngMin, $lngMax] = self::markClusteredAndGetBounds($index, $venues, $metadata);
 
@@ -130,11 +129,8 @@ final class MapPointsBuilder
      */
     private static function createClusteringMetadata(array $venues, float $latClusterLimit, float $lngClusterLimit): array
     {
-        $metadata = [];
-
-        foreach (array_keys($venues) as $i) {
-            $metadata[$i] = ['links' => [], 'clustered' => false];
-        }
+        /** @var list<list<NonNegInt>> */
+        $links = array_fill(0, count($venues), []);
 
         for ($i = 0; $i < count($venues); $i++) {
             for ($j = $i + 1; $j < count($venues); $j++) {
@@ -146,13 +142,18 @@ final class MapPointsBuilder
                     $latClusterLimit,
                     $lngClusterLimit,
                 )) {
-                    $metadata[$i]['links'][] = $j;
-                    $metadata[$j]['links'][] = $i;
+                    assert(isset($links[$i], $links[$j]));
+
+                    $links[$i][] = $j;
+                    $links[$j][] = $i;
                 }
             }
         }
 
-        return $metadata;
+        return array_map(
+            fn (array $venueLinks): array => ['links' => $venueLinks, 'clustered' => false],
+            $links,
+        );
     }
 
     /**
@@ -171,6 +172,8 @@ final class MapPointsBuilder
      */
     private static function markClusteredAndGetBounds(int $index, array $venues, array &$metadata): array
     {
+        assert(isset($metadata[$index]));
+
         $metadata[$index]['clustered'] = true;
 
         $latMin = $venues[$index]['lat'];
@@ -180,6 +183,8 @@ final class MapPointsBuilder
 
         for ($i = 0; $i < count($metadata[$index]['links']); $i++) {
             $pointIndex = $metadata[$index]['links'][$i];
+
+            assert(isset($metadata[$pointIndex]));
 
             $metadata[$pointIndex]['clustered'] = true;
 

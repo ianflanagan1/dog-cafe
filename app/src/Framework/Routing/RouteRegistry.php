@@ -85,7 +85,7 @@ final class RouteRegistry
      */
     private const string SEGMENT_ALLOWED = '[A-Za-z0-9._~-]+';
 
-    /** @var RouteSegment $routes */
+    /** @var RouteSegment */
     private array $routes;
 
     /** @var list<ControllerAction> */
@@ -130,7 +130,7 @@ final class RouteRegistry
 
         [$class, $method] = $this->actions[$actionIndex];
 
-        return [$class, $method, $parameters];
+        return [$class, $method, $parameters]; // @phpstan-ignore return.type (parameter names are non-empty by PARAMETER_ALLOWED; PHPStan loses this through the recursive routes tree)
     }
 
     /**
@@ -184,14 +184,14 @@ final class RouteRegistry
                             $route->path,
                             $route->method,
                             $actionIndex,
-                            $routes
+                            $routes // @phpstan-ignore argument.type (the recursive routes tree is untyped below one level; see class docblock)
                         );
                     }
                 }
             }
         }
 
-        $this->routes = $routes;
+        $this->routes = $routes; // @phpstan-ignore assign.propertyType (the recursive routes tree is untyped below one level; see class docblock)
         $this->actions = $actions;
 
         $this->cache->set(self::CACHE_KEY_ROUTES, json_encode($routes));
@@ -300,7 +300,7 @@ final class RouteRegistry
                 $segments,
                 $httpMethod,
                 $actionIndex,
-                $routes['par']
+                $routes['par'] // @phpstan-ignore argument.type, parameterByRef.type (the recursive routes tree is untyped below one level; see class docblock)
             );
 
             return;
@@ -347,7 +347,7 @@ final class RouteRegistry
                 $segments,
                 $httpMethod,
                 $actionIndex,
-                $routes['seg'][$segment],
+                $routes['seg'][$segment], // @phpstan-ignore argument.type (the recursive routes tree is untyped below one level; see class docblock)
             );
             return;
         }
@@ -407,7 +407,7 @@ final class RouteRegistry
     {
         $segment = $segments[0];
 
-        /** @var RouteSegment $routes */
+        /** @var RouteSegment */
         $routes = $routes['seg'][$segment];
 
         // If there are more segments, continue processing recursively
@@ -454,7 +454,7 @@ final class RouteRegistry
 
         assert(isset($routes['par']));
 
-        /** @var RouteParameter $par */
+        /** @var RouteParameter */
         $par = $routes['par'];
 
         $parameterName = $par['name'];

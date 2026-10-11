@@ -111,11 +111,12 @@ final class VenueHydrator
             $images = json_decode($venue['images'], true);
 
             assert(
-                is_array($images),
-                'Decoded images must be an array'
+                is_array($images) && array_is_list($images),
+                'Decoded images must be a list'
             );
 
-            $images = array_splice($images, 0, 7);
+            /** @phpstan-var list<non-empty-string> */
+            $images = array_slice($images, 0, 7);
 
         } else {
             $images = [];
@@ -150,7 +151,7 @@ final class VenueHydrator
             $output[] = self::getOpenCloseByDay($venue, $day);
         }
 
-        /** @phpstan-var OpenCloseArray $output */
+        /** @phpstan-var OpenCloseArray */
 
         return $output;
     }

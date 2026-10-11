@@ -21,6 +21,6 @@ final class InputValidationException extends Exception
         public readonly array $inputs,
         public readonly array $errors,
     ) {
-        parent::__construct("Input validation failed", 422);
+        parent::__construct('Input validation failed', 422);
     }
 }

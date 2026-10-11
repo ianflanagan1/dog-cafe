@@ -28,7 +28,7 @@ final readonly class MapController extends Controller
     {
         $town = $townResolver->resolve($townStr, $request->ip());
 
-        /** @var MapValidated $validated */
+        /** @var MapValidated */
         $validated = $request->validate();
 
         $isType = fn (VenueType $t): bool => in_array($t, $validated['types'], true);
@@ -59,7 +59,7 @@ final readonly class MapController extends Controller
      */
     public function searchMap(SearchMapRequest $request, MapPointsService $mapPointsService): Response
     {
-        /** @var SearchMapValidated $validated */
+        /** @var SearchMapValidated */
         $validated = $request->validate();
 
         $points = $mapPointsService->get(

@@ -36,7 +36,7 @@ final class Log
 
     public static function exception(Throwable $exception): void
     {
-        $message = get_class($exception) . ': ' . $exception->getMessage();
+        $message = $exception::class . ': ' . $exception->getMessage();
         $trace = $exception->getTraceAsString();
 
         self::writeStdErr('EXCEPTION', $message . PHP_EOL . $trace);
@@ -118,7 +118,7 @@ final class Log
         }
 
         if ($value instanceof Throwable) {
-            return $indent . get_class($value) . ': ' . $value->getMessage();
+            return $indent . $value::class . ': ' . $value->getMessage();
         }
 
         return $indent . gettype($value) . ': ' . print_r($value, true);

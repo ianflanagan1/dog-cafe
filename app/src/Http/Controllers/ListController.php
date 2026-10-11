@@ -41,7 +41,7 @@ final readonly class ListController extends Controller
     ): Response {
         $town = $townResolver->resolve($townStr, $request->ip());
 
-        /** @var ListValidated $validated */
+        /** @var ListValidated */
         $validated = $request->validate();
 
         [$totalPages, $venues] = $listVenuePageService->get(
@@ -104,7 +104,7 @@ final readonly class ListController extends Controller
             throw new NotFoundException();
         }
 
-        /** @var ListValidated $validated */
+        /** @var ListValidated */
         $validated = $request->validate();
 
         [$totalPages, $venues] = $listVenuePageService->get(

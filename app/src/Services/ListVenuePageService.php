@@ -233,7 +233,7 @@ final readonly class ListVenuePageService
         );
 
         if ($items !== null) {
-            /** @var list<VenueMinimalForCache> $items */
+            /** @var list<VenueMinimalForCache> */
             $items = json_decode($items, true);
 
             // Otherwise, get from database and save to cache

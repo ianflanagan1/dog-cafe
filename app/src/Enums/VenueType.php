@@ -6,6 +6,7 @@ namespace App\Enums;
 
 use App\Framework\Support\QueryStringConversionsTrait;
 use JsonSerializable;
+use Override;
 
 /**
  * @phpstan-type VenueTypeCacheArray list<array{
@@ -50,6 +51,7 @@ enum VenueType: int implements JsonSerializable
         };
     }
 
+    #[Override]
     public function jsonSerialize(): int
     {
         return $this->value;

@@ -30,7 +30,7 @@ final readonly class VenueController extends Controller
      */
     public function venueMinimal(VenueShortRequest $request, VenueRepository $venueRepository): Response
     {
-        /** @var VenueShortValidated $validated */
+        /** @var VenueShortValidated */
         $validated = $request->validate();
 
         $venue = $venueRepository->findMinimalByExtId($validated['ext_id']);

@@ -49,7 +49,7 @@ readonly class AppUserRepository
      */
     public function findById(int $id): ?AppUser
     {
-        /** @var ?AppUserArray $res */
+        /** @var ?AppUserArray */
 
         $res = $this->genericRepository->findRowWithSqlWhere(
             'id, email, name, picture',
@@ -71,7 +71,7 @@ readonly class AppUserRepository
      */
     public function findByEmail(string $email): ?AppUser
     {
-        /** @var ?AppUserArray $res */
+        /** @var ?AppUserArray */
 
         $res = $this->genericRepository->findRowWithSqlWhere(
             'id, email, name, picture',

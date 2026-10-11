@@ -121,7 +121,7 @@ final class Validator
 
     /**
      * @param list<Error> $errors
-     * @param string $field
+     * @param non-empty-string $field
      * @param mixed $value
      * @param ?list<non-empty-string> $rules
      * @return void

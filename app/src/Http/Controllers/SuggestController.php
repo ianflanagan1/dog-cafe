@@ -50,7 +50,7 @@ final readonly class SuggestController extends Controller
         }
 
         try {
-            /** @var SuggestValidated $validated */
+            /** @var SuggestValidated */
             $validated = $request->validate();
 
         } catch (InputValidationException $e) {

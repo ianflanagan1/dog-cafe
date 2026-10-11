@@ -6,9 +6,11 @@ namespace App\Framework\Validation\Rules;
 
 use App\Framework\Errors\Error;
 use App\Framework\Errors\ErrorCode;
+use Override;
 
 final class RequiredRule implements RuleInterface
 {
+    #[Override]
     public function validate(string $field, mixed $value): ?Error
     {
         if ($value === null) {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Framework\Database;
 
+use Override;
+
 final class SqlWhere
 {
     /**
@@ -16,6 +18,7 @@ final class SqlWhere
     ) {
     }
 
+    #[Override]
     public function __toString(): string
     {
         return $this->getString();

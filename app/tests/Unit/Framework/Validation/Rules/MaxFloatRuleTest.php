@@ -76,7 +76,7 @@ class MaxFloatRuleTest extends TestCase
     #[DataProvider('cases_to_test_rule_passes')]
     public function test_rule_passes(float $limit, float $value): void
     {
-        $result = (new MaxFloatRule($limit))->validate(self::FIELD, $value);
+        $result = new MaxFloatRule($limit)->validate(self::FIELD, $value);
 
         $this->assertNull($result);
     }
@@ -119,7 +119,7 @@ class MaxFloatRuleTest extends TestCase
     #[DataProvider('cases_to_test_rule_fails')]
     public function test_rule_fails(float $limit, float $value): void
     {
-        $result = (new MaxFloatRule($limit))->validate(self::FIELD, $value);
+        $result = new MaxFloatRule($limit)->validate(self::FIELD, $value);
 
         $this->assertInstanceOf(Error::class, $result);
         $this->assertSame(ErrorCode::ParameterTooLarge, $result->code);
