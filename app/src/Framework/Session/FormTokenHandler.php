@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Framework\Session;
 
+use App\Framework\Support\StringGenerator;
 use SensitiveParameter;
 
 readonly class FormTokenHandler
@@ -54,6 +55,6 @@ readonly class FormTokenHandler
      */
     protected static function generateToken(): string
     {
-        return sha1((string) mt_rand());
+        return StringGenerator::hex(32);
     }
 }
