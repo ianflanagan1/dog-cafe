@@ -41,7 +41,7 @@ final readonly class RouteExceptionHandler
 
         if ($e instanceof InputValidationException) {
             return $request->wantsJson()
-                ? Response::jsonErrors(422, $e->getErrors())
+                ? Response::jsonErrors(422, $e->errors)
                 : $this->viewRenderer->error(422);
         }
 
