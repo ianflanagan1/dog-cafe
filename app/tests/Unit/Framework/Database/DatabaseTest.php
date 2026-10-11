@@ -6,13 +6,16 @@ namespace Tests\Unit\Framework\Database;
 
 use App\Framework\Database\Database;
 use App\Framework\Errors\SystemException;
+use Override;
 use PDO;
 use PDOException;
 use PDOStatement;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
+#[AllowMockObjectsWithoutExpectations]
 final class DatabaseTest extends TestCase
 {
     protected Database $database;
@@ -23,6 +26,7 @@ final class DatabaseTest extends TestCase
     /** @var MockObject&PDOStatement */
     protected PDOStatement $statementMock;
 
+    #[Override]
     protected function setUp(): void
     {
         $this->pdoMock = $this->createMock(PDO::class);
@@ -37,10 +41,30 @@ final class DatabaseTest extends TestCase
             'user' => 'user',
             'password' => 'pass',
         ],
-            function (array $config, array $defaultOptions): MockObject&PDO {
+            function (array $config): MockObject&PDO {
                 return $this->pdoMock;
             },
         );
+    }
+
+    public function test_the_connection_is_given_the_attributes_the_class_relies_on(): void
+    {
+        $attributes = [];
+
+        $this->pdoMock->method('setAttribute')
+            ->willReturnCallback(function (int $attribute, mixed $value) use (&$attributes): bool {
+                $attributes[$attribute] = $value;
+                return true;
+            });
+
+        $this->pdoMock->method('prepare')->willReturn($this->statementMock);
+        $this->statementMock->method('execute')->willReturn(true);
+
+        $this->database->action('DELETE FROM test');
+
+        $this->assertSame(PDO::ERRMODE_EXCEPTION, $attributes[PDO::ATTR_ERRMODE] ?? null);
+        $this->assertSame(PDO::FETCH_ASSOC, $attributes[PDO::ATTR_DEFAULT_FETCH_MODE] ?? null);
+        $this->assertFalse($attributes[PDO::ATTR_EMULATE_PREPARES] ?? null);
     }
 
     public function test_action_returns_row_count(): void
