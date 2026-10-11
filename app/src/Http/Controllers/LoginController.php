@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Framework\Http\Controller;
 use App\Framework\Http\Response;
 use App\Framework\Routing\Attributes\Get;
+use App\Framework\Session\FormTokenHandler;
 use App\Framework\View\ViewRenderer;
 use App\Http\FormRequests\LoginRedirectRequest;
 use App\Http\FormRequests\LoginRequest;
@@ -21,18 +22,21 @@ final readonly class LoginController extends Controller
     // COUPLED:oauth-redirect-paths. = google-console and discord-portal redirect URI paths (docs/external/); ⊆ nginx:PHP location routes
     protected const string REDIRECT_ROUTE_GOOGLE  = '/redirect-google-login';
     protected const string REDIRECT_ROUTE_DISCORD = '/redirect-discord-login';
+    protected const string OAUTH_STATE_KEY = 'oauthState';
 
     #[Get('/login')]
     /**
      * Render login page.
      */
-    public function login(LoginRequest $request, ViewRenderer $viewRenderer, LoginService $loginService): Response
+    public function login(LoginRequest $request, ViewRenderer $viewRenderer, LoginService $loginService, FormTokenHandler $formTokenHandler): Response
     {
         /** @var LoginValidated */
         $validated = $request->validate();
 
         // Store the route to return to after successful login
         $loginService->storePreLoginLocation($validated['location']);
+
+        $state = $formTokenHandler->createToken(self::OAUTH_STATE_KEY);
 
         return $viewRenderer->render(
             status: 200,
@@ -45,8 +49,8 @@ final readonly class LoginController extends Controller
                 'canonical' => '/login',
             ],
             bodyParameters: [
-                'urlGoogle'     => $loginService->getLoginUrlGoogle(self::REDIRECT_ROUTE_GOOGLE),
-                'urlDiscord'    => $loginService->getLoginUrlDiscord(self::REDIRECT_ROUTE_DISCORD),
+                'urlGoogle'     => $loginService->getLoginUrlGoogle(self::REDIRECT_ROUTE_GOOGLE, $state),
+                'urlDiscord'    => $loginService->getLoginUrlDiscord(self::REDIRECT_ROUTE_DISCORD, $state),
             ],
         );
     }
@@ -55,8 +59,12 @@ final readonly class LoginController extends Controller
     /**
      * Handle to callback from Google OAuth.
      */
-    public function redirectGoogleLogin(LoginRedirectRequest $request, LoginService $loginService): Response
+    public function redirectGoogleLogin(LoginRedirectRequest $request, ViewRenderer $viewRenderer, LoginService $loginService, FormTokenHandler $formTokenHandler): Response
     {
+        if (!$formTokenHandler->isValidToken(self::OAUTH_STATE_KEY, $request->formToken('state'))) {
+            return $viewRenderer->error(403);
+        }
+
         /** @var LoginRedirectValidated */
         $validated = $request->validate();
 
@@ -68,8 +76,12 @@ final readonly class LoginController extends Controller
     /**
      * Handle to callback from Discord OAuth.
      */
-    public function redirectDiscordLogin(LoginRedirectRequest $request, LoginService $loginService): Response
+    public function redirectDiscordLogin(LoginRedirectRequest $request, ViewRenderer $viewRenderer, LoginService $loginService, FormTokenHandler $formTokenHandler): Response
     {
+        if (!$formTokenHandler->isValidToken(self::OAUTH_STATE_KEY, $request->formToken('state'))) {
+            return $viewRenderer->error(403);
+        }
+
         /** @var LoginRedirectValidated */
         $validated = $request->validate();
 

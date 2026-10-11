@@ -14,12 +14,15 @@ use App\Session\FavouriteSessionStore;
 use Google\Client;
 use Google\Service\Oauth2;
 use SensitiveParameter;
+use Uri\Rfc3986\Uri;
 
 /**
  * @phpstan-import-type PosInt from StandardTypes
  */
 final readonly class LoginService
 {
+    private const string GOOGLE_AUTHORIZE_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
+    private const string DISCORD_AUTHORIZE_URL = 'https://discord.com/oauth2/authorize';
     private const string DISCORD_TOKEN_URL = 'https://discordapp.com/api/oauth2/token';
     private const string DISCORD_USERS_URL = 'https://discordapp.com/api/users/@me';
     private const string DISCORD_AVATAR_URL_BASE = 'https://cdn.discordapp.com/avatars/';
@@ -54,13 +57,20 @@ final readonly class LoginService
      * Generates the full Google OAuth2 login URL for use on the login page.
      *
      * @param non-empty-string $route Relative path for the OAuth2 redirect_uri.
+     * @param non-empty-string $state Single-use token the callback must return, to reject forged logins.
      * @return non-empty-string
      */
-    public function getLoginUrlGoogle(string $route): string
+    public function getLoginUrlGoogle(string $route, #[SensitiveParameter] string $state): string
     {
-        $redirectUrl = $this->appUrl . $route;
-
-        return 'https://accounts.google.com/o/oauth2/v2/auth?response_type=code&access_type=online&client_id=' . $this->config['googleClientId'] . '&redirect_uri=' . urlencode($redirectUrl) . '&state&scope=email%20profile&approval_prompt=auto';
+        return self::authorizeUrl(self::GOOGLE_AUTHORIZE_URL, [
+            'response_type'     => 'code',
+            'access_type'       => 'online',
+            'client_id'         => $this->config['googleClientId'],
+            'redirect_uri'      => $this->appUrl . $route,
+            'state'             => $state,
+            'scope'             => 'email profile',
+            'approval_prompt'   => 'auto',
+        ]);
 
         // https://console.cloud.google.com
     }
@@ -69,13 +79,18 @@ final readonly class LoginService
      * Generates the full Discord OAuth2 login URL for use on the login page.
      *
      * @param non-empty-string $route Relative path for the OAuth2 redirect_uri.
+     * @param non-empty-string $state Single-use token the callback must return, to reject forged logins.
      * @return non-empty-string
      */
-    public function getLoginUrlDiscord(string $route): string
+    public function getLoginUrlDiscord(string $route, #[SensitiveParameter] string $state): string
     {
-        $redirectUrl = $this->appUrl . $route;
-
-        return 'https://discord.com/oauth2/authorize?client_id=' . $this->config['discordClientId'] . '&response_type=code&redirect_uri=' . urlencode($redirectUrl) . '&scope=identify+email';
+        return self::authorizeUrl(self::DISCORD_AUTHORIZE_URL, [
+            'client_id'         => $this->config['discordClientId'],
+            'response_type'     => 'code',
+            'redirect_uri'      => $this->appUrl . $route,
+            'state'             => $state,
+            'scope'             => 'identify email',
+        ]);
 
         // https://discord.com/developers/applications
     }
@@ -171,7 +186,6 @@ final readonly class LoginService
                 'client_secret' => $this->config['discordClientSecret'],
                 'grant_type'    => 'authorization_code',
                 'redirect_uri'  => $redirectUrl,
-                'score'         => 'identity%20email',
             ],
         );
 
@@ -196,8 +210,8 @@ final readonly class LoginService
             return false;
         }
 
-        if (!isset($result['access_token'])) {
-            Log::error('`access_token` not set', $result);
+        if (!isset($result['access_token']) || !is_string($result['access_token'])) {
+            Log::error('`access_token` invalid', $result);
             return false;
         }
 
@@ -241,6 +255,11 @@ final readonly class LoginService
          */
 
         if ($user === false) {
+            return false;
+        }
+
+        if (!isset($user['id']) || !is_string($user['id']) || empty($user['id'])) {
+            Log::error('`id` invalid', $user);
             return false;
         }
 
@@ -336,6 +355,22 @@ final readonly class LoginService
         $this->favouriteSessionStore->refresh($id);
 
         return $id;
+    }
+
+    /**
+     * @param non-empty-string $authorizeUrl
+     * @param array<non-empty-string, string> $query
+     * @return non-empty-string
+     */
+    private static function authorizeUrl(string $authorizeUrl, #[SensitiveParameter] array $query): string
+    {
+        $url = new Uri($authorizeUrl)
+            ->withQuery(http_build_query($query, encoding_type: PHP_QUERY_RFC3986))
+            ->toString();
+
+        assert($url !== '', 'An absolute URI is never empty');
+
+        return $url;
     }
 
     private static function validateCode(#[SensitiveParameter] mixed $code): bool
