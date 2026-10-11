@@ -2,7 +2,7 @@
 
 This records the **current** state of `dogcafeuk.com`.
 
-- COUPLED:public-domain. = caddy:site addresses, php:session.cookie_domain
+- COUPLED:public-domain. = caddy:site addresses, app:config/session.php cookie_domain
 
 | Setting | Value |
 |---|---|

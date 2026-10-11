@@ -21,6 +21,7 @@ return [
         'port'      => (int) trim(getenv('REDIS_PORT') ?: '6379'),
         'password'  => trim(getenv('REDIS_PASSWORD') ?: ''),
     ],
+    'session' => require __DIR__ . '/session.php',
     'loginProviders' => [
         'googleClientId'        => trim(getenv('GOOGLE_OAUTH_CLIENT_ID') ?: ''),
         'googleClientSecret'    => trim(getenv('GOOGLE_OAUTH_CLIENT_SECRET') ?: ''),

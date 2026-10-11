@@ -100,27 +100,10 @@ class Auth
 
     public function logout(): void
     {
-        if (! ini_get('session.use_cookies')) {
-            $parameters = session_get_cookie_params();
-
-            $sessionName = session_name();
-
-            if ($sessionName !== false) {
-                setcookie(
-                    $sessionName,
-                    '',
-                    time() - 42000,
-                    $parameters['path'],
-                    $parameters['domain'],
-                    $parameters['secure'],
-                    $parameters['httponly']
-                );
-            }
-        }
-
-        session_destroy();
+        $this->session->destroy();
 
         $this->user = null;
+        $this->resolved = true;
     }
 
     /**
