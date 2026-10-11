@@ -79,20 +79,24 @@ return [
         $session->start();
         return $session;
     },
-    RedisCache::class => function (Redis $redis, Config $config): RedisCache {
+    RedisCache::class => function (Config $config): RedisCache {
         /**
          * @var array{
          *      host: non-empty-string,
          *      port: int,
          *      password: non-empty-string,
-         * } $redisConfig
+         * }
          */
         $redisConfig = $config->get('redis');
 
-        return new RedisCache(
-            $redis,
-            $redisConfig,
-        );
+        $redisFactory = function () use ($redisConfig): Redis {
+            $redis = new Redis();
+            $redis->connect($redisConfig['host'], $redisConfig['port']);
+            $redis->auth($redisConfig['password']);
+            return $redis;
+        };
+
+        return new RedisCache($redisFactory);
     },
     RouteRegistry::class => function (RedisCache $cache): RouteRegistry {
         $router = new RouteRegistry($cache);
