@@ -96,11 +96,11 @@ final readonly class ListController extends Controller
      */
     public function listJson(ListRequest $request, TownRepository $townRepository, ListVenuePageService $listVenuePageService, string $townStr): Response
     {
-        $town = filter_var($townStr, FILTER_CALLBACK, [
-            'options' => $townRepository->findByNameUrlLower(...),
-        ]);
+        $town = $townStr === ''
+            ? null
+            : $townRepository->findByNameUrlLower($townStr);
 
-        if ($town === false) {
+        if ($town === null) {
             throw new NotFoundException();
         }
 
