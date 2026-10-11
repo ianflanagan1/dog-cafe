@@ -18,14 +18,9 @@ class ContainerTest extends TestCase
     {
         $container = new Container([
             'id' => function (ContainerInterface $containerFromInterface, Container $containerFromClass): ClassWithContainer {
-                $a = new ClassWithContainer();
-
                 $this->assertInstanceOf(Container::class, $containerFromInterface);
 
-                $a->containerFromInterface = $containerFromInterface;
-                $a->containerFromClass = $containerFromClass;
-
-                return $a;
+                return new ClassWithContainer($containerFromInterface, $containerFromClass);
             },
         ]);
 
@@ -69,7 +64,7 @@ class ContainerTest extends TestCase
     public function test_get_throws_exception_for_closure_parameter_without_type_hint(): void
     {
         $container = new Container([
-            'id' => function ($noType): stdClass {
+            'id' => function ($noType): stdClass { // @phpstan-ignore shipmonk.unknownClosureParamType, shipmonk.unusedParameter (the missing type is what's under test)
                 return new stdClass();
             },
         ]);
@@ -105,23 +100,23 @@ class ContainerTest extends TestCase
         $a = $container->get(AutowiringD::class);
 
         $this->assertInstanceOf(AutowiringD::class, $a);
-        $this->assertEquals(4, $a->int);
-        $this->assertEquals('d', $a->string);
+        $this->assertSame(4, $a->int);
+        $this->assertSame('d', $a->string);
     }
 
     public function test_get_resolves_autowiring_some_parameters(): void
     {
         $nonDefault = -1;
         $container = new Container([
-            AutowiringD::class => function (ContainerInterface $container) use ($nonDefault): AutowiringD {
+            AutowiringD::class => function () use ($nonDefault): AutowiringD {
                 return new AutowiringD($nonDefault);
             },
         ]);
         $a = $container->get(AutowiringD::class);
 
         $this->assertInstanceOf(AutowiringD::class, $a);
-        $this->assertEquals($nonDefault, $a->int);
-        $this->assertEquals('d', $a->string);
+        $this->assertSame($nonDefault, $a->int);
+        $this->assertSame('d', $a->string);
     }
 
     public function test_get_resolves_nested_autowiring(): void
@@ -130,32 +125,26 @@ class ContainerTest extends TestCase
         $a = $container->get(AutowiringA::class);
 
         $this->assertInstanceOf(AutowiringA::class, $a);
-        $this->assertEquals(1, $a->int);
-        $this->assertEquals('a', $a->string);
+        $this->assertSame(1, $a->int);
+        $this->assertSame('a', $a->string);
 
-        $this->assertInstanceOf(AutowiringB::class, $a->b);
-        $this->assertEquals(2, $a->b->int);
-        $this->assertEquals('b', $a->b->string);
+        $this->assertSame(2, $a->b->int);
+        $this->assertSame('b', $a->b->string);
 
-        $this->assertInstanceOf(AutowiringD::class, $a->d);
-        $this->assertEquals(4, $a->d->int);
-        $this->assertEquals('d', $a->d->string);
+        $this->assertSame(4, $a->d->int);
+        $this->assertSame('d', $a->d->string);
 
-        $this->assertInstanceOf(AutowiringC1::class, $a->b->c1);
-        $this->assertEquals(3, $a->b->c1->int);
-        $this->assertEquals('c1', $a->b->c1->string);
+        $this->assertSame(3, $a->b->c1->int);
+        $this->assertSame('c1', $a->b->c1->string);
 
-        $this->assertInstanceOf(AutowiringC2::class, $a->b->c2);
-        $this->assertEquals(3, $a->b->c2->int);
-        $this->assertEquals('c2', $a->b->c2->string);
+        $this->assertSame(3, $a->b->c2->int);
+        $this->assertSame('c2', $a->b->c2->string);
 
-        $this->assertInstanceOf(AutowiringD::class, $a->b->d);
-        $this->assertEquals(4, $a->b->d->int);
-        $this->assertEquals('d', $a->b->d->string);
+        $this->assertSame(4, $a->b->d->int);
+        $this->assertSame('d', $a->b->d->string);
 
-        $this->assertInstanceOf(AutowiringD::class, $a->b->c1->d);
-        $this->assertEquals(4, $a->b->c1->d->int);
-        $this->assertEquals('d', $a->b->c1->d->string);
+        $this->assertSame(4, $a->b->c1->d->int);
+        $this->assertSame('d', $a->b->c1->d->string);
 
         $this->assertSame($a->d, $a->b->d);
         $this->assertSame($a->d, $a->b->c1->d);
@@ -195,32 +184,26 @@ class ContainerTest extends TestCase
         $a = $container->get(AutowiringA::class);
 
         $this->assertInstanceOf(AutowiringA::class, $a);
-        $this->assertEquals(1, $a->int);
-        $this->assertEquals('a', $a->string);
+        $this->assertSame(1, $a->int);
+        $this->assertSame('a', $a->string);
 
-        $this->assertInstanceOf(AutowiringB::class, $a->b);
-        $this->assertEquals(2, $a->b->int);
-        $this->assertEquals('b', $a->b->string);
+        $this->assertSame(2, $a->b->int);
+        $this->assertSame('b', $a->b->string);
 
-        $this->assertInstanceOf(AutowiringD::class, $a->d);
-        $this->assertEquals(11, $a->d->int);
-        $this->assertEquals('d-1', $a->d->string);
+        $this->assertSame(11, $a->d->int);
+        $this->assertSame('d-1', $a->d->string);
 
-        $this->assertInstanceOf(AutowiringC1::class, $a->b->c1);
-        $this->assertEquals(3, $a->b->c1->int);
-        $this->assertEquals('c1', $a->b->c1->string);
+        $this->assertSame(3, $a->b->c1->int);
+        $this->assertSame('c1', $a->b->c1->string);
 
-        $this->assertInstanceOf(AutowiringC2::class, $a->b->c2);
-        $this->assertEquals(3, $a->b->c2->int);
-        $this->assertEquals('c2', $a->b->c2->string);
+        $this->assertSame(3, $a->b->c2->int);
+        $this->assertSame('c2', $a->b->c2->string);
 
-        $this->assertInstanceOf(AutowiringD::class, $a->b->d);
-        $this->assertEquals(12, $a->b->d->int);
-        $this->assertEquals('d-2', $a->b->d->string);
+        $this->assertSame(12, $a->b->d->int);
+        $this->assertSame('d-2', $a->b->d->string);
 
-        $this->assertInstanceOf(AutowiringD::class, $a->b->c1->d);
-        $this->assertEquals(13, $a->b->c1->d->int);
-        $this->assertEquals('d-3', $a->b->c1->d->string);
+        $this->assertSame(13, $a->b->c1->d->int);
+        $this->assertSame('d-3', $a->b->c1->d->string);
 
         $this->assertNotSame($a->d, $a->b->d);
         $this->assertNotSame($a->d, $a->b->c1->d);
@@ -240,8 +223,8 @@ class ContainerTest extends TestCase
         $result = $container->get(stdClass::class);
         $this->assertInstanceOf(stdClass::class, $result);
         $this->assertInstanceOf(AutowiringD::class, $result->d);
-        $this->assertEquals(4, $result->d->int);
-        $this->assertEquals('d', $result->d->string);
+        $this->assertSame(4, $result->d->int);
+        $this->assertSame('d', $result->d->string);
     }
 
     public function test_get_throws_exception_for_autowiring_without_defaults(): void
@@ -409,9 +392,11 @@ class ContainerTest extends TestCase
 
 class ClassWithContainer
 {
-    public Container $containerFromInterface;
-
-    public Container $containerFromClass;
+    public function __construct(
+        public readonly Container $containerFromInterface,
+        public readonly Container $containerFromClass,
+    ) {
+    }
 }
 
 class TestClass
@@ -436,10 +421,10 @@ class NoParameters
 class AutowiringA
 {
     public function __construct(
-        public AutowiringB $b,
-        public AutowiringD $d,
-        public int $int = 1,
-        public string $string = 'a',
+        public readonly AutowiringB $b,
+        public readonly AutowiringD $d,
+        public readonly int $int = 1,
+        public readonly string $string = 'a',
     ) {
     }
 }
@@ -447,11 +432,11 @@ class AutowiringA
 class AutowiringB
 {
     public function __construct(
-        public AutowiringC1 $c1,
-        public AutowiringC2 $c2,
-        public AutowiringD $d,
-        public int $int = 2,
-        public string $string = 'b',
+        public readonly AutowiringC1 $c1,
+        public readonly AutowiringC2 $c2,
+        public readonly AutowiringD $d,
+        public readonly int $int = 2,
+        public readonly string $string = 'b',
     ) {
     }
 }
@@ -459,9 +444,9 @@ class AutowiringB
 class AutowiringC1
 {
     public function __construct(
-        public AutowiringD $d,
-        public int $int = 3,
-        public string $string = 'c1',
+        public readonly AutowiringD $d,
+        public readonly int $int = 3,
+        public readonly string $string = 'c1',
     ) {
     }
 }
@@ -469,8 +454,8 @@ class AutowiringC1
 class AutowiringC2
 {
     public function __construct(
-        public int $int = 3,
-        public string $string = 'c2',
+        public readonly int $int = 3,
+        public readonly string $string = 'c2',
     ) {
     }
 }
@@ -478,15 +463,15 @@ class AutowiringC2
 class AutowiringD
 {
     public function __construct(
-        public int $int = 4,
-        public string $string = 'd',
+        public readonly int $int = 4,
+        public readonly string $string = 'd',
     ) {
     }
 }
 
 class NoDefaults
 {
-    public function __construct(public int $a)
+    public function __construct(public readonly int $a)
     {
     }
 }

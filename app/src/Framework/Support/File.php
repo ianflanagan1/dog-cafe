@@ -27,7 +27,7 @@ final class File
         $uri = Uri::parse($url);
 
         // Anything else (e.g. file://) would let curl read local files or reach non-HTTP services
-        if ($uri === null || !in_array($uri->getScheme(), ['http', 'https'], true) || empty($uri->getHost())) {
+        if ($uri === null || !in_array($uri->getScheme(), ['http', 'https'], true) || ($uri->getHost() ?? '') === '') {
             Log::error("Invalid URL for download: {$url}");
             return false;
         }
@@ -48,7 +48,7 @@ final class File
 
         if ($fileHandle === false) {
             $error = error_get_last();
-            Log::error("fopen failed: {$tempFile}" . ($error ? ' - ' . $error['message'] : ''));
+            Log::error("fopen failed: {$tempFile}" . ($error !== null ? ' - ' . $error['message'] : ''));
             return false;
         }
 
@@ -93,7 +93,7 @@ final class File
 
         if (!unlink($file)) {
             $error = error_get_last();
-            Log::error("fopen failed: {$file}" . ($error ? ' - ' . $error['message'] : ''));
+            Log::error("fopen failed: {$file}" . ($error !== null ? ' - ' . $error['message'] : ''));
             return false;
 
         }
@@ -135,7 +135,7 @@ final class File
 
         if (!rename($source, $target)) {
             $error = error_get_last();
-            Log::error("rename failed: {$source} → {$target}" . ($error ? ' - ' . $error['message'] : ''));
+            Log::error("rename failed: {$source} → {$target}" . ($error !== null ? ' - ' . $error['message'] : ''));
             return false;
         }
 
@@ -222,7 +222,7 @@ final class File
 
         if (!chmod($location, $permissions)) {
             $error = error_get_last();
-            Log::error("chmod failed: {$location}" . ($error ? ' - ' . $error['message'] : ''));
+            Log::error("chmod failed: {$location}" . ($error !== null ? ' - ' . $error['message'] : ''));
             return false;
         }
 

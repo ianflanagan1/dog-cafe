@@ -80,7 +80,7 @@ final class Container implements ContainerInterface
      */
     private function resolve(string $id, array $loopTracker = []): object
     {
-        if (array_search($id, $loopTracker) !== false) {
+        if (in_array($id, $loopTracker, true)) {
             throw new ContainerException('Circular dependency: ' . implode(' -> ', $loopTracker) . ' -> ' . $id);
         }
 
@@ -122,6 +122,10 @@ final class Container implements ContainerInterface
         $args = $this->buildDependencies($reflection->getParameters(), $loopTracker);
         $instance = $instruction(...$args);
 
+        if (!is_object($instance)) {
+            throw new ContainerException("Cannot resolve: the closure for `$id` did not return an object");
+        }
+
         $this->instructions[$id] = $instance;
 
         return $instance;
@@ -157,7 +161,7 @@ final class Container implements ContainerInterface
 
         $parameters = $constructor->getParameters();
 
-        if (empty($parameters)) {
+        if ($parameters === []) {
             $this->instructions[$id] = new $id();
             return $this->instructions[$id];
         }
@@ -175,7 +179,7 @@ final class Container implements ContainerInterface
      */
     private function buildDependencies(array $parameters, array $loopTracker, array $provided = []): array
     {
-        if (empty($parameters)) {
+        if ($parameters === []) {
             return [];
         }
 
@@ -198,7 +202,7 @@ final class Container implements ContainerInterface
                     throw new ContainerException('Cannot resolve parameter: no type hint provided');
                 }
 
-                if ($type == ContainerInterface::class || $type == Container::class) {
+                if (in_array((string) $type, [ContainerInterface::class, Container::class], true)) {
                     return $this;
                 }
 

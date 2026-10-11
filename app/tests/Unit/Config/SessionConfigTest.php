@@ -15,7 +15,10 @@ final class SessionConfigTest extends TestCase
      */
     private static function config(): array
     {
-        return require CONFIG_PATH . '/session.php';
+        /** @var array<string, scalar> */
+        $config = require CONFIG_PATH . '/session.php';
+
+        return $config;
     }
 
     /**

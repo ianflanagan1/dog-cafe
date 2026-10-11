@@ -7,5 +7,8 @@ use App\Framework\Container\Container;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$container = new Container(require CONFIG_PATH . '/containerBindings.php');
+/** @var array<string, (callable(): mixed)|object|string> */
+$instructions = require CONFIG_PATH . '/containerBindings.php';
+
+$container = new Container($instructions);
 $container->call(App::class, 'run');

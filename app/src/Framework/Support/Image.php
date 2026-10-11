@@ -31,7 +31,7 @@ final class Image
 
         $mime = mime_content_type($tempFile);
 
-        if ($mime === false || empty($mime)) {
+        if ($mime === false || $mime === '') {
             Log::error("`mime_content_type()` failed for: {$url}", $mime);
             File::delete($tempFile);
             return false;

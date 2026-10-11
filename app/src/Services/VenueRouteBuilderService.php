@@ -31,17 +31,17 @@ final class VenueRouteBuilderService
         if (
             $page < 1                                       // Page is not positive; Occurs when building for "last page" from Page 1
             || ($totalPages > 0 && $page > $totalPages)     // Results exist and Page exceeds total pages
-            || ($totalPages < 1 && $page != 1)              // No results and Page is not 1
+            || ($totalPages < 1 && $page !== 1)             // No results and Page is not 1
         ) {
             return null;
         }
 
         // For URL brevity, Page should not be expressed for its default value (1)
-        if ($page != 1) {
+        if ($page !== 1) {
             $args['page'] = $page;
         }
 
-        if (!empty($types)) {
+        if ($types !== []) {
             $args['types'] = [];
 
             foreach ($types as $type) {
@@ -53,11 +53,11 @@ final class VenueRouteBuilderService
             $args['open_now'] = '';
         }
 
-        $query = !empty($args)
+        $query = $args !== []
             ? '?' . urldecode(http_build_query($args))
             : '';
 
-        if ($town) {
+        if ($town !== null) {
             $base .= '/' . $town;
         }
 

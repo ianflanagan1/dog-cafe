@@ -151,7 +151,7 @@ class RouteRegistryTest extends TestCase
      *   >
      * >
      */
-    public static function cases_to_test_registering_conflicting_routes_throws()
+    public static function cases_to_test_registering_conflicting_routes_throws(): array
     {
         return [
             'Conflicting parameter (at start)' => ['/:abc'],
@@ -193,7 +193,7 @@ class RouteRegistryTest extends TestCase
         $this->cacheMock
             ->expects($this->exactly(2))
             ->method('set')
-            ->willReturnCallback(function ($key, $value, $ttl) use ($routesKey, $actionsKey): bool {
+            ->willReturnCallback(function (string $key, mixed $value) use ($routesKey, $actionsKey): bool {
                 $expected = [
                     $routesKey => json_encode([]),
                     $actionsKey => json_encode([]),
@@ -626,7 +626,7 @@ class RouteRegistryTest extends TestCase
         $this->cacheMock
             ->expects($this->exactly(2))
             ->method('set')
-            ->willReturnCallback(function ($key, $value, $ttl) use ($routesKey, $actionsKey, $routes, $actions): bool {
+            ->willReturnCallback(function (string $key, mixed $value) use ($routesKey, $actionsKey, $routes, $actions): bool {
                 $expected = [
                     $routesKey => json_encode($routes),
                     $actionsKey => json_encode($actions),

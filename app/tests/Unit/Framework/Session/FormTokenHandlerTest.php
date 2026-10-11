@@ -85,7 +85,7 @@ final class FormTokenHandlerTest extends TestCase
             ->method('addValue')
             ->with(
                 $this->SESSION_PREFIX.'a-key',
-                $this->callback(function ($token) use (&$capturedToken) {
+                self::callback(function (mixed $token) use (&$capturedToken): bool {
                     $capturedToken = $token;
 
                     return true;

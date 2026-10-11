@@ -42,7 +42,7 @@ final readonly class Request
         $headers = [];
 
         foreach ($_SERVER as $key => $value) {
-            if (is_string($value) && str_starts_with($key, 'HTTP_')) {
+            if (is_string($key) && is_string($value) && str_starts_with($key, 'HTTP_')) {
                 $headers[strtolower(str_replace('_', '-', substr($key, 5)))] = $value;
             }
         }
@@ -55,13 +55,21 @@ final readonly class Request
 
         $method = HttpMethod::from(strtolower($requestMethod));
 
+        /** @var Inputs */
+        $query = $_GET;
+
+        /** @var array<string, mixed> */
+        $serverParams = $_SERVER;
+
         return new self(
             $method,
-            $requestUri ?: '/',
-            $_GET,
+            $requestUri === ''
+                ? '/'
+                : $requestUri,
+            $query,
             self::parseBodyFromGlobals($method),
             $headers,
-            $_SERVER,
+            $serverParams,
         );
     }
 
@@ -136,6 +144,7 @@ final readonly class Request
     private static function parseBodyFromGlobals(HttpMethod $method): array
     {
         if ($method === HttpMethod::POST) {
+            /** @var Inputs */
             return $_POST;
         }
 
@@ -156,9 +165,9 @@ final readonly class Request
 
     private function hasBody(): bool
     {
-        return $this->method == HttpMethod::POST
-            || $this->method == HttpMethod::PUT
-            || $this->method == HttpMethod::PATCH
-            || $this->method == HttpMethod::DELETE;
+        return $this->method === HttpMethod::POST
+            || $this->method === HttpMethod::PUT
+            || $this->method === HttpMethod::PATCH
+            || $this->method === HttpMethod::DELETE;
     }
 }

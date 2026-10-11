@@ -10,6 +10,7 @@ use App\Framework\Support\StandardTypes;
 use Closure;
 use PDO;
 use PDOException;
+use PDOStatement;
 use RuntimeException;
 use SensitiveParameter;
 use stdClass;
@@ -19,6 +20,14 @@ use stdClass;
  *
  * @phpstan-import-type PosInt from StandardTypes
  * @phpstan-import-type NonNegInt from StandardTypes
+ * @phpstan-type DatabaseConfig array{
+ *      driver: string,
+ *      port: int,
+ *      host: string,
+ *      database: string,
+ *      user: string,
+ *      password: string,
+ * }
  * */
 final class Database
 {
@@ -31,15 +40,8 @@ final class Database
     private ?PDO $pdo = null;
 
     /**
-     * @param array{
-     *      driver: string,
-     *      port: int,
-     *      host: string,
-     *      database: string,
-     *      user: string,
-     *      password: string,
-     * } $config
-     * @param Closure(array<string, mixed>): PDO $pdoFactory
+     * @param DatabaseConfig $config
+     * @param Closure(DatabaseConfig): PDO $pdoFactory
      */
     public function __construct(
         #[SensitiveParameter] private array $config,
@@ -57,13 +59,7 @@ final class Database
     public function action(string $sql, array $values = []): int
     {
         try {
-            $statement = $this->connect()->prepare($sql);
-            $executed = $statement->execute($values);
-
-            if ($executed === false) {
-                throw new RuntimeException('Failed to execute action query');
-            }
-
+            $statement = $this->execute($sql, $values);
             $rows = $statement->rowCount();
 
         } catch (PDOException $e) {
@@ -84,13 +80,7 @@ final class Database
     public function fetch(string $sql, array $values = [], int $mode = PDO::FETCH_ASSOC): array|stdClass|null
     {
         try {
-            $statement = $this->connect()->prepare($sql);
-            $executed = $statement->execute($values);
-
-            if ($executed === false) {
-                throw new RuntimeException('Failed to execute fetch query');
-            }
-
+            $statement = $this->execute($sql, $values);
             $res = $statement->fetch($mode);
 
         } catch (PDOException $e) {
@@ -122,13 +112,8 @@ final class Database
     public function fetchAll(string $sql, array $values = [], int $mode = PDO::FETCH_ASSOC): array
     {
         try {
-            $statement = $this->connect()->prepare($sql);
-            $executed = $statement->execute($values);
-
-            if ($executed === false) {
-                throw new RuntimeException('Failed to execute fetchAll query');
-            }
-
+            $statement = $this->execute($sql, $values);
+            /** @var list<array<string|int, mixed>>|list<stdClass>|array<mixed, list<mixed>> */
             $res = $statement->fetchAll($mode);
 
         } catch (PDOException $e) {
@@ -149,13 +134,7 @@ final class Database
     public function fetchColumn(string $sql, array $values = [], int $column = 0): mixed
     {
         try {
-            $statement = $this->connect()->prepare($sql);
-            $executed = $statement->execute($values);
-
-            if ($executed === false) {
-                throw new RuntimeException('Failed to execute fetchColumn query');
-            }
-
+            $statement = $this->execute($sql, $values);
             $res = $statement->fetchColumn($column);
 
         } catch (PDOException $e) {
@@ -176,13 +155,7 @@ final class Database
     public function fetchAllColumn(string $sql, array $values = [], int $column = 0): array
     {
         try {
-            $statement = $this->connect()->prepare($sql);
-            $executed = $statement->execute($values);
-
-            if ($executed === false) {
-                throw new RuntimeException('Failed to execute fetchAllColumn query');
-            }
-
+            $statement = $this->execute($sql, $values);
             $res = $statement->fetchAll(PDO::FETCH_COLUMN, $column);
 
         } catch (PDOException $e) {
@@ -204,30 +177,43 @@ final class Database
     public function insert(string $sql, array $values = []): int
     {
         try {
-            $statement = $this->connect()->prepare($sql);
-            $executed = $statement->execute($values);
-
-            if ($executed === false) {
-                throw new RuntimeException('Failed to execute insert query');
-            }
-
-            $id = $this->connect()->lastInsertId();
+            $this->execute($sql, $values);
+            $lastInsertId = $this->connect()->lastInsertId();
 
         } catch (PDOException $e) {
             self::error($e, $sql);
         }
 
-        if ($id === '' || $id === false) {
+        if ($lastInsertId === '' || $lastInsertId === false) {
             throw new RuntimeException('Insert did not produce an ID');
         }
 
-        assert(ctype_digit($id), 'ID must be an integer');
+        assert(ctype_digit($lastInsertId), 'ID must be an integer');
 
-        $id = (int) $id;
+        $id = (int) $lastInsertId;
 
         assert($id > 0, 'ID must be positive');
 
         return $id;
+    }
+
+    /**
+     * @param non-empty-string $sql
+     * @param array<string|int, mixed> $values
+     */
+    private function execute(string $sql, array $values): PDOStatement
+    {
+        $statement = $this->connect()->prepare($sql);
+
+        if ($statement === false) {
+            throw new RuntimeException('Failed to prepare query');
+        }
+
+        if (!$statement->execute($values)) {
+            throw new RuntimeException('Failed to execute query');
+        }
+
+        return $statement;
     }
 
     private function connect(): PDO

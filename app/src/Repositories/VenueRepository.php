@@ -91,11 +91,11 @@ final readonly class VenueRepository
      * @param bool $filterActive
      * @return SqlWhere
      */
-    public static function getWhereForFavs(array $favourites, ?int $townId = null, array $types = [], bool $openNow = false, bool $filterActive = true)
+    public static function getWhereForFavs(array $favourites, ?int $townId = null, array $types = [], bool $openNow = false, bool $filterActive = true): SqlWhere
     {
         $where = new SqlWhere();
 
-        if ($favourites) {
+        if ($favourites !== []) {
             $where->addStatement('(id = ' . implode(' OR id = ', $favourites) . ')');
         }
 
@@ -243,7 +243,7 @@ final readonly class VenueRepository
      */
     public function getVenuePageRawForFavs(array $favourites, int $page, int $pageSize, array $types, bool $openNow, VenueOrderBy $orderBy): array
     {
-        if (empty($favourites)) {
+        if ($favourites === []) {
             return [0, []];
         }
 
@@ -318,7 +318,7 @@ final readonly class VenueRepository
             $where->addStatement('active = true');
         }
 
-        if ($townId) {
+        if ($townId !== null) {
             $where->addStatement("town_id = {$townId}");
         }
 

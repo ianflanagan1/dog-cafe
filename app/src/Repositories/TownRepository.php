@@ -116,7 +116,7 @@ final readonly class TownRepository
         }
 
         assert(
-            is_array($towns) && !empty($towns) && array_is_list($towns),
+            is_array($towns) && $towns !== [] && array_is_list($towns),
             '$towns (all towns) must be non-empty list'
         );
 
@@ -129,7 +129,7 @@ final readonly class TownRepository
      */
     private function getAllArraysFromDatabase(): array
     {
-        $towns = $this->genericRepository->fetchRows(
+        $rows = $this->genericRepository->fetchRows(
             'id, name, name_url, name_url_lower, name_search, county, venue_count, lat, lng',
             Town::TABLE,
             'venue_count > ?',
@@ -138,16 +138,15 @@ final readonly class TownRepository
         );
 
         assert(
-            !empty($towns),
-            '$towns array (all towns, from database) must be non-empty'
+            $rows !== [],
+            '$rows (all towns, from database) must be non-empty'
         );
 
-        /** @var non-empty-list<TownFromDatabase> $towns */
-
-        foreach ($towns as &$town) {
-            $town['lat'] = (float) $town['lat'];
-            $town['lng'] = (float) $town['lng'];
-        }
+        /** @var non-empty-list<TownFromDatabase> */
+        $towns = array_map(
+            static fn (array $row): array => [...$row, 'lat' => (float) $row['lat'], 'lng' => (float) $row['lng']],
+            $rows,
+        );
 
         return $towns;
     }
@@ -162,7 +161,7 @@ final readonly class TownRepository
 
         assert(
             $res === null
-            || (is_string($res) && !empty($res)),
+            || (is_string($res) && $res !== ''),
             '$town (from cache) must be null or a string'
         );
 

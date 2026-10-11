@@ -92,7 +92,7 @@ final class MapPointsBuilder
 
         while ($index !== null) {
             assert(
-                !empty($venues) && !empty($metadata),
+                $venues !== [] && $metadata !== [],
                 '$venues and $metadata must be non-empty when $index !== null'
             );
 
@@ -129,7 +129,6 @@ final class MapPointsBuilder
      */
     private static function createClusteringMetadata(array $venues, float $latClusterLimit, float $lngClusterLimit): array
     {
-        /** @var list<list<NonNegInt>> */
         $links = array_fill(0, count($venues), []);
 
         for ($i = 0; $i < count($venues); $i++) {

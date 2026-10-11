@@ -44,7 +44,7 @@ final class SqlWhere
 
     public function getString(): string
     {
-        if (empty($this->statements)) {
+        if ($this->statements === []) {
             return '';
         }
 
@@ -52,7 +52,7 @@ final class SqlWhere
     }
 
     /**
-     * @return array<mixed>
+     * @return list<?scalar>
      */
     public function getParameters(): array
     {

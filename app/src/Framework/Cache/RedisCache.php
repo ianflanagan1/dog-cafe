@@ -11,6 +11,7 @@ use InvalidArgumentException;
 use Override;
 use Psr\SimpleCache\CacheInterface;
 use Redis;
+use RuntimeException;
 use Stringable;
 
 class RedisCache implements CacheInterface
@@ -43,14 +44,10 @@ class RedisCache implements CacheInterface
         $this->assertValidKey($key);
         $this->assertRedisCompatibleValue($value);
 
-        if ($ttl instanceof DateInterval) {
-            $ttl = new DateTime('@0')->add($ttl)->getTimestamp();
-        } elseif ($ttl === null) {
-            $ttl = 0;
-        }
+        $seconds = self::seconds($ttl) ?? 0;
 
-        if ($ttl > 0) {
-            return (bool) $this->connection()->set($key, $value, ['EX' => $ttl]);
+        if ($seconds > 0) {
+            return (bool) $this->connection()->set($key, $value, ['EX' => $seconds]);
         }
 
         return (bool) $this->connection()->set($key, $value);
@@ -67,7 +64,7 @@ class RedisCache implements CacheInterface
     #[Override]
     public function clear(): bool
     {
-        return $this->connection()->flushDB();
+        return $this->connection()->flushDB() === true;
     }
 
     #[Override]
@@ -75,10 +72,15 @@ class RedisCache implements CacheInterface
     {
         $keys = iterator_to_array($keys, false);
         array_walk($keys, $this->assertValidKey(...));
-        $values = $this->connection()->mGet($keys);
+        $values = $this->connection()->mget($keys);
+
+        if (!is_array($values)) {
+            throw new RuntimeException('Redis MGET failed');
+        }
+
         $results = [];
 
-        // mGet() returns values in the same order as the keys
+        // mget() returns values in the same order as the keys
         foreach (array_combine($keys, $values) as $key => $value) {
             $results[$key] = $value === false
                 ? $default
@@ -94,7 +96,7 @@ class RedisCache implements CacheInterface
     #[Override]
     public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
     {
-        $values = iterator_to_array($values);
+        $values = iterator_to_array($values, true);
 
         foreach ($values as $key => $value) {
             // PHP stores numeric string keys like '123' as ints
@@ -102,15 +104,13 @@ class RedisCache implements CacheInterface
             $this->assertRedisCompatibleValue($value);
         }
 
-        $result = $this->connection()->mSet($values);
+        /** @var array<string, mixed> $values Keys validated above. Numeric ones are ints, which Redis stores as their string form */
+        $result = $this->connection()->mset($values) === true;
+        $seconds = self::seconds($ttl);
 
-        if ($ttl !== null) {
-            if ($ttl instanceof DateInterval) {
-                $ttl = new DateTime('@0')->add($ttl)->getTimestamp();
-            }
-
+        if ($seconds !== null) {
             foreach (array_keys($values) as $key) {
-                $this->connection()->expire($key, (int) $ttl);
+                $this->connection()->expire($key, $seconds);
             }
         }
 
@@ -151,6 +151,13 @@ class RedisCache implements CacheInterface
         if (!is_scalar($value) && !$value instanceof Stringable && $value !== null) {
             throw new InvalidArgumentException('Only scalar, Stringable, or null values are supported for Redis storage. Type: ' . get_debug_type($value));
         }
+    }
+
+    private static function seconds(null|int|DateInterval $ttl): ?int
+    {
+        return $ttl instanceof DateInterval
+            ? new DateTime('@0')->add($ttl)->getTimestamp()
+            : $ttl;
     }
 
     private function connection(): Redis

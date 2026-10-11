@@ -60,7 +60,7 @@ final class SessionTest extends TestCase
     {
         return new class (self::REDIS_CONFIG, ['cookie_httponly' => true, 'cookie_samesite' => 'Strict']) extends Session {
             /** @var list<array{name: string, value: string, options: array<string, scalar>}> */
-            public array $sentCookies = [];
+            public array $sentCookies = []; // @phpstan-ignore shipmonk.publicPropertyNotReadonly (a spy: sendCookie() appends to it)
 
             #[Override]
             protected function startOptions(): array

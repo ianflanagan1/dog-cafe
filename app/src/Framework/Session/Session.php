@@ -186,7 +186,7 @@ class Session implements SessionInterface
             : $this->startOptions();
 
         // The lock is what stops concurrent requests overwriting each other's changes. session_start() can't enable it, so php.ini must
-        if (($options['save_handler'] ?? null) === 'redis' && !ini_get('redis.session.locking_enabled')) {
+        if (($options['save_handler'] ?? null) === 'redis' && filter_var(ini_get('redis.session.locking_enabled'), FILTER_VALIDATE_BOOL) !== true) {
             throw new SessionException('redis.session.locking_enabled must be on in php.ini');
         }
 

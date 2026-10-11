@@ -222,7 +222,7 @@ class RedisCacheTest extends TestCase
         $values = ['value1', false, 'value3'];
 
         $this->redisMock->expects($this->once())
-            ->method('mGet')
+            ->method('mget')
             ->with($keys)
             ->willReturn($values);
 
@@ -240,7 +240,7 @@ class RedisCacheTest extends TestCase
     public function test_get_multiple_accepts_keys_from_a_generator(): void
     {
         $this->redisMock->expects($this->once())
-            ->method('mGet')
+            ->method('mget')
             ->with(['key1', 'key2'])
             ->willReturn(['value1', 'value2']);
 
@@ -259,7 +259,7 @@ class RedisCacheTest extends TestCase
         $values = ['key1' => 'value1', 'key2' => 'value2'];
 
         $this->redisMock->expects($this->once())
-            ->method('mSet')
+            ->method('mset')
             ->with($values)
             ->willReturn(true);
 
@@ -272,14 +272,14 @@ class RedisCacheTest extends TestCase
         $values = ['key1' => 'value1', 'key2' => 'value2'];
 
         $this->redisMock->expects($this->once())
-            ->method('mSet')
+            ->method('mset')
             ->with($values)
             ->willReturn(true);
 
         $expireCalls = [];
         $this->redisMock->expects($this->exactly(2))
             ->method('expire')
-            ->willReturnCallback(function ($key, $ttl) use (&$expireCalls) {
+            ->willReturnCallback(function (string $key, int $ttl) use (&$expireCalls): bool {
                 $expireCalls[] = [$key, $ttl];
 
                 return true;
@@ -297,7 +297,7 @@ class RedisCacheTest extends TestCase
         $interval = new DateInterval('PT30M'); // 30 minutes
 
         $this->redisMock->expects($this->once())
-            ->method('mSet')
+            ->method('mset')
             ->with($values)
             ->willReturn(true);
 
@@ -314,7 +314,7 @@ class RedisCacheTest extends TestCase
         $values = ['123' => 'value1'];
 
         $this->redisMock->expects($this->once())
-            ->method('mSet')
+            ->method('mset')
             ->with($values)
             ->willReturn(true);
 
@@ -327,7 +327,7 @@ class RedisCacheTest extends TestCase
         $values = ['key1' => 'value1', 'key2' => 'value2'];
 
         $this->redisMock->expects($this->once())
-            ->method('mSet')
+            ->method('mset')
             ->with($values)
             ->willReturn(true);
 
@@ -337,7 +337,7 @@ class RedisCacheTest extends TestCase
 
     public function test_set_multiple_throws_exception_for_invalid_value(): void
     {
-        $this->redisMock->expects($this->never())->method('mSet');
+        $this->redisMock->expects($this->never())->method('mset');
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Only scalar, Stringable, or null values are supported for Redis storage. Type: stdClass');
@@ -482,7 +482,7 @@ class RedisCacheTest extends TestCase
         $this->expectExceptionMessage('Only scalar, Stringable, or null values are supported for Redis storage. Type: resource (stream)');
 
         $resource = fopen('php://memory', 'r');
-        if ($resource) {
+        if ($resource !== false) {
             $this->cache->set('test_key', $resource);
             fclose($resource);
         }

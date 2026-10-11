@@ -2,30 +2,39 @@
 
 declare(strict_types=1);
 
+/** Unset and empty both fall back to the default */
+$env = static function (string $name, string $default): string {
+    $value = getenv($name);
+
+    return $value === false || $value === ''
+        ? $default
+        : $value;
+};
+
 return [
     'app' => [
-        'app_env'   => trim(getenv('APP_ENV') ?: 'production'),
+        'app_env'   => trim($env('APP_ENV', 'production')),
         // COUPLED:public-domain. default = caddy:site address
-        'url'       => rtrim(trim(getenv('APP_URL') ?: 'https://dogcafeuk.com'), '/'),
+        'url'       => rtrim(trim($env('APP_URL', 'https://dogcafeuk.com')), '/'),
     ],
     'dbCore' => [
-        'driver'    => trim(getenv('DB_CORE_DRIVER') ?: 'pgsql'),
-        'port'      => (int) trim(getenv('DB_CORE_PORT') ?: '5432'),
-        'host'      => trim(getenv('DB_CORE_HOST') ?: 'dog-cafe-postgres'),
-        'database'  => trim(getenv('POSTGRES_DB') ?: 'admin'),
-        'user'      => trim(getenv('POSTGRES_USER') ?: 'admin'),
-        'password'  => trim(getenv('POSTGRES_PASSWORD') ?: ''),
+        'driver'    => trim($env('DB_CORE_DRIVER', 'pgsql')),
+        'port'      => (int) trim($env('DB_CORE_PORT', '5432')),
+        'host'      => trim($env('DB_CORE_HOST', 'dog-cafe-postgres')),
+        'database'  => trim($env('POSTGRES_DB', 'admin')),
+        'user'      => trim($env('POSTGRES_USER', 'admin')),
+        'password'  => trim($env('POSTGRES_PASSWORD', '')),
     ],
     'redis' => [
-        'host'      => trim(getenv('REDIS_HOST') ?: 'dog-cafe-cache'),
-        'port'      => (int) trim(getenv('REDIS_PORT') ?: '6379'),
-        'password'  => trim(getenv('REDIS_PASSWORD') ?: ''),
+        'host'      => trim($env('REDIS_HOST', 'dog-cafe-cache')),
+        'port'      => (int) trim($env('REDIS_PORT', '6379')),
+        'password'  => trim($env('REDIS_PASSWORD', '')),
     ],
     'session' => require __DIR__ . '/session.php',
     'loginProviders' => [
-        'googleClientId'        => trim(getenv('GOOGLE_OAUTH_CLIENT_ID') ?: ''),
-        'googleClientSecret'    => trim(getenv('GOOGLE_OAUTH_CLIENT_SECRET') ?: ''),
-        'discordClientId'       => trim(getenv('DISCORD_CLIENT_ID') ?: ''),
-        'discordClientSecret'   => trim(getenv('DISCORD_CLIENT_SECRET') ?: ''),
+        'googleClientId'        => trim($env('GOOGLE_OAUTH_CLIENT_ID', '')),
+        'googleClientSecret'    => trim($env('GOOGLE_OAUTH_CLIENT_SECRET', '')),
+        'discordClientId'       => trim($env('DISCORD_CLIENT_ID', '')),
+        'discordClientSecret'   => trim($env('DISCORD_CLIENT_SECRET', '')),
     ],
 ];

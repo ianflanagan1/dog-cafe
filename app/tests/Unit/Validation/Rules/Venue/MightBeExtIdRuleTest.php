@@ -22,7 +22,7 @@ class MightBeExtIdRuleTest extends TestCase
      *      }
      * >
      */
-    public static function cases_to_test_rule_passes()
+    public static function cases_to_test_rule_passes(): array
     {
         return [
             '22-character alpha-numeric string' => [
@@ -47,7 +47,7 @@ class MightBeExtIdRuleTest extends TestCase
      *      }
      * >
      */
-    public static function cases_to_test_rule_fails()
+    public static function cases_to_test_rule_fails(): array
     {
         return [
             '21-character alpha-numeric string' => [

@@ -8,6 +8,7 @@ declare(strict_types=1);
  */
 
 $domain = getenv('SESSION_DOMAIN');    // Unset -> production default; set but empty -> host-only cookie
+$secureCookie = getenv('SESSION_SECURE_COOKIE');  // Unset or empty -> secure
 
 return [
     'name'              => 'DOGCAFEID',
@@ -19,7 +20,9 @@ return [
     'cookie_domain'     => $domain !== false
         ? trim($domain)
         : 'dogcafeuk.com',
-    'cookie_secure'     => filter_var(getenv('SESSION_SECURE_COOKIE') ?: 'true', FILTER_VALIDATE_BOOL),
+    'cookie_secure'     => $secureCookie === false || $secureCookie === ''
+        ? true
+        : filter_var($secureCookie, FILTER_VALIDATE_BOOL),
     'cookie_httponly'   => true,        // Prevents client-side scripts from accessing session cookie
     'cookie_samesite'   => 'Lax',       // Sent on top-level cross-site GET navigations (OAuth redirects back from Google/Discord), not on cross-site POST/fetch. Helps mitigate CSRF
     'cookie_lifetime'   => 31536000,    // Seconds. 31536000 = 1 year; 0 -> expire when browser closed

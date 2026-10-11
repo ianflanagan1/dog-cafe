@@ -39,7 +39,7 @@ final class MapCacheFileManager
         'lng_max' => 2,
     ];
     private const string CACHE_FILE_NAMESPACE = 'map';
-    private const int POINT_INDEX_TYPE = 0; // @phpstan-ignore classConstant.unused (documents the point tuple layout alongside LAT and LNG)
+    private const int POINT_INDEX_TYPE = 0; // @phpstan-ignore classConstant.unused, shipmonk.deadConstant (documents the point tuple layout alongside LAT and LNG)
     private const int POINT_INDEX_LAT = 1;
     private const int POINT_INDEX_LNG = 2;
 
@@ -276,7 +276,7 @@ final class MapCacheFileManager
         $typesString = "/types={$typesString}";
 
         $openNowString = $openNow
-            ? "opennow={$day}_{$time}"
+            ? 'opennow=' . ($day ?? '') . '_' . ($time ?? '')
             : '';
 
         return CACHE_FILE_PATH . '/' . self::CACHE_FILE_NAMESPACE . "/zoom={$zoom}/{$typesString}/{$openNowString}";

@@ -58,7 +58,7 @@ final class Log
         $caller = self::getCaller();
 
         $prefix = $caller !== null
-            ? "[{$caller['class']}::{$caller['function']}({$caller['line']})]"
+            ? '[' . ($caller['class'] ?? '') . '::' . $caller['function'] . '(' . ($caller['line'] ?? '') . ')]'
             : '';
 
         $suffix = $dump !== self::UNSET_DUMP
@@ -156,7 +156,7 @@ final class Log
     }
 
     /**
-     * @return array{
+     * @return ?array{
      *      class: ?class-string,
      *      function: string,
      *      line: ?int

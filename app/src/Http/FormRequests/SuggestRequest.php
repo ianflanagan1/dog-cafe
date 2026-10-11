@@ -16,7 +16,7 @@ final readonly class SuggestRequest extends FormRequest
     protected const array EXPECTED_INPUTS = [
         'suggest' => [
             'filter' => [
-                'type' => FILTER_DEFAULT,
+                'type' => FILTER_UNSAFE_RAW,
                 'options'   => null,
                 'default'   => null,
             ],

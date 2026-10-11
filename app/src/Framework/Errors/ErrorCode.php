@@ -40,7 +40,7 @@ enum ErrorCode: int
         }
 
         // Check for missing placeholders
-        if (preg_match('/:[a-zA-Z0-9_]+/', $message, $matches)) {
+        if (preg_match('/:[a-zA-Z0-9_]+/', $message, $matches) === 1) {
             //  :           Literal (colon)
             //  a-zA-Z0-9   Alpha-numeric character
             //  _           Literal (underscore)

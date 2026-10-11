@@ -78,7 +78,14 @@ function disabledFunctions(string $iniPath): array
         exit(2);
     }
 
-    return array_fill_keys(preg_split('/[\s,]+/', strtolower(trim($list)), -1, PREG_SPLIT_NO_EMPTY) ?: [], true);
+    $names = preg_split('/[\s,]+/', strtolower(trim($list)), -1, PREG_SPLIT_NO_EMPTY);
+
+    return array_fill_keys(
+        $names === false
+            ? []
+            : $names,
+        true,
+    );
 }
 
 /**

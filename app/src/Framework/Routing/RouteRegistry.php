@@ -31,10 +31,20 @@ use ReflectionClass;
  *          par?: mixed,
  *          get?: NonNegInt,
  *          post?: NonNegInt,
+ *          put?: NonNegInt,
+ *          patch?: NonNegInt,
+ *          delete?: NonNegInt,
+ *          options?: NonNegInt,
+ *          head?: NonNegInt,
  *      }>,
  *      par?: RouteParameter,
  *      get?: NonNegInt,
  *      post?: NonNegInt,
+ *      put?: NonNegInt,
+ *      patch?: NonNegInt,
+ *      delete?: NonNegInt,
+ *      options?: NonNegInt,
+ *      head?: NonNegInt,
  * }
  *
  * @phpstan-type RouteParameter array{
@@ -44,6 +54,11 @@ use ReflectionClass;
  *          par?: mixed,
  *          get?: NonNegInt,
  *          post?: NonNegInt,
+ *          put?: NonNegInt,
+ *          patch?: NonNegInt,
+ *          delete?: NonNegInt,
+ *          options?: NonNegInt,
+ *          head?: NonNegInt,
  *      }>,
  *      par?: array{
  *          name: string,
@@ -51,9 +66,19 @@ use ReflectionClass;
  *          par?: mixed,
  *          get?: NonNegInt,
  *          post?: NonNegInt,
+ *          put?: NonNegInt,
+ *          patch?: NonNegInt,
+ *          delete?: NonNegInt,
+ *          options?: NonNegInt,
+ *          head?: NonNegInt,
  *      },
  *      get?: NonNegInt,
  *      post?: NonNegInt,
+ *      put?: NonNegInt,
+ *      patch?: NonNegInt,
+ *      delete?: NonNegInt,
+ *      options?: NonNegInt,
+ *      head?: NonNegInt,
  * }
  *
  * @phpstan-type ControllerAction array{
@@ -86,10 +111,10 @@ final class RouteRegistry
     private const string SEGMENT_ALLOWED = '[A-Za-z0-9._~-]+';
 
     /** @var RouteSegment */
-    private array $routes;
+    private array $routes = ['seg' => []];
 
     /** @var list<ControllerAction> */
-    private array $actions;
+    private array $actions = [];
 
     public function __construct(
         private CacheInterface $cache,
@@ -111,13 +136,13 @@ final class RouteRegistry
 
         array_shift($segments);
 
-        if (empty($segments)) {
+        if ($segments === []) {
             throw new RouteNotFoundException();
         }
 
         $parameters = [];
 
-        $actionIndex = $this->resolveRecursive(
+        $actionIndex = self::resolveRecursive(
             $segments,
             $this->routes,
             $request->method,
@@ -173,7 +198,7 @@ final class RouteRegistry
             foreach ($reflectionClass->getMethods() as $method) {
                 $routeAttributes = $method->getAttributes(Route::class, ReflectionAttribute::IS_INSTANCEOF);
 
-                if (!empty($routeAttributes)) {
+                if ($routeAttributes !== []) {
                     $actions[] = [$controller, $method->getName()];
                     $actionIndex = count($actions) - 1;
 
@@ -217,12 +242,12 @@ final class RouteRegistry
 
         array_shift($segments);
 
-        if (empty($segments)) {
+        if ($segments === []) {
             throw new RouteNotValidException();
         }
 
         foreach ($segments as $segment) {
-            if (!preg_match('/^(' . self::PARAMETER_ALLOWED . '|' . self::SEGMENT_ALLOWED . ')$/', $segment) && $segments !== ['']) {
+            if (preg_match('/^(' . self::PARAMETER_ALLOWED . '|' . self::SEGMENT_ALLOWED . ')$/', $segment) !== 1 && $segments !== ['']) {
                 // Empty string fails       -> Can't have double slashes in route; can't end with a slash
                 //                          -> But allow a single empty-string segment
                 // Single colon ":" fails   -> Parameters must have names
@@ -347,7 +372,7 @@ final class RouteRegistry
                 $segments,
                 $httpMethod,
                 $actionIndex,
-                $routes['seg'][$segment], // @phpstan-ignore argument.type (the recursive routes tree is untyped below one level; see class docblock)
+                $routes['seg'][$segment], // @phpstan-ignore argument.type, parameterByRef.type (the recursive routes tree is untyped below one level; see class docblock)
             );
             return;
         }
@@ -485,6 +510,6 @@ final class RouteRegistry
 
     private static function isSegmentParameter(string $segment): bool
     {
-        return !empty($segment) && $segment[0] === ':';
+        return str_starts_with($segment, ':');
     }
 }

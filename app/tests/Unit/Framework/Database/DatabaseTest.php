@@ -41,7 +41,7 @@ final class DatabaseTest extends TestCase
             'user' => 'user',
             'password' => 'pass',
         ],
-            function (array $config): MockObject&PDO {
+            function (): MockObject&PDO {
                 return $this->pdoMock;
             },
         );

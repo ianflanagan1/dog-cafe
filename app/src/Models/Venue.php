@@ -177,7 +177,7 @@ final class Venue extends Model
 
     public static function stringMightBeExtId(string $value): bool
     {
-        return strlen($value) == Venue::EXT_ID_LENGTH && ctype_alnum($value);
+        return strlen($value) === Venue::EXT_ID_LENGTH && ctype_alnum($value);
     }
 
     public static function stringMightBeHumanUrl(string $value): bool

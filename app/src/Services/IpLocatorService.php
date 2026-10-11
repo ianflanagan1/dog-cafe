@@ -33,7 +33,7 @@ final class IpLocatorService
         // On error, log (if not dev environment) and return null
         if (
             !isset($result['countryCode']) || !isset($result['lat']) || !isset($result['lon'])
-            || !is_string($result['countryCode']) || empty($result['countryCode'])
+            || !is_string($result['countryCode']) || $result['countryCode'] === ''
             || !is_float($result['lat']) || !is_float($result['lon'])
         ) {
             if (!self::isDevRequestIp($ip)) {
@@ -56,11 +56,11 @@ final class IpLocatorService
      */
     public static function isInServedArea(string $countryCode): bool
     {
-        return $countryCode == 'GB'     // England, Scotland, Wales, Northern Ireland
-            || $countryCode == 'IM'     // Isle of Man
-            || $countryCode == 'JE'     // Jersey
-            || $countryCode == 'GG'     // Guernsey
-            // || $countryCode == 'IE'    // Ireland
+        return $countryCode === 'GB'     // England, Scotland, Wales, Northern Ireland
+            || $countryCode === 'IM'     // Isle of Man
+            || $countryCode === 'JE'     // Jersey
+            || $countryCode === 'GG'     // Guernsey
+            // || $countryCode === 'IE'    // Ireland
         ;
 
         // NOTE: When expanding the served area, consider if usage of Geo::getDistanceForOrdinalRanking() is still practical
@@ -73,9 +73,9 @@ final class IpLocatorService
     private static function isDevRequestIp(string $ip): bool
     {
         return in_array($ip, ['127.0.0.1', '::1'], true) ||         // Localhost
-            preg_match('/^172\.(1[6-9]|2[0-9]|3[0-1])\./', $ip) ||  // Docker bridge
-            preg_match('/^192\.168\./', $ip) ||                     // Home router network
-            preg_match('/^10\./', $ip);                             // Private class A
+            preg_match('/^172\.(1[6-9]|2[0-9]|3[0-1])\./', $ip) === 1 ||  // Docker bridge
+            preg_match('/^192\.168\./', $ip) === 1 ||                     // Home router network
+            preg_match('/^10\./', $ip) === 1;                             // Private class A
     }
 }
 

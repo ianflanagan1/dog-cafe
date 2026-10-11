@@ -48,7 +48,7 @@ final readonly class FavouriteController extends Controller
         /** @var ListValidated */
         $validated = $request->validate();
 
-        [$totalPages, $venues] = $venueRepository->getVenuePageRawForFavs(
+        [$totalPages, $rows] = $venueRepository->getVenuePageRawForFavs(
             $favouriteSessionStore->getAll(),
             $validated['page'],
             self::PAGE_SIZE,
@@ -65,7 +65,7 @@ final readonly class FavouriteController extends Controller
             $validated['open_now'],
         );
 
-        $venues = array_map(fn (array $v): array => VenueHydrator::processTypes($v), $venues);
+        $venues = array_map(fn (array $v): array => VenueHydrator::processTypes($v), $rows);
         $venues = array_map(fn (array $v): array => VenueHydrator::processOpeningTimes($v, Locality::UnitedKingdom), $venues);
 
         return $viewRenderer->render(
@@ -102,7 +102,7 @@ final readonly class FavouriteController extends Controller
         /** @var ListValidated */
         $validated = $request->validate();
 
-        [$totalPages, $venues] = $venueRepository->getVenuePageRawForFavs(
+        [$totalPages, $rows] = $venueRepository->getVenuePageRawForFavs(
             $favouriteSessionStore->getAll(),
             $validated['page'],
             self::PAGE_SIZE,
@@ -111,7 +111,7 @@ final readonly class FavouriteController extends Controller
             $validated['order_by'],
         );
 
-        $venues = array_map(fn (array $v): array => VenueHydrator::processTypes($v), $venues);
+        $venues = array_map(fn (array $v): array => VenueHydrator::processTypes($v), $rows);
         $venues = array_map(fn (array $v): array => VenueHydrator::processOpeningTimes($v, Locality::UnitedKingdom), $venues);
 
         return Response::json(200, [

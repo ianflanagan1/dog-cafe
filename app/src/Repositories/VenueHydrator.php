@@ -68,14 +68,14 @@ final class VenueHydrator
             $day = $today + 1;
 
             for ($i = 0; $i < 7; $i++) {
-                if ($day == 7) {
+                if ($day === 7) {
                     $day = 0;
                 }
 
                 $nextOpen = $venue[Venue::COLUMN_PREFIX_OPEN_TIME . $day];
 
                 if ($nextOpen !== null) {
-                    if ($day == $today + 1) {
+                    if ($day === $today + 1) {
                         $changeTime = 'tomorrow ' . Time::militaryToCivilianTime($nextOpen);
                         break;
                     }
@@ -125,7 +125,7 @@ final class VenueHydrator
         $fav = 0;
 
         foreach ($favourites as $favourite) {
-            if ($favourite == $venue['id']) {
+            if ($favourite === $venue['id']) {
                 $fav = 1;
                 break;
             }

@@ -109,7 +109,7 @@ enum VenueType: int implements JsonSerializable
      */
     public static function typesToString(array $types): string
     {
-        if (empty($types)) {
+        if ($types === []) {
             return '123';
         }
 

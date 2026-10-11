@@ -58,7 +58,7 @@ class Auth
 
         assert(
             $res === null
-            || (is_string($res) && $res != ''),
+            || (is_string($res) && $res !== ''),
             'Picture must be null or non-empty string',
         );
 
@@ -129,7 +129,7 @@ class Auth
 
         assert(
             $res === null
-            || (is_array($res) && !empty($res)),
+            || (is_array($res) && $res !== []),
             'Use profile must be null or non-empty array'
         );
 

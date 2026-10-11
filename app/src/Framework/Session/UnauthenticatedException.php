@@ -8,7 +8,8 @@ use RuntimeException;
 
 final class UnauthenticatedException extends RuntimeException
 {
-    public function __construct(public bool $redirect)
+    public function __construct(public readonly bool $redirect)
     {
+        parent::__construct();
     }
 }

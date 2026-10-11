@@ -1,4 +1,11 @@
 includes:
+    - phar://phpstan.phar/conf/bleedingEdge.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-phpunit/rules.neon
+    - vendor/shipmonk/phpstan-rules/rules.neon
+    - vendor/shipmonk/dead-code-detector/rules.neon
     - vendor/spaze/phpstan-disallowed-calls/extension.neon
     - vendor/spaze/phpstan-disallowed-calls/disallowed-dangerous-calls.neon
     - vendor/spaze/phpstan-disallowed-calls/disallowed-execution-calls.neon
@@ -8,8 +15,37 @@ includes:
     - vendor/ianflanagan1/phpstan-redundant-inherited-phpdoc/rules.neon
 
 parameters:
-    level: 9            # 0-9
+    level: 10           # 0-10
     checkMissingOverrideMethodAttribute: true
+    checkUninitializedProperties: true
+    checkBenevolentUnionTypes: true
+    checkDynamicProperties: true
+    reportPossiblyNonexistentConstantArrayOffset: true
+    reportAlwaysTrueInLastCondition: true
+    reportWrongPhpDocTypeInVarTag: true
+    reportAnyTypeWideningInVarTag: true
+    checkStrictPrintfPlaceholderTypes: true
+    rememberPossiblyImpureFunctionValues: false
+    # No outside callers, so a public signature wider than its implementation is just imprecise
+    checkTooWideReturnTypesInProtectedAndPublicMethods: true
+    checkTooWideParameterOutInProtectedAndPublicMethods: true
+
+    # Exceptions are never checked. Expected failures, the ones some caller should decide on, are
+    # returned as sentinels (?T) or Result objects, which level 10 forces callers to handle;
+    # Result-returning functions carry #[\NoDiscard]. Every throw is meant to reach
+    # RouteExceptionHandler (or the vendor-boundary catch that translates it), so @throws tags
+    # would only say "this can fail" everywhere. Hence:
+    # exceptions:
+    #     check:
+    #         missingCheckedExceptionInThrows: true
+    #         tooWideThrowType: true
+
+    shipmonkRules:
+        # Both assume checked exceptions exist; here none do (see the exceptions note above)
+        forbidCheckedExceptionInCallable:
+            enabled: false
+        forbidCheckedExceptionInYieldingMethod:
+            enabled: false
     # Also report overrides that are only possibly incompatible, e.g. narrowing an inherited string param to non-empty-string in PHPDoc
     reportMaybesInMethodSignatures: true
     reportStaticMethodSignatures: true
@@ -143,6 +179,17 @@ parameters:
             message: 'it is disabled in production (deploy/php/php.ini disable_functions)'
 
     ignoreErrors:
+        # shipmonk/dead-code-detector can't see #[Get]/#[Post]/... routing, so every action looks unused
+        -
+            identifier: shipmonk.deadMethod
+            path: src/Http/Controllers/*
+        # Test fixtures exist to be reflected on (routing, autowiring), not called or read
+        -
+            identifier: shipmonk.deadMethod
+            path: tests/*
+        -
+            identifier: shipmonk.deadProperty.neverRead
+            path: tests/*
         # Tests may simulate configuration with ini_set() (in separate processes). App code may not: production disables it
         -
             identifier: disallowed.function

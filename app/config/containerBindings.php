@@ -23,8 +23,11 @@ return [
     SessionInterface::class => Session::class,
 
     // complex class setup
-    Config::class => function () {
-        return new Config(require CONFIG_PATH . '/app.php');
+    Config::class => function (): Config {
+        /** @var array<string, array<string, ?scalar>> */
+        $config = require CONFIG_PATH . '/app.php';
+
+        return new Config($config);
     },
     Database::class => function (Config $config): Database {
         /**
@@ -40,6 +43,16 @@ return [
         $dbConfig = $config->get('dbCore');
 
         // This is moved outside the Database class to aid unit testing
+        /**
+         * @param array{
+         *      driver: string,
+         *      port: int,
+         *      host: string,
+         *      database: string,
+         *      user: string,
+         *      password: string,
+         * } $config
+         */
         $pdoFactory = function (#[SensitiveParameter] array $config): PDO {
             try {
                 $pdo = PDO::connect(
@@ -63,7 +76,7 @@ return [
         $database = new Database($dbConfig, $pdoFactory);
         return $database;
     },
-    Session::class => function (Config $config) {
+    Session::class => function (Config $config): Session {
         /**
          * @var array{
          *      host: non-empty-string,
@@ -98,8 +111,11 @@ return [
         return new RedisCache($redisFactory);
     },
     RouteRegistry::class => function (RedisCache $cache): RouteRegistry {
+        /** @var list<class-string> */
+        $controllers = require CONFIG_PATH . '/routerRegisterFromAttributes.php';
+
         $router = new RouteRegistry($cache);
-        $router->start(require CONFIG_PATH . '/routerRegisterFromAttributes.php');
+        $router->start($controllers);
         return $router;
     },
     LoginService::class => function (
@@ -145,9 +161,20 @@ return [
          */
         $appConfig = $config->get('app');
 
+        /**
+         * @var array<int<0, 22>, array{
+         *      latClusterLimit: float,
+         *      lngClusterLimit: float,
+         *      latChunkSize: float,
+         *      lngChunkSize: float,
+         *      chunkDecimals: int<1, max>,
+         * }>
+         */
+        $zoomLevelProperties = require CONFIG_PATH . '/mapZoomLevelProperties.php';
+
         return new MapPointsService(
             $appConfig,
-            require CONFIG_PATH . '/mapZoomLevelProperties.php',
+            $zoomLevelProperties,
             $venueRepository,
         );
     }

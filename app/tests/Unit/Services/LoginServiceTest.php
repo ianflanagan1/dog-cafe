@@ -10,6 +10,7 @@ use App\Repositories\AppUserRepository;
 use App\Services\AppUserPictureService;
 use App\Services\LoginService;
 use App\Session\FavouriteSessionStore;
+use Closure;
 use Override;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -29,38 +30,38 @@ final class LoginServiceTest extends TestCase
                 'discordClientId'       => 'discord-client',
                 'discordClientSecret'   => 'discord-secret',
             ],
-            $this->createStub(AppUserRepository::class),
-            $this->createStub(Session::class),
-            $this->createStub(FavouriteSessionStore::class),
-            $this->createStub(AppUserPictureService::class),
-            $this->createStub(Auth::class),
+            self::createStub(AppUserRepository::class),
+            self::createStub(Session::class),
+            self::createStub(FavouriteSessionStore::class),
+            self::createStub(AppUserPictureService::class),
+            self::createStub(Auth::class),
             'https://example.com',
         );
     }
 
     /**
-     * @return array<non-empty-string, array{non-empty-string, non-empty-string, non-empty-string}>
+     * @return array<non-empty-string, array{Closure(LoginService): string, non-empty-string, non-empty-string}>
      */
     public static function providers(): array
     {
         return [
-            'Google'    => ['getLoginUrlGoogle', 'accounts.google.com', 'google-client'],
-            'Discord'   => ['getLoginUrlDiscord', 'discord.com', 'discord-client'],
+            'Google'    => [static fn (LoginService $service): string => $service->getLoginUrlGoogle('/redirect-login', 'a-state-token'), 'accounts.google.com', 'google-client'],
+            'Discord'   => [static fn (LoginService $service): string => $service->getLoginUrlDiscord('/redirect-login', 'a-state-token'), 'discord.com', 'discord-client'],
         ];
     }
 
     #[DataProvider('providers')]
-    public function test_a_login_url_carries_the_given_state(string $method, string $host, string $clientId): void
+    public function test_a_login_url_carries_the_given_state(Closure $loginUrl, string $host, string $clientId): void
     {
-        $query = $this->loginUrlQuery($method, $host);
+        $query = $this->loginUrlQuery($loginUrl, $host);
 
         $this->assertSame('a-state-token', $query['state'] ?? null);
     }
 
     #[DataProvider('providers')]
-    public function test_a_login_url_carries_the_client_id_and_a_redirect_uri_under_the_app_url(string $method, string $host, string $clientId): void
+    public function test_a_login_url_carries_the_client_id_and_a_redirect_uri_under_the_app_url(Closure $loginUrl, string $host, string $clientId): void
     {
-        $query = $this->loginUrlQuery($method, $host);
+        $query = $this->loginUrlQuery($loginUrl, $host);
 
         $this->assertSame($clientId, $query['client_id'] ?? null);
         $this->assertSame('https://example.com/redirect-login', $query['redirect_uri'] ?? null);
@@ -68,12 +69,12 @@ final class LoginServiceTest extends TestCase
     }
 
     /**
+     * @param Closure(LoginService): string $loginUrl
      * @return array<mixed>
      */
-    private function loginUrlQuery(string $method, string $host): array
+    private function loginUrlQuery(Closure $loginUrl, string $host): array
     {
-        /** @var string */
-        $url = $this->loginService->{$method}('/redirect-login', 'a-state-token');
+        $url = $loginUrl($this->loginService);
 
         $uri = new Uri($url);
 

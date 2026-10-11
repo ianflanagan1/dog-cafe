@@ -128,7 +128,7 @@ final readonly class MapPointsService
     {
         $venues = $this->venueRepository->fetchForMap($lat1, $lat2, $lng1, $lng2, $types, $openNow);
 
-        if (empty($venues)) {
+        if ($venues === []) {
             return [];
         }
 
@@ -146,7 +146,6 @@ final readonly class MapPointsService
             $properties['lngClusterLimit'],
         );
     }
-
 
 
 

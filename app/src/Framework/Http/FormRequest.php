@@ -26,7 +26,7 @@ abstract readonly class FormRequest
      */
     public function validate(): array
     {
-        if (empty(static::EXPECTED_INPUTS)) {
+        if (static::EXPECTED_INPUTS === []) {
             return [];
         }
 

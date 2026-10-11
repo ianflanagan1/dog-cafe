@@ -31,8 +31,7 @@ final class Time
      */
     public static function militaryToCivilianTime(string $time): string
     {
-        $time = new DateTime($time);
-        $time = $time->format('g:i a');
+        $civilian = new DateTime($time)->format('g:i a');
 
         // g - 12-hour format of an hour (1 to 12)
         // G - 24-hour format of an hour (0 to 23)
@@ -41,13 +40,13 @@ final class Time
         // i - Minutes with leading zeros (00 to 59)
         // a - am / pm
 
-        if ($time == '12:00 pm') {
-            $time = 'midday';
+        if ($civilian === '12:00 pm') {
+            $civilian = 'midday';
 
-        } elseif ($time == '12:00 am') {
-            $time = 'midnight';
+        } elseif ($civilian === '12:00 am') {
+            $civilian = 'midnight';
         }
 
-        return $time;
+        return $civilian;
     }
 }

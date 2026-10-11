@@ -35,7 +35,7 @@ final readonly class TownResolver
     public function resolve(string $townStr, ?string $ip): Town
     {
         // If a town was specified in the request, return it
-        if (!empty($townStr)) {
+        if ($townStr !== '') {
             $town = $this->townRepository->findByNameUrlLower($townStr);
 
             if ($town !== null) {

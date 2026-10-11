@@ -39,7 +39,7 @@ final class VenueHtmlHelper
      */
     public static function buildTypesHtml(array $types): string
     {
-        if (empty($types)) {
+        if ($types === []) {
             return '';
         }
 
@@ -67,8 +67,6 @@ final class VenueHtmlHelper
         $e = fn (mixed $value): string => HtmlEscaper::html($value);
 
         $typesHtml = self::buildTypesHtml($venue['types']);
-        $timeHtml = '';
-        $imageHtml = '';
 
         if ($venue['open']) {
             $timeHtml = '<span class="open">Open</span> till ' . $e($venue['change_time']);

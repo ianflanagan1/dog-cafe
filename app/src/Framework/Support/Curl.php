@@ -9,7 +9,7 @@ use NoDiscard;
 use SensitiveParameter;
 
 /**
- * @phpstan-type Headers array<non-empty-string>
+ * @phpstan-type Headers list<non-empty-string>
  * @phpstan-type Post array<string, ?scalar>
  */
 final class Curl
@@ -55,7 +55,7 @@ final class Curl
             return false;
         }
 
-        if (empty($res)) {
+        if ($res === '') {
             Log::error('Response invalid', $res);
             return false;
         }
@@ -112,11 +112,11 @@ final class Curl
             CURLOPT_SHARE           => self::persistentShare(),
         ];
 
-        if (!empty($headers)) {
+        if ($headers !== []) {
             $options[CURLOPT_HTTPHEADER] = $headers;
         }
 
-        if (!empty($post)) {
+        if ($post !== []) {
             $options[CURLOPT_POST] = true;
             $options[CURLOPT_POSTFIELDS] = http_build_query($post);
         }

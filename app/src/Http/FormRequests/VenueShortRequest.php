@@ -16,7 +16,7 @@ final readonly class VenueShortRequest extends FormRequest
     protected const array EXPECTED_INPUTS = [
         'ext_id' => [
             'filter' => [
-                'type' => FILTER_DEFAULT,
+                'type' => FILTER_UNSAFE_RAW,
                 'options'   => null,
                 'default'   => null,
             ],

@@ -13,7 +13,12 @@
         "laravel/pint": "^1.32",
         "spaze/phpstan-disallowed-calls": "^4.14",
         "ianflanagan1/phpstan-inferable-var-tag-name": "^0.1",
-        "ianflanagan1/phpstan-redundant-inherited-phpdoc": "^0.1"
+        "ianflanagan1/phpstan-redundant-inherited-phpdoc": "^0.1",
+        "phpstan/phpstan-strict-rules": "^2.1",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.1",
+        "shipmonk/phpstan-rules": "^4.4",
+        "shipmonk/dead-code-detector": "^1.4"
     },
     "autoload": {
         "psr-4": {

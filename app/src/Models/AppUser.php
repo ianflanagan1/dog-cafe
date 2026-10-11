@@ -28,10 +28,10 @@ final class AppUser extends Model
      * @param ?non-empty-string $picture
      */
     public function __construct(
-        public int $id,
-        public string $email,
-        public ?string $name,
-        public ?string $picture,
+        public readonly int $id,
+        public readonly string $email,
+        public readonly ?string $name,
+        public readonly ?string $picture,
     ) {
     }
 

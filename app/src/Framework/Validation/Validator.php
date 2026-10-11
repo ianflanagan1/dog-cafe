@@ -50,16 +50,19 @@ final class Validator
         $errors = [];
         $validated = [];
 
-        foreach ($expectedInputs as $field => $properties) {
+        foreach ($expectedInputs as $key => $definition) {
 
             // If indexed/non-associative, the value is the field name and there no properties
-            if (is_int($field) && is_string($properties)) {
-                $field = $properties;
+            if (is_int($key) && is_string($definition)) {
+                $field = $definition;
                 $properties = [];
 
                 // Otherwise, if properties is not an array, convert to empty array
-            } elseif (!is_array($properties)) {
-                $properties = [];
+            } else {
+                $field = $key;
+                $properties = is_array($definition)
+                    ? $definition
+                    : [];
             }
 
             /** @phpstan-var non-empty-string $field */
@@ -67,7 +70,7 @@ final class Validator
             $value = self::filter(
                 $inputs,
                 $field,
-                $properties['filter']['type'] ?? FILTER_DEFAULT,
+                $properties['filter']['type'] ?? FILTER_UNSAFE_RAW,
                 $properties['filter']['options'] ?? null,
                 $properties['filter']['default'] ?? null,
             );
@@ -85,7 +88,7 @@ final class Validator
             $validated[$field] = $value;
         }
 
-        if (! empty($errors)) {
+        if ($errors !== []) {
             throw new InputValidationException($inputs, $errors);
         }
 

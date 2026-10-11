@@ -49,7 +49,7 @@ final readonly class ListVenuePageService
      */
     public static function processForJson(array $venue): array
     {
-        $venue['types'] = array_map(fn ($type) => $type['value'], $venue['types']);
+        $venue['types'] = array_column($venue['types'], 'value');
         return $venue;
     }
 
@@ -98,9 +98,9 @@ final readonly class ListVenuePageService
      */
     private static function buildTotalPagesCacheKey(int $townId, int $pageSize, array $types): string
     {
-        $types = array_map(fn ($type) => $type->value, $types);
-        sort($types);
-        $typesStr = implode(',', $types);
+        $typeValues = array_map(fn (VenueType $type): int => $type->value, $types);
+        sort($typeValues);
+        $typesStr = implode(',', $typeValues);
 
         return "venueListTotalPages:{$townId}:{$typesStr}:{$pageSize}";
     }
@@ -114,9 +114,9 @@ final readonly class ListVenuePageService
      */
     private static function buildItemsCacheKey(int $townId, int $page, int $pageSize, array $types, VenueOrderBy $orderBy): string
     {
-        $types = array_map(fn ($type) => $type->value, $types);
-        sort($types);
-        $typesStr = implode(',', $types);
+        $typeValues = array_map(fn (VenueType $type): int => $type->value, $types);
+        sort($typeValues);
+        $typesStr = implode(',', $typeValues);
 
         return "venueListItems:{$townId}:{$typesStr}:{$orderBy->value}:{$pageSize}:{$page}";
     }
@@ -155,10 +155,10 @@ final readonly class ListVenuePageService
             $orderBy
         );
 
-        $items = array_map(fn (array $v): array => VenueHydrator::processTypes($v), $items);
-        $items = array_map(fn (array $v): array => VenueHydrator::processOpeningTimes($v, Locality::UnitedKingdom), $items);
+        $processed = array_map(fn (array $v): array => VenueHydrator::processTypes($v), $items);
+        $processed = array_map(fn (array $v): array => VenueHydrator::processOpeningTimes($v, Locality::UnitedKingdom), $processed);
 
-        return [$totalPages, $items];
+        return [$totalPages, $processed];
     }
 
     /**
@@ -228,7 +228,7 @@ final readonly class ListVenuePageService
 
         assert(
             $items === null
-            || (is_string($items) && !empty($items)),
+            || (is_string($items) && $items !== ''),
             '$items (from cache) must be null or a string'
         );
 
@@ -270,14 +270,14 @@ final readonly class ListVenuePageService
         SqlWhere $where,
         VenueOrderBy $orderBy,
     ): array {
-        $items = $this->venueRepository->fetch(
+        $rows = $this->venueRepository->fetch(
             $page,
             $pageSize,
             $where,
             $orderBy,
         );
 
-        $items = array_map(fn (array $v): array => VenueHydrator::processTypes($v), $items);
+        $items = array_map(fn (array $v): array => VenueHydrator::processTypes($v), $rows);
         $this->cache->set($itemsCacheKey, json_encode($items), self::TTL);
         return $items;
     }

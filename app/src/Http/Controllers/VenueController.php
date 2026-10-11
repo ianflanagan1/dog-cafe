@@ -33,13 +33,13 @@ final readonly class VenueController extends Controller
         /** @var VenueShortValidated */
         $validated = $request->validate();
 
-        $venue = $venueRepository->findMinimalByExtId($validated['ext_id']);
+        $row = $venueRepository->findMinimalByExtId($validated['ext_id']);
 
-        if ($venue === null) {
+        if ($row === null) {
             throw new NotFoundException();
         }
 
-        $venue = VenueHydrator::processTypes($venue);
+        $venue = VenueHydrator::processTypes($row);
         $venue = VenueHydrator::processOpeningTimes($venue, Locality::UnitedKingdom);
 
         return Response::json(200, [

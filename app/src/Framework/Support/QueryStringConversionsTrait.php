@@ -13,20 +13,18 @@ trait QueryStringConversionsTrait
      */
     public static function fromCommaSeparatedString(string $names, string $separator = ','): array
     {
-        if ($names == '') {
+        if ($names === '') {
             return [];
         }
 
         $cases = [];
-        $names = explode($separator, strtolower($names));
+        $validNames = array_map(strtolower(...), array_column(self::cases(), 'name'));
 
-        $validNames = array_column(self::cases(), 'name');
-
-        foreach ($names as $name) {
-            $index = array_search($name, array_map('strtolower', $validNames));
+        foreach (explode($separator, strtolower($names)) as $name) {
+            $index = array_search($name, $validNames, true);
 
             if ($index !== false) {
-                $cases[] = self::{$validNames[$index]};
+                $cases[] = self::cases()[$index];
             }
         }
 

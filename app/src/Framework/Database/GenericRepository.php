@@ -144,9 +144,9 @@ final readonly class GenericRepository
         int $limit = 0,
         int $offset = 0,
     ): array {
-        $orderBy = self::getOrderByString($orderBy);
-        $limit = self::getLimitString($limit);
-        $offset = self::getOffsetString($offset);
+        $orderBySql = self::getOrderByString($orderBy);
+        $limitSql = self::getLimitString($limit);
+        $offsetSql = self::getOffsetString($offset);
 
         /** @var list<array<string, ?scalar>> */
 
@@ -154,9 +154,9 @@ final readonly class GenericRepository
             "SELECT {$columns}
             FROM {$table}
             WHERE {$where}
-            {$orderBy}
-            {$limit}
-            {$offset}",
+            {$orderBySql}
+            {$limitSql}
+            {$offsetSql}",
             [$parameter],
         );
 
@@ -201,9 +201,9 @@ final readonly class GenericRepository
         int $limit = 0,
         int $offset = 0,
     ): array {
-        $orderBy = self::getOrderByString($orderBy);
-        $limit = self::getLimitString($limit);
-        $offset = self::getOffsetString($offset);
+        $orderBySql = self::getOrderByString($orderBy);
+        $limitSql = self::getLimitString($limit);
+        $offsetSql = self::getOffsetString($offset);
 
         /** @var list<array<string, ?scalar>> */
 
@@ -211,9 +211,9 @@ final readonly class GenericRepository
             "SELECT {$columns}
             FROM {$table}
             {$where}
-            {$orderBy}
-            {$limit}
-            {$offset}",
+            {$orderBySql}
+            {$limitSql}
+            {$offsetSql}",
             $where->getParameters(),
         );
 

@@ -13,6 +13,7 @@ use App\Repositories\AppUserRepository;
 use App\Session\FavouriteSessionStore;
 use Google\Client;
 use Google\Service\Oauth2;
+use Google\Service\Oauth2\Resource\Userinfo;
 use SensitiveParameter;
 use Uri\Rfc3986\Uri;
 
@@ -116,11 +117,18 @@ final readonly class LoginService
         $clientGoogle->setRedirectUri($redirectUrl);
 
         $token = $clientGoogle->fetchAccessTokenWithAuthCode($code);
-        $clientGoogle->setAccessToken($token['access_token']);
+        $accessToken = $token['access_token'] ?? null;
 
-        $oauth2 = new Oauth2($clientGoogle);
+        if (!is_string($accessToken) || $accessToken === '') {
+            Log::error('`access_token` invalid');
+            return false;
+        }
 
-        $userinfo = $oauth2->userinfo->get();
+        $clientGoogle->setAccessToken($accessToken);
+
+        /** @var Userinfo */
+        $userinfoResource = new Oauth2($clientGoogle)->userinfo;
+        $userinfo = $userinfoResource->get();
 
         // https://github.com/googleapis/google-api-php-client-services/blob/main/src/Oauth2/Userinfo.php
 
@@ -128,26 +136,27 @@ final readonly class LoginService
         $name = $userinfo->name;
         $pictureUrl = $userinfo->picture;
 
-        if (!is_string($email) || empty($email)) {
+        // The model declares these as string, but fields the API didn't return are left null
+        if (!is_string($email) || $email === '') { // @phpstan-ignore function.alreadyNarrowedType
             Log::error('`email` invalid', $email);
             return false;
         }
 
-        if (!is_string($name)) {
+        if (!is_string($name)) { // @phpstan-ignore function.alreadyNarrowedType
             Log::error('`name` invalid', $name);
             return false;
         }
 
-        if (!is_string($pictureUrl)) {
+        if (!is_string($pictureUrl)) { // @phpstan-ignore function.alreadyNarrowedType
             Log::error('`picture` invalid', $pictureUrl);
             return false;
         }
 
-        if (empty($name)) {
+        if ($name === '') {
             $name = null;
         }
 
-        if (empty($pictureUrl)) {
+        if ($pictureUrl === '') {
             $pictureUrl = null;
         }
 
@@ -258,23 +267,23 @@ final readonly class LoginService
             return false;
         }
 
-        if (!isset($user['id']) || !is_string($user['id']) || empty($user['id'])) {
+        if (!isset($user['id']) || !is_string($user['id']) || $user['id'] === '') {
             Log::error('`id` invalid', $user);
             return false;
         }
 
-        if (!isset($user['email']) || !is_string($user['email']) || empty($user['email'])) {
+        if (!isset($user['email']) || !is_string($user['email']) || $user['email'] === '') {
             Log::error('`email` invalid', $user);
             return false;
         }
 
         $email = $user['email'];
 
-        $name = isset($user['global_name']) && is_string($user['global_name']) && !empty($user['global_name'])
+        $name = isset($user['global_name']) && is_string($user['global_name']) && $user['global_name'] !== ''
             ? $user['global_name']
             : null;
 
-        $pictureUrl = isset($user['avatar']) && is_string($user['avatar']) && !empty($user['avatar'])
+        $pictureUrl = isset($user['avatar']) && is_string($user['avatar']) && $user['avatar'] !== ''
             ? self::DISCORD_AVATAR_URL_BASE . $user['id'] . '/' . $user['avatar'] . '.jpg'
             : null;
 
@@ -293,7 +302,7 @@ final readonly class LoginService
      */
     public function storePreLoginLocation(?string $location): void
     {
-        if ($location === null || empty($location)) {
+        if ($location === null || $location === '') {
             return;
         }
 
@@ -312,7 +321,7 @@ final readonly class LoginService
 
         assert(
             $res === null
-            || (is_string($res) && !empty($res)),
+            || (is_string($res) && $res !== ''),
             'Pre-Login Location must be null or non-empty-string',
         );
 
@@ -375,7 +384,7 @@ final readonly class LoginService
 
     private static function validateCode(#[SensitiveParameter] mixed $code): bool
     {
-        if (!is_string($code) || empty($code)) {
+        if (!is_string($code) || $code === '') {
             Log::error('`code` invalid', $code);
             return false;
         }
