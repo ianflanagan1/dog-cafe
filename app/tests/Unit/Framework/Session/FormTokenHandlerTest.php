@@ -71,7 +71,7 @@ final class FormTokenHandlerTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function test_create_token_generates_and_stores_and_returns_sha1_token(): void
+    public function test_create_token_stores_and_returns_a_256_bit_hex_token(): void
     {
         $capturedToken = null;
 
@@ -90,7 +90,7 @@ final class FormTokenHandlerTest extends TestCase
 
         $token = $this->formTokenHandler->createToken('a-key');
 
-        $this->assertMatchesRegularExpression('/^[0-9a-f]{40}$/i', $token);
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $token);
         $this->assertSame($capturedToken, $token);
     }
 
