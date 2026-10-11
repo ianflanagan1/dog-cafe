@@ -155,7 +155,8 @@ final readonly class GenericRepository
             FROM {$table}
             WHERE {$where}
             {$orderBy}
-            {$limit}",
+            {$limit}
+            {$offset}",
             [$parameter],
         );
 
