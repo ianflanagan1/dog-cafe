@@ -7,6 +7,7 @@ namespace App\Framework\Database;
 use App\Framework\Errors\SystemException;
 use App\Framework\Support\Log;
 use App\Framework\Support\StandardTypes;
+use Closure;
 use PDO;
 use PDOException;
 use RuntimeException;
@@ -21,14 +22,12 @@ use stdClass;
  * */
 final class Database
 {
-    protected const array DEFAULT_OPTIONS = [
+    /** The code assumes these. They are not configurable */
+    private const array REQUIRED_ATTRIBUTES = [
         PDO::ATTR_DEFAULT_FETCH_MODE    => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES      => false,
         PDO::ATTR_ERRMODE               => PDO::ERRMODE_EXCEPTION,
     ];
-
-    /** @var callable */
-    protected $pdoFactory;
     private ?PDO $pdo = null;
 
     /**
@@ -39,15 +38,13 @@ final class Database
      *      database: string,
      *      user: string,
      *      password: string,
-     *      options?: list<int|bool>
      * } $config
-     * @param callable $pdoFactory
+     * @param Closure(array<string, mixed>): PDO $pdoFactory
      */
     public function __construct(
-        callable $pdoFactory,
         #[SensitiveParameter] private array $config,
+        private Closure $pdoFactory,
     ) {
-        $this->pdoFactory = $pdoFactory;
     }
 
     /**
@@ -236,7 +233,13 @@ final class Database
     private function connect(): PDO
     {
         if ($this->pdo === null) {
-            $this->pdo = ($this->pdoFactory)($this->config, self::DEFAULT_OPTIONS);
+            $pdo = ($this->pdoFactory)($this->config);
+
+            foreach (self::REQUIRED_ATTRIBUTES as $attribute => $value) {
+                $pdo->setAttribute($attribute, $value);
+            }
+
+            $this->pdo = $pdo;
         }
 
         return $this->pdo;

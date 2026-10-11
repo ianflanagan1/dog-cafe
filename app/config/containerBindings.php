@@ -35,15 +35,14 @@ return [
          *      database: non-empty-string,
          *      user: non-empty-string,
          *      password: non-empty-string,
-         *      options?: list<int|bool>
-         * } $dbConfig
+         * }
          */
         $dbConfig = $config->get('dbCore');
 
         // This is moved outside the Database class to aid unit testing
-        $pdoFactory = function (#[SensitiveParameter] array $config, array $defaultOptions): PDO {
+        $pdoFactory = function (#[SensitiveParameter] array $config): PDO {
             try {
-                $pdo = new PDO(
+                $pdo = PDO::connect(
                     sprintf(
                         '%s:host=%s;port=%d;dbname=%s;',
                         $config['driver'],
@@ -53,7 +52,6 @@ return [
                     ),
                     $config['user'],
                     $config['password'],
-                    $config['options'] ?? $defaultOptions,
                 );
             } catch (PDOException $e) {
                 throw new RuntimeException('Failed to connect to database: ' . $e->getMessage(), (int) $e->getCode(), $e);
