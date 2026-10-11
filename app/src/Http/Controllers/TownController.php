@@ -21,7 +21,7 @@ final readonly class TownController extends Controller
      */
     public function searchTown(SearchTownRequest $request, TownSearchService $townSearchService): Response
     {
-        /** @var SearchTownValidated $validated */
+        /** @var SearchTownValidated */
         $validated = $request->validate();
 
         return Response::json(200, [

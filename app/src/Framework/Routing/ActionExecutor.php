@@ -27,7 +27,7 @@ final class ActionExecutor
      */
     public function handle(array $actionable): Response
     {
-        /** @var Response $result */
+        /** @var Response */
         $result = $this->container->call($actionable[0], $actionable[1], $actionable[2]);
 
         return $result;

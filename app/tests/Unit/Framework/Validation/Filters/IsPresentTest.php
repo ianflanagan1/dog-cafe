@@ -51,7 +51,7 @@ class IsPresentTest extends TestCase
     #[DataProvider('cases_to_test_rule_passes')]
     public function test_rule_passes(mixed $value): void
     {
-        $result = (new IsPresent())->filter($value);
+        $result = new IsPresent()->filter($value);
 
         $this->assertTrue($result);
     }
@@ -76,7 +76,7 @@ class IsPresentTest extends TestCase
     #[DataProvider('cases_to_test_rule_fails')]
     public function test_rule_fails(mixed $value): void
     {
-        $result = (new IsPresent())->filter($value);
+        $result = new IsPresent()->filter($value);
 
         $this->assertFalse($result);
     }

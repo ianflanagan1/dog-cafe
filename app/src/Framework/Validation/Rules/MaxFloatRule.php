@@ -8,6 +8,7 @@ use App\Framework\Errors\Error;
 use App\Framework\Errors\ErrorCode;
 use App\Framework\Support\FloatComparator;
 use InvalidArgumentException;
+use Override;
 
 final class MaxFloatRule implements RuleInterface
 {
@@ -15,11 +16,7 @@ final class MaxFloatRule implements RuleInterface
     {
     }
 
-    /**
-     * @param non-empty-string $field
-     * @param mixed $value
-     * @return ?Error
-     */
+    #[Override]
     public function validate(string $field, mixed $value): ?Error
     {
         if (!is_float($value)) {

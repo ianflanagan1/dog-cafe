@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Framework\Container;
 
+use Override;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionFunction;
@@ -22,12 +23,10 @@ final class Container implements ContainerInterface
     }
 
     /**
-     * Retrieve an object by its container identifier.
-     *
-     * @param string $id
      * @return object
      * @throws ContainerException
      */
+    #[Override]
     public function get(string $id): object
     {
         return $this->resolve($id);
@@ -38,6 +37,7 @@ final class Container implements ContainerInterface
         $this->instructions[$id] = $instruction;
     }
 
+    #[Override]
     public function has(string $id): bool
     {
         return isset($this->instructions[$id]);
@@ -112,7 +112,7 @@ final class Container implements ContainerInterface
      */
     private function resolveCallable(string $id, array $loopTracker): object
     {
-        /** @var callable $instruction */
+        /** @var callable */
         $instruction = $this->instructions[$id];
 
         $reflection = is_array($instruction)

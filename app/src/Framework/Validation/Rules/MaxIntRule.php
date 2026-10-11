@@ -7,6 +7,7 @@ namespace App\Framework\Validation\Rules;
 use App\Framework\Errors\Error;
 use App\Framework\Errors\ErrorCode;
 use InvalidArgumentException;
+use Override;
 
 final class MaxIntRule implements RuleInterface
 {
@@ -14,11 +15,7 @@ final class MaxIntRule implements RuleInterface
     {
     }
 
-    /**
-     * @param non-empty-string $field
-     * @param mixed $value
-     * @return ?Error
-     */
+    #[Override]
     public function validate(string $field, mixed $value): ?Error
     {
         if (!is_int($value)) {

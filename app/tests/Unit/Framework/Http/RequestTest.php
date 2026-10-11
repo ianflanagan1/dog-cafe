@@ -12,8 +12,8 @@ final class RequestTest extends TestCase
 {
     public function test_path_strips_query_string(): void
     {
-        $this->assertSame('/list/london', (new Request(HttpMethod::GET, '/list/london?page=2&q=a?b'))->path());
-        $this->assertSame('/list/london', (new Request(HttpMethod::GET, '/list/london'))->path());
+        $this->assertSame('/list/london', new Request(HttpMethod::GET, '/list/london?page=2&q=a?b')->path());
+        $this->assertSame('/list/london', new Request(HttpMethod::GET, '/list/london')->path());
     }
 
     public function test_header_lookup_is_case_insensitive(): void
@@ -67,7 +67,7 @@ final class RequestTest extends TestCase
 
     public function test_ip(): void
     {
-        $this->assertSame('1.2.3.4', (new Request(HttpMethod::GET, '/', serverParams: ['REMOTE_ADDR' => '1.2.3.4']))->ip());
-        $this->assertNull((new Request(HttpMethod::GET, '/', serverParams: ['REMOTE_ADDR' => '']))->ip());
+        $this->assertSame('1.2.3.4', new Request(HttpMethod::GET, '/', serverParams: ['REMOTE_ADDR' => '1.2.3.4'])->ip());
+        $this->assertNull(new Request(HttpMethod::GET, '/', serverParams: ['REMOTE_ADDR' => ''])->ip());
     }
 }

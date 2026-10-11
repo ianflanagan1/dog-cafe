@@ -11,7 +11,7 @@ interface RuleInterface
     /**
      * Validate a value. Return an Error if invalid, or null if valid.
      *
-     * @param string $field
+     * @param non-empty-string $field
      * @param mixed $value
      * @return ?Error
      */

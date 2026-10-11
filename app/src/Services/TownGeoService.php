@@ -36,7 +36,7 @@ final readonly class TownGeoService
             }
         }
 
-        /** @phpstan-var Town $closest */
+        /** @phpstan-var Town */
 
         return $closest;
     }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Unit\Framework\Routing;
 
 use App\Framework\Cache\RedisCache;
-use App\Framework\Container\Container;
 use App\Framework\Http\HttpMethod;
 use App\Framework\Http\Request;
 use App\Framework\Routing\ActionExecutor;
@@ -16,7 +15,10 @@ use App\Framework\Routing\RouteConflictException;
 use App\Framework\Routing\RouteNotFoundException;
 use App\Framework\Routing\RouteNotValidException;
 use App\Framework\Routing\RouteRegistry;
+use App\Framework\Support\StringGenerator;
 use Exception;
+use Override;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -26,13 +28,12 @@ use Tests\Traits\ConstantAccessTrait;
  * @phpstan-import-type Actionable from ActionExecutor
  * @phpstan-import-type ControllerAction from RouteRegistry
  */
+#[AllowMockObjectsWithoutExpectations]
 class RouteRegistryTest extends TestCase
 {
     use ConstantAccessTrait;
 
     protected RouteRegistry $routeRegistry;
-
-    protected MockObject&Container $containerMock;
 
     protected MockObject&RedisCache $cacheMock;
 
@@ -40,13 +41,14 @@ class RouteRegistryTest extends TestCase
 
     protected string $CACHE_KEY_ACTIONS;
 
+    #[Override]
     protected function setUp(): void
     {
         $this->cacheMock = $this->createMock(RedisCache::class);
         $this->routeRegistry = new RouteRegistry($this->cacheMock);
 
         // Get protected class constants
-        /** @var array{0: non-empty-string, 1: non-empty-string} $result */
+        /** @var array{0: non-empty-string, 1: non-empty-string} */
         $result = self::getConstantValue(RouteRegistry::class, ['CACHE_KEY_ROUTES', 'CACHE_KEY_ACTIONS']);
 
         [$this->CACHE_KEY_ROUTES, $this->CACHE_KEY_ACTIONS] = $result;
@@ -704,7 +706,7 @@ class RouteRegistryTest extends TestCase
      */
     protected function makeDynamicController(string $route): string
     {
-        $className = 'TestController_'.md5(uniqid());
+        $className = 'TestController_'.StringGenerator::hex(8);
 
         $classCode = <<<PHP
             namespace DynamicTest;
@@ -715,9 +717,9 @@ class RouteRegistryTest extends TestCase
             }
         PHP;
 
-        eval($classCode);
+        eval($classCode); // @phpstan-ignore disallowed.eval (attribute arguments must be constant, so data-provider routes need generated classes)
 
-        /** @var class-string $output */
+        /** @var class-string */
         $output = "DynamicTest\\{$className}";
 
         return $output;

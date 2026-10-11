@@ -12,6 +12,11 @@
             "imports_order": ["const", "class", "function"]
         },
         "nullable_type_declaration_for_default_null_value": true,
+        "single_quote": true,
+        "new_expression_parentheses": true,
+        "get_class_to_class_keyword": true,
+        "modernize_types_casting": true,
+        "phpdoc_var_without_name": true,
         "ordered_class_elements": {
             "order": [
                 "use_trait",

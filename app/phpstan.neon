@@ -1,5 +1,18 @@
+includes:
+    - vendor/spaze/phpstan-disallowed-calls/extension.neon
+    - vendor/spaze/phpstan-disallowed-calls/disallowed-dangerous-calls.neon
+    - vendor/spaze/phpstan-disallowed-calls/disallowed-execution-calls.neon
+    - vendor/spaze/phpstan-disallowed-calls/disallowed-insecure-calls.neon
+    - vendor/spaze/phpstan-disallowed-calls/disallowed-loose-calls.neon
+    - vendor/ianflanagan1/phpstan-inferable-var-tag-name/rules.neon
+    - vendor/ianflanagan1/phpstan-redundant-inherited-phpdoc/rules.neon
+
 parameters:
     level: 9            # 0-9
+    checkMissingOverrideMethodAttribute: true
+    # Also report overrides that are only possibly incompatible, e.g. narrowing an inherited string param to non-empty-string in PHPDoc
+    reportMaybesInMethodSignatures: true
+    reportStaticMethodSignatures: true
     errorFormat: table  # raw table checkstyle json prettyJson junit github gitlab teamcity
     paths:
         - src
@@ -7,3 +20,17 @@ parameters:
         - public
         - tests
     # excluding static/ vendor/
+
+    # spaze/phpstan-disallowed-calls
+    # Extends its disallowed-insecure-calls.neon, which only covers rand(), mt_rand(), lcg_value() and uniqid()
+    disallowedFunctionCalls:
+        -
+            function:
+                - 'srand()'
+                - 'mt_srand()'
+                - 'mt_getrandmax()'
+                - 'getrandmax()'
+                - 'str_shuffle()'
+                - 'shuffle()'
+                - 'array_rand()'
+            message: 'it uses the predictable Mt19937 generator; use Random\Randomizer (secure by default) or random_bytes()'

@@ -166,7 +166,7 @@ class ContainerTest extends TestCase
         $container = new Container([
             AutowiringA::class => function (ContainerInterface $container): AutowiringA {
 
-                /** @var AutowiringB $b */
+                /** @var AutowiringB */
                 $b = $container->get(AutowiringB::class);
 
                 return new AutowiringA(
@@ -176,7 +176,7 @@ class ContainerTest extends TestCase
             },
             AutowiringB::class => function (ContainerInterface $container, AutowiringC2 $injectedC2): AutowiringB {
 
-                /** @var AutowiringC1 $c1 */
+                /** @var AutowiringC1 */
                 $c1 = $container->get(AutowiringC1::class);
 
                 return new AutowiringB(

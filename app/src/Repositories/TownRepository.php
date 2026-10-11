@@ -116,10 +116,11 @@ final readonly class TownRepository
         }
 
         assert(
-            is_array($towns) && !empty($towns),
-            '$towns (all towns) must be non-empty array'
+            is_array($towns) && !empty($towns) && array_is_list($towns),
+            '$towns (all towns) must be non-empty list'
         );
 
+        /** @phpstan-var non-empty-list<TownFromDatabase> */
         return $towns;
     }
 

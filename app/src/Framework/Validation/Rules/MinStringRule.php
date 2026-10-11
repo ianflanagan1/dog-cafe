@@ -7,6 +7,7 @@ namespace App\Framework\Validation\Rules;
 use App\Framework\Errors\Error;
 use App\Framework\Errors\ErrorCode;
 use InvalidArgumentException;
+use Override;
 
 final class MinStringRule implements RuleInterface
 {
@@ -17,18 +18,14 @@ final class MinStringRule implements RuleInterface
         }
     }
 
-    /**
-     * @param non-empty-string $field
-     * @param mixed $value
-     * @return ?Error
-     */
+    #[Override]
     public function validate(string $field, mixed $value): ?Error
     {
         if (!is_string($value)) {
             throw new InvalidArgumentException();
         }
 
-        if (!is_string($value) || strlen($value) < $this->min) {
+        if (strlen($value) < $this->min) {
             $min = $this->min;
 
             $min .= $min > 1

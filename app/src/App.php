@@ -16,7 +16,7 @@ final readonly class App
         $request = Request::fromGlobals();
         $container->set(Request::class, $request);
 
-        /** @var Router $router */
+        /** @var Router */
         $router = $container->get(Router::class);
 
         $this->send($router->resolve($request));

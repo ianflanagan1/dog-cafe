@@ -6,6 +6,8 @@ namespace Tests\Unit\Framework\Session;
 
 use App\Framework\Session\FormTokenHandler;
 use App\Framework\Session\SessionListManager;
+use Override;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Tests\Traits\ConstantAccessTrait;
@@ -23,13 +25,14 @@ final class FormTokenHandlerTest extends TestCase
 
     protected string $SESSION_PREFIX;
 
+    #[Override]
     protected function setUp(): void
     {
         $this->sessionListManagerMock = $this->createMock(SessionListManager::class);
         $this->formTokenHandler = new FormTokenHandler($this->sessionListManagerMock);
 
         // Get protected class constants
-        /** @var array{0: non-empty-string, 1: int} $result */
+        /** @var array{0: non-empty-string, 1: int} */
         $result = self::getConstantValue(FormTokenHandler::class, ['SESSION_PREFIX', 'MAX_TOKENS']);
 
         [$this->SESSION_PREFIX, $this->MAX_TOKENS] = $result;
@@ -37,6 +40,8 @@ final class FormTokenHandlerTest extends TestCase
 
     public function test_is_valid_token_returns_false_if_token_is_null(): void
     {
+        $this->sessionListManagerMock->expects($this->never())->method('consumeValue');
+
         $result = $this->formTokenHandler->isValidToken('a-key', null);
         $this->assertFalse($result);
     }
@@ -94,6 +99,7 @@ final class FormTokenHandlerTest extends TestCase
         $this->assertSame($capturedToken, $token);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function test_create_token_returns_unique_values_for_different_keys(): void
     {
         $token1 = $this->formTokenHandler->createToken('key1');
@@ -102,6 +108,7 @@ final class FormTokenHandlerTest extends TestCase
         $this->assertNotSame($token1, $token2);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function test_create_token_returns_unique_values_for_same_key(): void
     {
         $token1a = $this->formTokenHandler->createToken('key1');

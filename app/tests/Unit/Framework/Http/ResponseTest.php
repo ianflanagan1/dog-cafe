@@ -23,7 +23,7 @@ final class ResponseTest extends TestCase
     {
         $response = Response::jsonError(404, ErrorCode::ItemNotFound);
 
-        /** @var array{data: array{errors: list<array{code: int}>}} $decoded */
+        /** @var array{data: array{errors: list<array{code: int}>}} */
         $decoded = json_decode($response->body, true);
 
         $this->assertSame(404, $response->status);

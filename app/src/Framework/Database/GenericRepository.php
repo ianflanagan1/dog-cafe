@@ -69,7 +69,7 @@ final readonly class GenericRepository
      */
     public function findRow(string $columns, string $table, string $where, bool|float|int|string|null $parameter): ?array
     {
-        /** @var ?array<string, ?scalar> $res */
+        /** @var ?array<string, ?scalar> */
 
         $res = $this->database->fetch(
             "SELECT {$columns}
@@ -91,7 +91,7 @@ final readonly class GenericRepository
      */
     public function findValue(string $selectColumn, string $table, string $where, bool|float|int|string|null $parameter): bool|float|int|string|null
     {
-        /** @var ?scalar $res */
+        /** @var ?scalar */
 
         $res = $this->database->fetchColumn(
             "SELECT {$selectColumn}
@@ -113,7 +113,7 @@ final readonly class GenericRepository
      */
     public function fetchValues(string $selectColumn, string $table, string $where, bool|float|int|string|null $parameter): array
     {
-        /** @var list<?scalar> $res */
+        /** @var list<?scalar> */
 
         $res = $this->database->fetchAllColumn(
             "SELECT {$selectColumn}
@@ -148,7 +148,7 @@ final readonly class GenericRepository
         $limit = self::getLimitString($limit);
         $offset = self::getOffsetString($offset);
 
-        /** @var list<array<string, ?scalar>> $res */
+        /** @var list<array<string, ?scalar>> */
 
         $res = $this->database->fetchAll(
             "SELECT {$columns}
@@ -170,7 +170,7 @@ final readonly class GenericRepository
      */
     public function findRowWithSqlWhere(string $columns, string $table, SqlWhere $where): ?array
     {
-        /** @var ?array<string, ?scalar> $res */
+        /** @var ?array<string, ?scalar> */
 
         $res = $this->database->fetch(
             "SELECT {$columns}
@@ -204,7 +204,7 @@ final readonly class GenericRepository
         $limit = self::getLimitString($limit);
         $offset = self::getOffsetString($offset);
 
-        /** @var list<array<string, ?scalar>> $res */
+        /** @var list<array<string, ?scalar>> */
 
         $res = $this->database->fetchAll(
             "SELECT {$columns}
@@ -247,7 +247,7 @@ final readonly class GenericRepository
     {
         $total = $this->getTotal($sqlWhere, 'venue');
 
-        /** @phpstan-var NonNegInt $totalPages */
+        /** @phpstan-var NonNegInt */
         $totalPages = (int) ceil($total / $pageSize);
 
         return $totalPages;

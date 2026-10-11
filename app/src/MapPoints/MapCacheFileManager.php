@@ -38,8 +38,8 @@ final class MapCacheFileManager
         'lng_min' => -9,
         'lng_max' => 2,
     ];
-    protected const int POINT_INDEX_TYPE = 0;
     private const string CACHE_FILE_NAMESPACE = 'map';
+    private const int POINT_INDEX_TYPE = 0; // @phpstan-ignore classConstant.unused (documents the point tuple layout alongside LAT and LNG)
     private const int POINT_INDEX_LAT = 1;
     private const int POINT_INDEX_LNG = 2;
 
@@ -187,7 +187,7 @@ final class MapCacheFileManager
                         throw new RuntimeException();
                     }
 
-                    /** @var Chunk $chunk */
+                    /** @var Chunk */
                     $chunk = json_decode($content, true);
 
                     $chunks[] = $chunk;
@@ -300,7 +300,7 @@ final class MapCacheFileManager
             throw new RuntimeException();
         }
 
-        /** @var list<non-empty-string> $openTimes */
+        /** @var list<non-empty-string> */
         $openTimes = json_decode($content, true);
 
         // Progress through the list of opening times until current time is reached

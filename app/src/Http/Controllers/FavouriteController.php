@@ -45,7 +45,7 @@ final readonly class FavouriteController extends Controller
     ): Response {
         $auth->guard(true);
 
-        /** @var ListValidated $validated */
+        /** @var ListValidated */
         $validated = $request->validate();
 
         [$totalPages, $venues] = $venueRepository->getVenuePageRawForFavs(
@@ -99,7 +99,7 @@ final readonly class FavouriteController extends Controller
     ): Response {
         $auth->guard();
 
-        /** @var ListValidated $validated */
+        /** @var ListValidated */
         $validated = $request->validate();
 
         [$totalPages, $venues] = $venueRepository->getVenuePageRawForFavs(
@@ -133,7 +133,7 @@ final readonly class FavouriteController extends Controller
     ): Response {
         $auth->guard();
 
-        /** @var FavValidated $validated */
+        /** @var FavValidated */
         $validated = $request->validate();
         $id = $venueRepository->findIdByExtId($validated['ext_id']);
 

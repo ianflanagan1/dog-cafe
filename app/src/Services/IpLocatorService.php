@@ -72,7 +72,7 @@ final class IpLocatorService
      */
     private static function isDevRequestIp(string $ip): bool
     {
-        return in_array($ip, ['127.0.0.1', '::1']) ||               // Localhost
+        return in_array($ip, ['127.0.0.1', '::1'], true) ||         // Localhost
             preg_match('/^172\.(1[6-9]|2[0-9]|3[0-1])\./', $ip) ||  // Docker bridge
             preg_match('/^192\.168\./', $ip) ||                     // Home router network
             preg_match('/^10\./', $ip);                             // Private class A

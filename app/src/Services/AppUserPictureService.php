@@ -147,6 +147,6 @@ readonly class AppUserPictureService
      */
     protected static function createFilename(string $url, string $uniqueSuffix): string
     {
-        return sha1($url . $uniqueSuffix);
+        return sha1($url . $uniqueSuffix); // @phpstan-ignore disallowed.function (a filename derived from a public URL, not a secret; changing it would re-download every user's picture)
     }
 }

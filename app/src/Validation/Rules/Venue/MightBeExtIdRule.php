@@ -10,17 +10,14 @@ use App\Framework\Support\StandardTypes;
 use App\Framework\Validation\Rules\RuleInterface;
 use App\Models\Venue;
 use InvalidArgumentException;
+use Override;
 
 /**
  * @phpstan-import-type PosInt from StandardTypes
 */
 final class MightBeExtIdRule implements RuleInterface
 {
-    /**
-     * @param non-empty-string $field
-     * @param mixed $value
-     * @return ?Error
-     */
+    #[Override]
     public function validate(string $field, mixed $value): ?Error
     {
         if (!is_string($value)) {

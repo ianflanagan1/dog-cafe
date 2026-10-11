@@ -6,14 +6,12 @@ namespace App\Services;
 
 use App\Framework\Routing\RouteNotFoundException;
 use App\Models\Town;
-use App\Repositories\AppUserRepository;
 use App\Repositories\TownRepository;
 use App\Session\TownSessionStore;
 
 final readonly class TownResolver
 {
     public function __construct(
-        protected AppUserRepository $appUserRepository,
         private TownGeoService $townGeoService,
         private TownRepository $townRepository,
         private TownSessionStore $townSessionStore,

@@ -47,7 +47,7 @@ final class Curl
     #[NoDiscard]
     public static function stringResponse(string $url, #[SensitiveParameter] array $headers = [], #[SensitiveParameter] array $payload = []): string|false
     {
-        /** @var string|false $res */
+        /** @var string|false */
         $res = self::curl($url, $headers, $payload);
 
         if ($res === false) {
@@ -72,7 +72,7 @@ final class Curl
     #[NoDiscard]
     public static function fileResponse(string $url, #[SensitiveParameter] array $headers = [], #[SensitiveParameter] array $post = [], mixed $fileHandle = null): bool
     {
-        /** @var bool $res */
+        /** @var bool */
         $res = Curl::curl($url, $headers, $post, $fileHandle);
 
         return $res;
@@ -105,7 +105,7 @@ final class Curl
             CURLOPT_MAXREDIRS       => 10,
             CURLOPT_CONNECTTIMEOUT  => 5,
             CURLOPT_TIMEOUT         => 30,
-            CURLOPT_HEADER          => 0,       // Output only contains body
+            CURLOPT_HEADER          => false,   // Output only contains body
         ];
 
         if (!empty($headers)) {

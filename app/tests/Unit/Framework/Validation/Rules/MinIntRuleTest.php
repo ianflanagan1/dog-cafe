@@ -56,7 +56,7 @@ class MinIntRuleTest extends TestCase
     #[DataProvider('cases_to_test_rule_passes')]
     public function test_rule_passes(int $limit, int $value): void
     {
-        $result = (new MinIntRule($limit))->validate(self::FIELD, $value);
+        $result = new MinIntRule($limit)->validate(self::FIELD, $value);
 
         $this->assertNull($result);
     }
@@ -91,7 +91,7 @@ class MinIntRuleTest extends TestCase
     #[DataProvider('cases_to_test_rule_fails')]
     public function test_rule_fails(int $limit, int $value): void
     {
-        $result = (new MinIntRule($limit))->validate(self::FIELD, $value);
+        $result = new MinIntRule($limit)->validate(self::FIELD, $value);
 
         $this->assertInstanceOf(Error::class, $result);
         $this->assertSame(ErrorCode::ParameterTooSmall, $result->code);

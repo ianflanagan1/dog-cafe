@@ -47,11 +47,17 @@ final readonly class Request
             }
         }
 
-        $method = HttpMethod::from(strtolower($_SERVER['REQUEST_METHOD']));
+        $requestMethod = $_SERVER['REQUEST_METHOD'];
+        $requestUri = $_SERVER['REQUEST_URI'];
+
+        assert(is_string($requestMethod), 'REQUEST_METHOD must be a string');
+        assert(is_string($requestUri), 'REQUEST_URI must be a string');
+
+        $method = HttpMethod::from(strtolower($requestMethod));
 
         return new self(
             $method,
-            $_SERVER['REQUEST_URI'] ?: '/',
+            $requestUri ?: '/',
             $_GET,
             self::parseBodyFromGlobals($method),
             $headers,
@@ -139,12 +145,12 @@ final readonly class Request
 
         try {
             [$parsedBody] = request_parse_body();
-        } catch (RequestParseBodyException) { // @phpstan-ignore catch.neverThrown (PHPStan's stub for request_parse_body() lacks @throws)
+        } catch (RequestParseBodyException) {
             // Body missing, malformed, or not form-encoded
             return [];
         }
 
-        /** @var Inputs $parsedBody */
+        /** @var Inputs */
         return $parsedBody;
     }
 
