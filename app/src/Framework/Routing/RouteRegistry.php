@@ -62,10 +62,10 @@ use ReflectionClass;
  * }
  */
 
-class RouteRegistry
+final class RouteRegistry
 {
-    protected const string CACHE_KEY_ROUTES  = 'routerRoutes';
-    protected const string CACHE_KEY_ACTIONS = 'routerActions';
+    private const string CACHE_KEY_ROUTES  = 'routerRoutes';
+    private const string CACHE_KEY_ACTIONS = 'routerActions';
 
     /**
      * Parameter name must be a colon followed by a valid PHP variable name
@@ -74,7 +74,7 @@ class RouteRegistry
      * [A-Za-z_]    One alphabetic or underscore
      * [A-Za-z0-9_] Zero or more alpha-number or underscore
      */
-    protected const string PARAMETER_ALLOWED = ':[A-Za-z_][A-Za-z0-9_]*';
+    private const string PARAMETER_ALLOWED = ':[A-Za-z_][A-Za-z0-9_]*';
 
     /**
      * Segment name must be alpha-numeric or . _ ~ -
@@ -83,16 +83,16 @@ class RouteRegistry
      * ._~-         Literals
      * +            One or more such characters
      */
-    protected const string SEGMENT_ALLOWED = '[A-Za-z0-9._~-]+';
+    private const string SEGMENT_ALLOWED = '[A-Za-z0-9._~-]+';
 
     /** @var RouteSegment $routes */
-    protected array $routes;
+    private array $routes;
 
     /** @var list<ControllerAction> */
-    protected array $actions;
+    private array $actions;
 
     public function __construct(
-        protected CacheInterface $cache,
+        private CacheInterface $cache,
     ) {
     }
 
@@ -162,7 +162,7 @@ class RouteRegistry
     /**
      * @param list<class-string> $controllers
      */
-    protected function registerFromAttributes(array $controllers): void
+    private function registerFromAttributes(array $controllers): void
     {
         $routes = [];
         $actions = [];
@@ -206,7 +206,7 @@ class RouteRegistry
      * @return void
      * @throws RouteNotValidException
      */
-    protected function registerRoute(string $route, HttpMethod $httpMethod, int $actionIndex, array &$routes): void
+    private function registerRoute(string $route, HttpMethod $httpMethod, int $actionIndex, array &$routes): void
     {
         $segments = explode('/', $route);
 
@@ -246,7 +246,7 @@ class RouteRegistry
      * @param RouteSegment|RouteParameter $routes
      * @return void
      */
-    protected static function registerRouteRecursive(array $segments, HttpMethod $httpMethod, int $actionIndex, array &$routes): void
+    private static function registerRouteRecursive(array $segments, HttpMethod $httpMethod, int $actionIndex, array &$routes): void
     {
         $segment = $segments[0];
 
@@ -277,7 +277,7 @@ class RouteRegistry
      * @return void
      * @throws RouteConflictException
      */
-    protected static function registerParameter(array $segments, HttpMethod $httpMethod, int $actionIndex, array &$routes): void
+    private static function registerParameter(array $segments, HttpMethod $httpMethod, int $actionIndex, array &$routes): void
     {
         $segment = $segments[0];
         $parameterName = substr($segment, 1);
@@ -329,7 +329,7 @@ class RouteRegistry
      * @return void
      * @throws RouteConflictException
      */
-    protected static function registerSegment(array $segments, HttpMethod $httpMethod, int $actionIndex, array &$routes): void
+    private static function registerSegment(array $segments, HttpMethod $httpMethod, int $actionIndex, array &$routes): void
     {
         $segment = $segments[0];
 
@@ -368,7 +368,7 @@ class RouteRegistry
      * @param array<string, ?string> $parameters
      * @return ?NonNegInt
      */
-    protected static function resolveRecursive(array $segments, array $routes, HttpMethod $httpMethod, array &$parameters): ?int
+    private static function resolveRecursive(array $segments, array $routes, HttpMethod $httpMethod, array &$parameters): ?int
     {
         $segment = $segments[0];
 
@@ -403,7 +403,7 @@ class RouteRegistry
      * @param array<string, ?string> $parameters
      * @return ?NonNegInt
      */
-    protected static function resolveSegment(array $segments, array $routes, HttpMethod $httpMethod, array &$parameters): ?int
+    private static function resolveSegment(array $segments, array $routes, HttpMethod $httpMethod, array &$parameters): ?int
     {
         $segment = $segments[0];
 
@@ -448,7 +448,7 @@ class RouteRegistry
      * @param array<string, ?string> $parameters
      * @return ?NonNegInt
      */
-    protected static function resolveParameter(array $segments, array $routes, HttpMethod $httpMethod, array &$parameters): ?int
+    private static function resolveParameter(array $segments, array $routes, HttpMethod $httpMethod, array &$parameters): ?int
     {
         $segment = $segments[0];
 
@@ -483,7 +483,7 @@ class RouteRegistry
         return null;
     }
 
-    protected static function isSegmentParameter(string $segment): bool
+    private static function isSegmentParameter(string $segment): bool
     {
         return !empty($segment) && $segment[0] === ':';
     }

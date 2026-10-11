@@ -10,7 +10,7 @@ namespace App\Framework\Validation\Filters;
  * This callback is intended for use with FILTER_CALLBACK filters, returning `true` if the value is not null, indicating
  * the parameter was provided regardless of its actual value (including false, 0, empty string).
  */
-class IsPresent
+final class IsPresent
 {
     public static function filter(mixed $value): bool
     {

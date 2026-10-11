@@ -8,12 +8,12 @@ use App\Framework\Http\Request;
 use App\Framework\Http\Response;
 use Throwable;
 
-class Router
+final readonly class Router
 {
     public function __construct(
-        protected RouteRegistry $routeRegistry,
-        protected ActionExecutor $actionExecutor,
-        protected RouteExceptionHandler $routeExceptionHandler,
+        private RouteRegistry $routeRegistry,
+        private ActionExecutor $actionExecutor,
+        private RouteExceptionHandler $routeExceptionHandler,
     ) {
     }
 

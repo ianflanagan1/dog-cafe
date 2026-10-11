@@ -7,12 +7,12 @@ namespace App\Framework\Session;
 use App\Framework\Support\StringGenerator;
 use SensitiveParameter;
 
-readonly class FormTokenHandler
+final readonly class FormTokenHandler
 {
-    protected const int MAX_TOKENS = 10;
-    protected const string SESSION_PREFIX = 'formToken-';
+    private const int MAX_TOKENS = 10;
+    private const string SESSION_PREFIX = 'formToken-';
 
-    public function __construct(protected SessionListManager $sessionListManager)
+    public function __construct(private SessionListManager $sessionListManager)
     {
     }
 
@@ -53,7 +53,7 @@ readonly class FormTokenHandler
     /**
      * @return non-empty-string
      */
-    protected static function generateToken(): string
+    private static function generateToken(): string
     {
         return StringGenerator::hex(32);
     }

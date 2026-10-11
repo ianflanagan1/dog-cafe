@@ -13,6 +13,6 @@ namespace App\Framework\Support;
  * @phpstan-type DayOfWeek int<0,6>
  * @phpstan-type Permissions int<0, 0777>
  */
-class StandardTypes
+final class StandardTypes
 {
 }

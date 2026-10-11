@@ -6,7 +6,7 @@ namespace App\Framework\View;
 
 use Exception;
 
-class ViewNotFoundException extends Exception
+final class ViewNotFoundException extends Exception
 {
     public function __construct()
     {

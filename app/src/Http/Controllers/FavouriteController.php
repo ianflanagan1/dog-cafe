@@ -26,7 +26,7 @@ use App\Session\FavouriteSessionStore;
  * @phpstan-import-type ListValidated from ListRequest
  * @phpstan-import-type FavValidated from FavRequest
  */
-readonly class FavouriteController extends Controller
+final readonly class FavouriteController extends Controller
 {
     public const int PAGE_SIZE = 20;
     protected const string HTML_ROUTE = '/favs';

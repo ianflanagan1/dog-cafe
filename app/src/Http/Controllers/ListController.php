@@ -21,7 +21,7 @@ use App\Services\TownResolver;
  * @phpstan-import-type ListValidated from ListRequest
  * @phpstan-import-type VenueMinimalFromDatabase from Venue
  */
-readonly class ListController extends Controller
+final readonly class ListController extends Controller
 {
     public const int PAGE_SIZE = 20;
     protected const string HTML_ROUTE = '/list';

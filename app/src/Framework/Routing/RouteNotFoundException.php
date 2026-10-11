@@ -6,7 +6,7 @@ namespace App\Framework\Routing;
 
 use Exception;
 
-class RouteNotFoundException extends Exception
+final class RouteNotFoundException extends Exception
 {
     public function __construct()
     {

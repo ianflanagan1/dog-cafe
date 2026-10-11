@@ -22,7 +22,7 @@ use App\Session\FavouriteSessionStore;
  * @phpstan-import-type VenueShortValidated from VenueShortRequest
  */
 
-readonly class VenueController extends Controller
+final readonly class VenueController extends Controller
 {
     #[Get('/api/v1/venue-short')]
     /**

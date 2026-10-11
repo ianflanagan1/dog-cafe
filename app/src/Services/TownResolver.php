@@ -10,13 +10,13 @@ use App\Repositories\AppUserRepository;
 use App\Repositories\TownRepository;
 use App\Session\TownSessionStore;
 
-readonly class TownResolver
+final readonly class TownResolver
 {
     public function __construct(
-        protected TownGeoService $townGeoService,
-        protected TownRepository $townRepository,
-        protected TownSessionStore $townSessionStore,
         protected AppUserRepository $appUserRepository,
+        private TownGeoService $townGeoService,
+        private TownRepository $townRepository,
+        private TownSessionStore $townSessionStore,
     ) {
     }
 

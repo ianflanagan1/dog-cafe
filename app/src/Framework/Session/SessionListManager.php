@@ -15,7 +15,7 @@ use App\Framework\Support\StandardTypes;
  *
  * @phpstan-import-type PosInt from StandardTypes
  */
-class SessionListManager
+readonly class SessionListManager
 {
     public function __construct(
         protected Session $session,

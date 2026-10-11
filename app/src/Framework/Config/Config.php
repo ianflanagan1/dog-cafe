@@ -6,12 +6,12 @@ namespace App\Framework\Config;
 
 use SensitiveParameter;
 
-readonly class Config
+final readonly class Config
 {
     /**
      * @param array<string, array<string, ?scalar>> $config
      */
-    public function __construct(#[SensitiveParameter] protected array $config)
+    public function __construct(#[SensitiveParameter] private array $config)
     {
     }
 

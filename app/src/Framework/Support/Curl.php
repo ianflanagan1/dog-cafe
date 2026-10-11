@@ -10,7 +10,7 @@ use SensitiveParameter;
  * @phpstan-type Headers array<non-empty-string>
  * @phpstan-type Post array<string, ?scalar>
  */
-class Curl
+final class Curl
 {
     /**
      * @param non-empty-string $url

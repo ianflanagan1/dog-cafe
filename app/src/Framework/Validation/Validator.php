@@ -33,7 +33,7 @@ use App\Framework\Support\StandardTypes;
  *      }
  * >
  */
-class Validator
+final class Validator
 {
     /**
      * Filter and validate input data against expected inputs.
@@ -100,7 +100,7 @@ class Validator
      * @param mixed $default
      * @return mixed
      */
-    protected static function filter(array $inputs, string $field, int $type, mixed $options, mixed $default): mixed
+    private static function filter(array $inputs, string $field, int $type, mixed $options, mixed $default): mixed
     {
         if (!isset($inputs[$field])) {
             return $default;
@@ -126,7 +126,7 @@ class Validator
      * @param ?list<non-empty-string> $rules
      * @return void
      */
-    protected static function validate(array &$errors, string $field, mixed $value, ?array $rules, string $type): void
+    private static function validate(array &$errors, string $field, mixed $value, ?array $rules, string $type): void
     {
         if ($rules === null) {
             return;

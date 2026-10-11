@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Framework\Support;
 
-class FilePermissions
+final class FilePermissions
 {
     /**
      * Convert decimal (int) to octal string.

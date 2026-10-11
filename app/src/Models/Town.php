@@ -32,7 +32,7 @@ use App\Framework\Support\StandardTypes;
  * }
  */
 
-class Town extends Model
+final class Town extends Model
 {
     public const string TABLE = 'town';
 

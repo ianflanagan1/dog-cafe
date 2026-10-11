@@ -11,7 +11,7 @@ use Exception;
 /**
  * @phpstan-import-type Inputs from StandardTypes
  */
-class InputValidationException extends Exception
+final class InputValidationException extends Exception
 {
     /**
      * @param Inputs $inputs

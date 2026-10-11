@@ -6,6 +6,6 @@ namespace App\Framework\Errors;
 
 use RuntimeException;
 
-class SystemException extends RuntimeException
+final class SystemException extends RuntimeException
 {
 }

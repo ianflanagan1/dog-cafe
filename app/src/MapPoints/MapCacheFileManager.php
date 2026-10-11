@@ -30,18 +30,18 @@ use RuntimeException;
  *
  * @phpstan-type Chunk list<SinglePoint|ClusterPoint>
  */
-class MapCacheFileManager
+final class MapCacheFileManager
 {
-    protected const array COVERAGE = [ // Covering the UK
+    private const array COVERAGE = [ // Covering the UK
         'lat_min' => 49,
         'lat_max' => 61,
         'lng_min' => -9,
         'lng_max' => 2,
     ];
-    protected const string CACHE_FILE_NAMESPACE = 'map';
     protected const int POINT_INDEX_TYPE = 0;
-    protected const int POINT_INDEX_LAT = 1;
-    protected const int POINT_INDEX_LNG = 2;
+    private const string CACHE_FILE_NAMESPACE = 'map';
+    private const int POINT_INDEX_LAT = 1;
+    private const int POINT_INDEX_LNG = 2;
 
     /**
      * Get an array points from cache files for the specified geographical "rectangle", the specified zoom level, and
@@ -103,7 +103,7 @@ class MapCacheFileManager
      * @param list<list<SinglePoint|ClusterPoint>> $chunks
      * @return list<SinglePoint|ClusterPoint>
      */
-    protected static function getPointsFromChunks(float $lat1, float $lat2, float $lng1, float $lng2, array $chunks): array
+    private static function getPointsFromChunks(float $lat1, float $lat2, float $lng1, float $lng2, array $chunks): array
     {
         $points = [];
 
@@ -152,7 +152,7 @@ class MapCacheFileManager
      * @param NonNegInt $chunkDecimals
      * @return list<Chunk>
      */
-    protected static function getChunks(
+    private static function getChunks(
         float $lat1,
         float $lat2,
         float $lng1,
@@ -218,7 +218,7 @@ class MapCacheFileManager
      *      3: float,
      * }
      */
-    protected static function determineChunkBounds(float $lat1, float $lat2, float $lng1, float $lng2, float $latChunkSize, float $lngChunkSize): array
+    private static function determineChunkBounds(float $lat1, float $lat2, float $lng1, float $lng2, float $latChunkSize, float $lngChunkSize): array
     {
         if ($lat1 < self::COVERAGE['lat_min']) {
             $chunkLatMin = self::COVERAGE['lat_min'];
@@ -247,7 +247,7 @@ class MapCacheFileManager
      * @param MapZoom $zoom
      * @return non-empty-string
      */
-    protected static function determineCacheFileBase(int $zoom, array $types, bool $openNow, Locality $locality): string
+    private static function determineCacheFileBase(int $zoom, array $types, bool $openNow, Locality $locality): string
     {
         $typesString = VenueType::typesToString($types);
 
@@ -271,7 +271,7 @@ class MapCacheFileManager
      * @param ?non-empty-string $time
      * @return non-empty-string
      */
-    protected static function buildCacheFileBase(int $zoom, string $typesString, bool $openNow = false, ?int $day = null, ?string $time = null): string
+    private static function buildCacheFileBase(int $zoom, string $typesString, bool $openNow = false, ?int $day = null, ?string $time = null): string
     {
         $typesString = "/types={$typesString}";
 
@@ -290,7 +290,7 @@ class MapCacheFileManager
      * @param non-empty-string $currentTime
      * @return non-empty-string
      */
-    protected static function getCacheFileTime(string $typesString, int $day, string $currentTime): string
+    private static function getCacheFileTime(string $typesString, int $day, string $currentTime): string
     {
         // Load file of opening times
         $openTimesCacheFile = self::getOpenTimesCacheFile($typesString, $day);
@@ -326,7 +326,7 @@ class MapCacheFileManager
      * @param NonNegInt $decimals
      * @return non-empty-string
      */
-    protected static function getCacheFile(string $cacheFileBase, float $lat, float $lng, int $decimals): string
+    private static function getCacheFile(string $cacheFileBase, float $lat, float $lng, int $decimals): string
     {
         return $cacheFileBase . '/lat=' . (string) round($lat, $decimals) . '/lng=' . (string) round($lng, $decimals);
     }
@@ -340,7 +340,7 @@ class MapCacheFileManager
      * @param DayOfWeek $day
      * @return non-empty-string
      */
-    protected static function getOpenTimesCacheFile(string $typesString, int $day): string
+    private static function getOpenTimesCacheFile(string $typesString, int $day): string
     {
         return CACHE_FILE_PATH . '/' . self::CACHE_FILE_NAMESPACE . '/relevantTimes_' . $typesString . '_' . $day;
     }

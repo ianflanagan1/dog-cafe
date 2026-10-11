@@ -12,7 +12,7 @@ use App\Models\Venue;
  * @phpstan-import-type VenueMinimalForHtml from Venue
  * @phpstan-import-type VenueTypeCacheArray from VenueType
  */
-class VenueHtmlHelper
+final class VenueHtmlHelper
 {
     /**
      * @param list<VenueMinimalForHtml> $venues
@@ -62,7 +62,7 @@ class VenueHtmlHelper
      * @param VenueMinimalForHtml $venue
      * @return non-empty-string
      */
-    protected static function buildListVenueHtml(array $venue): string
+    private static function buildListVenueHtml(array $venue): string
     {
         $e = fn (mixed $value): string => HtmlEscaper::html($value);
 

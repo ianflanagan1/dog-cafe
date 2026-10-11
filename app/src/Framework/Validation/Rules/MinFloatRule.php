@@ -9,9 +9,9 @@ use App\Framework\Errors\ErrorCode;
 use App\Framework\Support\FloatComparator;
 use InvalidArgumentException;
 
-class MinFloatRule implements RuleInterface
+final class MinFloatRule implements RuleInterface
 {
-    public function __construct(protected float $min)
+    public function __construct(private float $min)
     {
     }
 

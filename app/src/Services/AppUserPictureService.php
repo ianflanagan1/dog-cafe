@@ -12,7 +12,7 @@ use App\Repositories\AppUserRepository;
 /**
  * @phpstan-import-type PosInt from StandardTypes
  */
-class AppUserPictureService
+readonly class AppUserPictureService
 {
     protected const string PATH = UPLOADS_PATH . '/user';
 

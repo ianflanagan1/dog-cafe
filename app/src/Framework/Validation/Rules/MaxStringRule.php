@@ -8,9 +8,9 @@ use App\Framework\Errors\Error;
 use App\Framework\Errors\ErrorCode;
 use InvalidArgumentException;
 
-class MaxStringRule implements RuleInterface
+final class MaxStringRule implements RuleInterface
 {
-    public function __construct(protected int $max)
+    public function __construct(private int $max)
     {
         if ($this->max < 1) {
             throw new InvalidArgumentException();

@@ -14,9 +14,9 @@ use App\Framework\Support\Log;
  *      lng: float,
  * }
  */
-class IpLocatorService
+final class IpLocatorService
 {
-    protected const string FIELDS = 'countryCode,lat,lon'; // Note: lon, not lng
+    private const string FIELDS = 'countryCode,lat,lon'; // Note: lon, not lng
 
     /**
      * @param non-empty-string $ip
@@ -70,7 +70,7 @@ class IpLocatorService
      * @param non-empty-string $ip
      * @return bool
      */
-    protected static function isDevRequestIp(string $ip): bool
+    private static function isDevRequestIp(string $ip): bool
     {
         return in_array($ip, ['127.0.0.1', '::1']) ||               // Localhost
             preg_match('/^172\.(1[6-9]|2[0-9]|3[0-1])\./', $ip) ||  // Docker bridge

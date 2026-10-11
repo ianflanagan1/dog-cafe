@@ -6,6 +6,6 @@ namespace App\Framework\Routing;
 
 use Exception;
 
-class RouteConflictException extends Exception
+final class RouteConflictException extends Exception
 {
 }

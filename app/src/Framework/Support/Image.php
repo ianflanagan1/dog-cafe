@@ -7,7 +7,7 @@ namespace App\Framework\Support;
 /**
  * @phpstan-import-type Permissions from StandardTypes
  */
-class Image
+final class Image
 {
     /**
      * Download an image from a URL to the temp directory to determine it's mime type, then move it to the passed
@@ -60,7 +60,7 @@ class Image
      * @param non-empty-string $mime
      * @return ?non-empty-string
      */
-    protected static function extensionFromMime(string $mime): ?string
+    private static function extensionFromMime(string $mime): ?string
     {
         return match ($mime) {
             'image/jpeg' => 'jpg',

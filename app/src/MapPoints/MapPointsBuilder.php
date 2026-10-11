@@ -45,16 +45,16 @@ use App\Models\Venue;
  *      clustered: bool,
  * }
  */
-class MapPointsBuilder
+final class MapPointsBuilder
 {
-    protected const int LAT_DECIMALS = 6;
-    protected const int LNG_DECIMALS = 6;
     protected const int CLUSTER_CATCHMENT_PIXELS = 45;
-    protected const float CLUSTER_BORDER_FACTOR = 0.02;
+    private const int LAT_DECIMALS = 6;
+    private const int LNG_DECIMALS = 6;
+    private const float CLUSTER_BORDER_FACTOR = 0.02;
 
     // Point types
-    protected const int POINT_TYPE_SINGLE = 1;
-    protected const int POINT_TYPE_CLUSTER = 2;
+    private const int POINT_TYPE_SINGLE = 1;
+    private const int POINT_TYPE_CLUSTER = 2;
 
     /**
      * Process an array of `VenueMapRaw` from the database into an array of `SinglePoints`.
@@ -128,7 +128,7 @@ class MapPointsBuilder
      * @param float $lngClusterLimit
      * @return list<ClusteringMetadata>
      */
-    protected static function createClusteringMetadata(array $venues, float $latClusterLimit, float $lngClusterLimit): array
+    private static function createClusteringMetadata(array $venues, float $latClusterLimit, float $lngClusterLimit): array
     {
         $metadata = [];
 
@@ -169,7 +169,7 @@ class MapPointsBuilder
      *      3: float,
      * }
      */
-    protected static function markClusteredAndGetBounds(int $index, array $venues, array &$metadata): array
+    private static function markClusteredAndGetBounds(int $index, array $venues, array &$metadata): array
     {
         $metadata[$index]['clustered'] = true;
 
@@ -207,7 +207,7 @@ class MapPointsBuilder
      * @param list<ClusteringMetadata> $metadata
      * @return ?NonNegInt
      */
-    protected static function getIndexWithMostLinks(array $metadata): ?int
+    private static function getIndexWithMostLinks(array $metadata): ?int
     {
         $max = 0;
         $index = null;
@@ -229,7 +229,7 @@ class MapPointsBuilder
      * @param list<ClusteringMetadata> $metadata
      * @return ?NonNegInt
      */
-    protected static function updateMetadataAndGetIndexWithMostLinks(array &$metadata): ?int
+    private static function updateMetadataAndGetIndexWithMostLinks(array &$metadata): ?int
     {
         $max = 0;
         $index = null;
@@ -265,7 +265,7 @@ class MapPointsBuilder
      * @param int<2, max> $count
      * @return ClusterPoint
      */
-    protected static function createClusterPoint(
+    private static function createClusterPoint(
         float $latMin,
         float $latMax,
         float $lngMin,
@@ -298,7 +298,7 @@ class MapPointsBuilder
      * @param VenueMapRaw $venue
      * @return SinglePoint
      */
-    protected static function createSinglePoint(array $venue): array
+    private static function createSinglePoint(array $venue): array
     {
         return [
             self::POINT_TYPE_SINGLE,
@@ -308,12 +308,12 @@ class MapPointsBuilder
         ];
     }
 
-    protected static function formatLat(float $lat): float
+    private static function formatLat(float $lat): float
     {
         return round($lat, self::LAT_DECIMALS);
     }
 
-    protected static function formatLng(float $lng): float
+    private static function formatLng(float $lng): float
     {
         return round($lng, self::LNG_DECIMALS);
     }

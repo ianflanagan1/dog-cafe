@@ -8,9 +8,9 @@ use App\Framework\Errors\Error;
 use App\Framework\Errors\ErrorCode;
 use InvalidArgumentException;
 
-class MinStringRule implements RuleInterface
+final class MinStringRule implements RuleInterface
 {
-    public function __construct(protected int $min)
+    public function __construct(private int $min)
     {
         if ($this->min < 1) {
             throw new InvalidArgumentException();

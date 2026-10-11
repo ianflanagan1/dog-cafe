@@ -8,9 +8,9 @@ use App\Framework\Errors\Error;
 use App\Framework\Errors\ErrorCode;
 use InvalidArgumentException;
 
-class MinIntRule implements RuleInterface
+final class MinIntRule implements RuleInterface
 {
-    public function __construct(protected int $min)
+    public function __construct(private int $min)
     {
     }
 

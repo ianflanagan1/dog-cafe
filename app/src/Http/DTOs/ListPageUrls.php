@@ -13,7 +13,7 @@ use App\Services\VenueRouteBuilderService;
  * @phpstan-import-type PosInt from StandardTypes
  * @phpstan-import-type NonNegInt from StandardTypes
  */
-readonly class ListPageUrls
+final readonly class ListPageUrls
 {
     /**
      * Immutable value object representing the canonical, previous, and next page URLs for a paginated venue listing.

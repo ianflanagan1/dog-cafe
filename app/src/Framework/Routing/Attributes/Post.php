@@ -8,7 +8,7 @@ use App\Framework\Http\HttpMethod;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
-readonly class Post extends Route
+final readonly class Post extends Route
 {
     /**
      * @param non-empty-string $path

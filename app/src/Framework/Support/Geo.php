@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Framework\Support;
 
-class Geo
+final class Geo
 {
-    protected const float EARTH_CIRCUMFERENCE_KM = 40075.017;   // (Earth radius (km) × 2 × π)
-    protected const float KM_PER_LAT = 111.31949079327357;      // Earth circumference (km) / 360 degrees
+    private const float EARTH_CIRCUMFERENCE_KM = 40075.017;   // (Earth radius (km) × 2 × π)
+    private const float KM_PER_LAT = 111.31949079327357;      // Earth circumference (km) / 360 degrees
 
     /**
      * Calculate an approximate distance from a fixed `Main` point.

@@ -21,7 +21,7 @@ use App\Models\Venue;
  * @phpstan-import-type OpenClose from Venue
  * @phpstan-import-type OpenCloseArray from Venue
  */
-class VenueHydrator
+final class VenueHydrator
 {
     /**
      * @param VenueMinimalFromDatabase $venue
@@ -142,7 +142,7 @@ class VenueHydrator
      * @param VenueFullFromDatabase $venue
      * @return OpenCloseArray
      */
-    protected static function getOpenClose(array $venue): array
+    private static function getOpenClose(array $venue): array
     {
         $output = [];
 
@@ -160,7 +160,7 @@ class VenueHydrator
      * @param int<0,6> $day
      * @return OpenClose
      */
-    protected static function getOpenCloseByDay(array $venue, int $day): array
+    private static function getOpenCloseByDay(array $venue, int $day): array
     {
         $openTime = $venue[Venue::COLUMN_PREFIX_OPEN_TIME . $day];
 

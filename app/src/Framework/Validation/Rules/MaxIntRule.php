@@ -8,9 +8,9 @@ use App\Framework\Errors\Error;
 use App\Framework\Errors\ErrorCode;
 use InvalidArgumentException;
 
-class MaxIntRule implements RuleInterface
+final class MaxIntRule implements RuleInterface
 {
-    public function __construct(protected int $max)
+    public function __construct(private int $max)
     {
     }
 

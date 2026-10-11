@@ -18,7 +18,7 @@ use App\Services\TownResolver;
  * @phpstan-import-type MapValidated from MapRequest
  * @phpstan-import-type SearchMapValidated from SearchMapRequest
  */
-readonly class MapController extends Controller
+final readonly class MapController extends Controller
 {
     #[Get('/map/:townStr')]
     /**

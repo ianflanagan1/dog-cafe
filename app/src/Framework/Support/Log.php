@@ -9,10 +9,10 @@ use Throwable;
 /**
  * @phpstan-import-type NonNegInt from StandardTypes
 */
-class Log
+final class Log
 {
-    protected const int PRETTIFY_SIZE_LIMIT = 5000;
-    protected const string UNSET_DUMP = '__LOG_INTERNAL_UNSET_DUMP__';
+    private const int PRETTIFY_SIZE_LIMIT = 5000;
+    private const string UNSET_DUMP = '__LOG_INTERNAL_UNSET_DUMP__';
 
     public static function info(string $message, mixed $dump = self::UNSET_DUMP): void
     {
@@ -42,17 +42,17 @@ class Log
         self::writeStdErr('EXCEPTION', $message . PHP_EOL . $trace);
     }
 
-    protected static function writeStdOut(string $level, string $message, mixed $dump = self::UNSET_DUMP): void
+    private static function writeStdOut(string $level, string $message, mixed $dump = self::UNSET_DUMP): void
     {
         self::write($level, $message, $dump, 'php://stdout');
     }
 
-    protected static function writeStdErr(string $level, string $message, mixed $dump = self::UNSET_DUMP): void
+    private static function writeStdErr(string $level, string $message, mixed $dump = self::UNSET_DUMP): void
     {
         self::write($level, $message, $dump, 'php://stderr');
     }
 
-    protected static function write(string $level, string $message, mixed $dump, string $stream): void
+    private static function write(string $level, string $message, mixed $dump, string $stream): void
     {
         $timestamp = date('Y-m-d H:i:s');
         $caller = self::getCaller();
@@ -85,7 +85,7 @@ class Log
      * @param mixed $dump
      * @return non-empty-string
      */
-    protected static function prettify(mixed $dump): string
+    private static function prettify(mixed $dump): string
     {
         $output = self::describeValue($dump);
 
@@ -101,7 +101,7 @@ class Log
      * @param NonNegInt $depth
      * @return non-empty-string
      */
-    protected static function describeValue(mixed $value, int $depth = 0): string
+    private static function describeValue(mixed $value, int $depth = 0): string
     {
         $indent = str_repeat('  ', $depth);
 
@@ -131,7 +131,7 @@ class Log
      * @param NonNegInt $depth
      * @return non-empty-string
      */
-    protected static function describeArray(array $array, int $depth): string
+    private static function describeArray(array $array, int $depth): string
     {
         $output = 'array:' . PHP_EOL;
 
@@ -162,7 +162,7 @@ class Log
      *      line: ?int
      * }
      */
-    protected static function getCaller(): ?array
+    private static function getCaller(): ?array
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 

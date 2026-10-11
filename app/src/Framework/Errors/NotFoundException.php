@@ -6,6 +6,6 @@ namespace App\Framework\Errors;
 
 use RuntimeException;
 
-class NotFoundException extends RuntimeException
+final class NotFoundException extends RuntimeException
 {
 }

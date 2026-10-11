@@ -12,10 +12,10 @@ use App\Framework\Support\StandardTypes;
  *
  * @phpstan-type FavouritesArray list<PosInt>
  */
-class FavouriteRepository
+final readonly class FavouriteRepository
 {
     public function __construct(
-        protected Database $database,
+        private Database $database,
     ) {
     }
 

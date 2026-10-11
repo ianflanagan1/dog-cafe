@@ -16,7 +16,7 @@ use App\Services\LoginService;
  * @phpstan-import-type LoginValidated from LoginRequest
  * @phpstan-import-type LoginRedirectValidated from LoginRedirectRequest
  */
-readonly class LoginController extends Controller
+final readonly class LoginController extends Controller
 {
     // COUPLED:oauth-redirect-paths. = google-console and discord-portal redirect URI paths (docs/external/); ⊆ nginx:PHP location routes
     protected const string REDIRECT_ROUTE_GOOGLE  = '/redirect-google-login';

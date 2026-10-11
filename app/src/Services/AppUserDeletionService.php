@@ -11,11 +11,11 @@ use App\Repositories\AppUserRepository;
 /**
  * Service responsible for handling self-service user account deletion and anonymisation.
  */
-class AppUserDeletionService
+final readonly class AppUserDeletionService
 {
     public function __construct(
-        protected Auth $auth,
-        protected AppUserRepository $appUserRepository,
+        private Auth $auth,
+        private AppUserRepository $appUserRepository,
     ) {
     }
 

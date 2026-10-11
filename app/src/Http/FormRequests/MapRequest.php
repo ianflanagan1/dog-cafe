@@ -14,7 +14,7 @@ use App\Framework\Validation\Filters\IsPresent;
  *      open_now: bool,
  * }
  */
-readonly class MapRequest extends FormRequest
+final readonly class MapRequest extends FormRequest
 {
     protected const array EXPECTED_INPUTS = [
         'types' => [

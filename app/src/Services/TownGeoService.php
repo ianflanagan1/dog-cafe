@@ -11,9 +11,9 @@ use App\Repositories\TownRepository;
 /**
  * Service for geospatial operations related to towns.
  */
-readonly class TownGeoService
+final readonly class TownGeoService
 {
-    public function __construct(protected TownRepository $townRepository)
+    public function __construct(private TownRepository $townRepository)
     {
     }
 

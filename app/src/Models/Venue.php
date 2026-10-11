@@ -168,7 +168,7 @@ use App\Framework\Support\StandardTypes;
  *      time: string
  * }
  */
-class Venue extends Model
+final class Venue extends Model
 {
     public const string TABLE = 'venue';
     public const int EXT_ID_LENGTH = 22;

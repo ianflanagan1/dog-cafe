@@ -15,7 +15,7 @@ use App\Framework\Validation\Rules\RuleInterface;
 use App\Validation\Rules\Venue\MightBeExtIdRule;
 use InvalidArgumentException;
 
-class RuleFactory
+final class RuleFactory
 {
     public static function fromString(string $rule, string $type): RuleInterface
     {
