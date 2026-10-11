@@ -69,13 +69,14 @@ return [
          *      host: non-empty-string,
          *      port: int,
          *      password: non-empty-string,
-         * } $redisConfig
+         * }
          */
         $redisConfig = $config->get('redis');
 
-        $session = new Session($redisConfig);
-        $session->start();
-        return $session;
+        /** @var array<string, scalar> */
+        $sessionConfig = $config->get('session');
+
+        return new Session($redisConfig, $sessionConfig);
     },
     RedisCache::class => function (Config $config): RedisCache {
         /**

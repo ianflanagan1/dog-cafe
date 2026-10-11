@@ -1,4 +1,4 @@
-# COUPLED:public-domain. = dns:records, php:session.cookie_domain, provider consoles (docs/external/dns.md)
+# COUPLED:public-domain. = dns:records, app:config/session.php cookie_domain, provider consoles (docs/external/dns.md)
 
 www.dogcafeuk.com {
     redir https://dogcafeuk.com{uri}

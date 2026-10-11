@@ -6,8 +6,6 @@ namespace App\Framework\Session;
 
 interface SessionInterface
 {
-    public function start(): void;
-
     public function close(): void;
 
     public function isActive(): bool;
@@ -15,6 +13,11 @@ interface SessionInterface
     public function get(string $key, mixed $default = null): mixed;
 
     public function regenerate(): bool;
+
+    /**
+     * Deletes the session's data and expires its cookie. Like close(), no further writes are accepted
+     */
+    public function destroy(): void;
 
     public function put(string $key, mixed $value): void;
 
