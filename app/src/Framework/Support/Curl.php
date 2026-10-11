@@ -103,6 +103,8 @@ final class Curl
             CURLOPT_FAILONERROR     => false,   // Don't HTTP status >= 400 as failure
             CURLOPT_FOLLOWLOCATION  => true,    // Follow redirects
             CURLOPT_MAXREDIRS       => 10,
+            CURLOPT_PROTOCOLS_STR       => 'http,https',    // Never file://, gopher:// etc., even via redirect
+            CURLOPT_REDIR_PROTOCOLS_STR => 'http,https',
             CURLOPT_CONNECTTIMEOUT  => 5,
             CURLOPT_TIMEOUT         => 30,
             CURLOPT_HEADER          => false,   // Output only contains body

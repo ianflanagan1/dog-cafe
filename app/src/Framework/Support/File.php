@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Framework\Support;
 
 use NoDiscard;
+use Uri\Rfc3986\Uri;
+
 /**
  * @phpstan-import-type NonNegInt from StandardTypes
  * @phpstan-import-type Permissions from StandardTypes
@@ -22,7 +24,10 @@ final class File
     #[NoDiscard]
     public static function download(string $url, string $file, bool $overwrite, int $filePermissions = 0600, int $mkdirPermissions = 0700): bool
     {
-        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+        $uri = Uri::parse($url);
+
+        // Anything else (e.g. file://) would let curl read local files or reach non-HTTP services
+        if ($uri === null || !in_array($uri->getScheme(), ['http', 'https'], true) || empty($uri->getHost())) {
             Log::error("Invalid URL for download: {$url}");
             return false;
         }
