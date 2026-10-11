@@ -5,48 +5,64 @@ declare(strict_types=1);
 namespace Tests\Unit\Framework\Cache;
 
 use App\Framework\Cache\RedisCache;
+use Closure;
 use DateInterval;
+use Generator;
 use InvalidArgumentException;
+use Override;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\SimpleCache\InvalidArgumentException as SimpleCacheInvalidArgumentException;
 use Redis;
 use stdClass;
 use Stringable;
 
 class RedisCacheTest extends TestCase
 {
-    protected const array CONFIG = [
-        'host' => 'localhost',
-        'port' => 6379,
-        'password' => 'password',
-    ];
-
     /** @phpstan-var MockObject&Redis */
     protected MockObject&Redis $redisMock;
 
     protected RedisCache $cache;
 
+    protected int $factoryCalls = 0;
+
+    #[Override]
     protected function setUp(): void
     {
         $this->redisMock = $this->createMock(Redis::class);
 
         $this->cache = new RedisCache(
-            $this->redisMock,
-            self::CONFIG,
+            function (): MockObject&Redis {
+                $this->factoryCalls++;
+                return $this->redisMock;
+            },
         );
     }
 
-    public function test_constructor_connects_to_redis(): void
+    #[AllowMockObjectsWithoutExpectations]
+    public function test_constructing_the_cache_does_not_connect(): void
+    {
+        $this->assertSame(0, $this->factoryCalls);
+    }
+
+    #[AllowMockObjectsWithoutExpectations]
+    public function test_the_connection_is_made_once_on_first_use(): void
+    {
+        $this->cache->get('key1');
+        $this->cache->get('key2');
+
+        $this->assertSame(1, $this->factoryCalls);
+    }
+
+    public function test_values_are_stored_unserialized_whatever_the_injected_client_was_configured_with(): void
     {
         $this->redisMock->expects($this->once())
-            ->method('connect')
-            ->with(self::CONFIG['host'], self::CONFIG['port']);
+            ->method('setOption')
+            ->with(Redis::OPT_SERIALIZER, Redis::SERIALIZER_NONE);
 
-        $this->redisMock->expects($this->once())
-            ->method('auth')
-            ->with(self::CONFIG['password']);
-
-        new RedisCache($this->redisMock, self::CONFIG);
+        $this->cache->get('key');
     }
 
     public function test_get_returns_value_when_key_exists(): void
@@ -97,7 +113,7 @@ class RedisCacheTest extends TestCase
     {
         $this->redisMock->expects($this->once())
             ->method('set')
-            ->with('test_key', 'test_value', 3600)
+            ->with('test_key', 'test_value', ['EX' => 3600])
             ->willReturn(true);
 
         $result = $this->cache->set('test_key', 'test_value', 3600);
@@ -110,7 +126,7 @@ class RedisCacheTest extends TestCase
 
         $this->redisMock->expects($this->once())
             ->method('set')
-            ->with('test_key', 'test_value', 3600)
+            ->with('test_key', 'test_value', ['EX' => 3600])
             ->willReturn(true);
 
         $result = $this->cache->set('test_key', 'test_value', $interval);
@@ -130,6 +146,8 @@ class RedisCacheTest extends TestCase
 
     public function test_set_throws_exception_for_invalid_value(): void
     {
+        $this->redisMock->expects($this->never())->method('set');
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Only scalar, Stringable, or null values are supported for Redis storage. Type: array');
 
@@ -139,6 +157,7 @@ class RedisCacheTest extends TestCase
     public function test_set_accepts_stringable_object(): void
     {
         $stringable = new class () implements Stringable {
+            #[Override]
             public function __toString(): string
             {
                 return 'stringable_value';
@@ -218,17 +237,14 @@ class RedisCacheTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_get_multiple_with_iterator(): void
+    public function test_get_multiple_accepts_keys_from_a_generator(): void
     {
-        $keys = ['key1', 'key2'];
-        $values = ['value1', 'value2'];
-
         $this->redisMock->expects($this->once())
             ->method('mGet')
-            ->with($keys)
-            ->willReturn($values);
+            ->with(['key1', 'key2'])
+            ->willReturn(['value1', 'value2']);
 
-        $result = $this->cache->getMultiple($keys);
+        $result = $this->cache->getMultiple(self::generate(['key1', 'key2']));
 
         $expected = [
             'key1' => 'value1',
@@ -293,8 +309,36 @@ class RedisCacheTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function test_set_multiple_accepts_numeric_string_keys_that_php_stores_as_ints(): void
+    {
+        $values = ['123' => 'value1'];
+
+        $this->redisMock->expects($this->once())
+            ->method('mSet')
+            ->with($values)
+            ->willReturn(true);
+
+        $result = $this->cache->setMultiple($values);
+        $this->assertTrue($result);
+    }
+
+    public function test_set_multiple_accepts_values_from_a_generator(): void
+    {
+        $values = ['key1' => 'value1', 'key2' => 'value2'];
+
+        $this->redisMock->expects($this->once())
+            ->method('mSet')
+            ->with($values)
+            ->willReturn(true);
+
+        $result = $this->cache->setMultiple(self::generate($values));
+        $this->assertTrue($result);
+    }
+
     public function test_set_multiple_throws_exception_for_invalid_value(): void
     {
+        $this->redisMock->expects($this->never())->method('mSet');
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Only scalar, Stringable, or null values are supported for Redis storage. Type: stdClass');
 
@@ -328,16 +372,14 @@ class RedisCacheTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function test_delete_multiple_with_iterator(): void
+    public function test_delete_multiple_accepts_keys_from_a_generator(): void
     {
-        $keys = ['key1', 'key2'];
-
         $this->redisMock->expects($this->once())
             ->method('del')
-            ->with($keys)
+            ->with(['key1', 'key2'])
             ->willReturn(2);
 
-        $result = $this->cache->deleteMultiple($keys);
+        $result = $this->cache->deleteMultiple(self::generate(['key1', 'key2']));
         $this->assertTrue($result);
     }
 
@@ -363,6 +405,34 @@ class RedisCacheTest extends TestCase
         $this->assertFalse($result);
     }
 
+    /**
+     * @return array<string, array{Closure(RedisCache): mixed}>
+     */
+    public static function callsWithAnEmptyKey(): array
+    {
+        return [
+            'get' => [static fn (RedisCache $cache): mixed => $cache->get('')],
+            'set' => [static fn (RedisCache $cache): bool => $cache->set('', 'value')],
+            'delete' => [static fn (RedisCache $cache): bool => $cache->delete('')],
+            'has' => [static fn (RedisCache $cache): bool => $cache->has('')],
+            'getMultiple' => [static fn (RedisCache $cache): iterable => $cache->getMultiple(['key1', ''])],
+            'setMultiple' => [static fn (RedisCache $cache): bool => $cache->setMultiple(['key1' => 'value', '' => 'value'])],
+            'deleteMultiple' => [static fn (RedisCache $cache): bool => $cache->deleteMultiple(['key1', ''])],
+        ];
+    }
+
+    /**
+     * @param Closure(RedisCache): mixed $call
+     */
+    #[AllowMockObjectsWithoutExpectations]
+    #[DataProvider('callsWithAnEmptyKey')]
+    public function test_an_empty_key_is_rejected_as_psr16_invalid(Closure $call): void
+    {
+        $this->expectException(SimpleCacheInvalidArgumentException::class);
+
+        $call($this->cache);
+    }
+
     public function test_assert_redis_compatible_value_with_valid_types(): void
     {
         // Test with various scalar types and null
@@ -375,17 +445,19 @@ class RedisCacheTest extends TestCase
             null,
         ];
 
+        $this->redisMock->expects($this->exactly(count($validValues)))
+            ->method('set')
+            ->willReturn(true);
+
         foreach ($validValues as $value) {
-            // This should not throw an exception
             $this->cache->set('test_key', $value);
         }
-
-        // If we reach here without exceptions, the test passes
-        $this->assertTrue(true);
     }
 
     public function test_assert_redis_compatible_value_with_invalid_object(): void
     {
+        $this->redisMock->expects($this->never())->method('set');
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Only scalar, Stringable, or null values are supported for Redis storage. Type: stdClass');
 
@@ -394,6 +466,8 @@ class RedisCacheTest extends TestCase
 
     public function test_assert_redis_compatible_value_with_invalid_array(): void
     {
+        $this->redisMock->expects($this->never())->method('set');
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Only scalar, Stringable, or null values are supported for Redis storage. Type: array');
 
@@ -402,13 +476,26 @@ class RedisCacheTest extends TestCase
 
     public function test_assert_redis_compatible_value_with_resource(): void
     {
+        $this->redisMock->expects($this->never())->method('set');
+
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Only scalar, Stringable, or null values are supported for Redis storage. Type: resource');
+        $this->expectExceptionMessage('Only scalar, Stringable, or null values are supported for Redis storage. Type: resource (stream)');
 
         $resource = fopen('php://memory', 'r');
         if ($resource) {
             $this->cache->set('test_key', $resource);
             fclose($resource);
         }
+    }
+
+    /**
+     * @template TKey
+     * @template TValue
+     * @param array<TKey, TValue> $items
+     * @return Generator<TKey, TValue>
+     */
+    private static function generate(array $items): Generator
+    {
+        yield from $items;
     }
 }
