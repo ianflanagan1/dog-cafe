@@ -27,5 +27,13 @@
         "psr-4": {
             "Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "@php scripts/check-vendor-disabled-functions.php"
+        ],
+        "post-update-cmd": [
+            "@php scripts/check-vendor-disabled-functions.php"
+        ]
     }
 }

@@ -56,6 +56,9 @@ services:
       - ./app/:/app/
       - ./deploy/php/php.ini:/usr/local/etc/php/php.ini:ro
       - ./deploy/php/php.dev.ini:/usr/local/etc/php/conf.d/php.dev.ini:ro
+      # Not in conf.d: added per command with PHP_INI_SCAN_DIR (Taskfile.yaml, scripts/git-hooks/pre-commit)
+      - ./deploy/php/php.phpunit.ini:/usr/local/etc/php/conf.d-phpunit/php.phpunit.ini:ro
+      - ./deploy/php/php.tooling.ini:/usr/local/etc/php/conf.d-tooling/php.tooling.ini:ro
       - ./deploy/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini:ro
       - ./deploy/php/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro
       - shared-frontend:/app/storage/uploads/:rw

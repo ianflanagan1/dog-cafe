@@ -65,11 +65,19 @@ FROM builder AS builder-prod
 USER root
 
 COPY composer.json composer.lock ./
-RUN composer install --no-interaction --no-progress --no-dev --no-autoloader --prefer-dist
+# --no-scripts: post-install-cmd's vendor check needs scripts/, which isn't copied yet; it runs explicitly below
+RUN composer install --no-interaction --no-progress --no-dev --no-autoloader --no-scripts --prefer-dist
 COPY . .
     # see.dockerignore
 
 RUN composer dump-autoload --no-dev --optimize --classmap-authoritative --no-interaction --strict-psr --strict-ambiguous
+
+# Fail the build if a production package calls a function production disables, beyond the reviewed calls.
+# php.ini comes from the `deploy` named context, because this build's context is ./app
+# (compose.production.yaml additional_contexts, Taskfile.yaml build:php-prod --build-context)
+COPY --from=deploy php/php.ini /tmp/php.production.ini
+RUN php scripts/check-vendor-disabled-functions.php /tmp/php.production.ini \
+    && rm -r scripts /tmp/php.production.ini
 
 # Delete useless directories/files from vendor/ directory
 RUN find vendor/ \
