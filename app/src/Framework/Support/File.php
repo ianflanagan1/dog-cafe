@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Framework\Support;
 
+use NoDiscard;
 /**
  * @phpstan-import-type NonNegInt from StandardTypes
  * @phpstan-import-type Permissions from StandardTypes
@@ -18,6 +19,7 @@ final class File
      * @param Permissions $mkdirPermissions
      * @return bool
      */
+    #[NoDiscard]
     public static function download(string $url, string $file, bool $overwrite, int $filePermissions = 0600, int $mkdirPermissions = 0700): bool
     {
         if (filter_var($url, FILTER_VALIDATE_URL) === false) {
@@ -111,6 +113,7 @@ final class File
      * @param Permissions $mkdirPermissions
      * @return bool
      */
+    #[NoDiscard]
     public static function rename(string $source, string $target, bool $overwrite = false, int $mkdirPermissions = 0700): bool
     {
         if (!self::ensureReadable($source)) {
@@ -169,6 +172,7 @@ final class File
      * @param Permissions $mkdirPermissions
      * @return bool
      */
+    #[NoDiscard]
     public static function move(string $source, string $target, bool $overwrite = false, int $mkdirPermissions = 0700): bool
     {
         if (!self::ensureReadable($source)) {

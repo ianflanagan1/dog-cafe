@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Framework\Support;
 
+use NoDiscard;
 use SensitiveParameter;
 
 /**
@@ -18,6 +19,7 @@ final class Curl
      * @param Post $payload
      * @return array<mixed>|false
      */
+    #[NoDiscard]
     public static function arrayResponse(string $url, #[SensitiveParameter] array $headers = [], #[SensitiveParameter] array $payload = []): array|false
     {
         $res = self::stringResponse($url, $headers, $payload);
@@ -42,6 +44,7 @@ final class Curl
      * @param Post $payload
      * @return non-empty-string|false
      */
+    #[NoDiscard]
     public static function stringResponse(string $url, #[SensitiveParameter] array $headers = [], #[SensitiveParameter] array $payload = []): string|false
     {
         /** @var string|false $res */
@@ -66,6 +69,7 @@ final class Curl
      * @param ?resource $fileHandle
      * @return bool
      */
+    #[NoDiscard]
     public static function fileResponse(string $url, #[SensitiveParameter] array $headers = [], #[SensitiveParameter] array $post = [], mixed $fileHandle = null): bool
     {
         /** @var bool $res */
@@ -81,6 +85,7 @@ final class Curl
      * @param ?resource $fileHandle
      * @return string|bool Returns string if content is returned, true if written to file (when $fileHandle is provided), or false on error.
      */
+    #[NoDiscard]
     public static function curl(string $url, #[SensitiveParameter] array $headers = [], #[SensitiveParameter] array $post = [], mixed $fileHandle = null): string|bool
     {
         $handle = curl_init();

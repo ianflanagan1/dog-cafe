@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Framework\Session;
 
 use App\Framework\Support\StringGenerator;
+use NoDiscard;
 use SensitiveParameter;
 
 final readonly class FormTokenHandler
@@ -21,6 +22,7 @@ final readonly class FormTokenHandler
      * @param ?non-empty-string $token
      * @return bool
      */
+    #[NoDiscard]
     public function isValidToken(string $key, #[SensitiveParameter] ?string $token): bool
     {
         if ($token === null) {
