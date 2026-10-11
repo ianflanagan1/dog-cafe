@@ -12,7 +12,7 @@ use App\Framework\Support\StandardTypes;
  *
  * @phpstan-import-type NonNegInt from StandardTypes
  */
-class VenueRouteBuilderService
+final class VenueRouteBuilderService
 {
     /**
      * @param non-empty-string $base

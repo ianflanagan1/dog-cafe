@@ -16,15 +16,15 @@ use RuntimeException;
  * @phpstan-import-type TownFromDatabase from Town
  */
 
-readonly class TownRepository
+final readonly class TownRepository
 {
-    protected const string CACHE_KEY_TOWNS_LIST = 'townsList';
-    protected const string CACHE_KEY_DEFAULT_TOWN = 'defaultTown';
-    protected const int DEFAULT_ID = 3719; // London
+    private const string CACHE_KEY_TOWNS_LIST = 'townsList';
+    private const string CACHE_KEY_DEFAULT_TOWN = 'defaultTown';
+    private const int DEFAULT_ID = 3719; // London
 
     public function __construct(
-        protected GenericRepository $genericRepository,
-        protected CacheInterface $cache,
+        private GenericRepository $genericRepository,
+        private CacheInterface $cache,
     ) {
     }
 
@@ -100,7 +100,7 @@ readonly class TownRepository
     /**
      * @return non-empty-list<TownFromDatabase>
      */
-    protected function getAllArrays(): array
+    private function getAllArrays(): array
     {
         // Check cache first
         $towns = $this->findFromCache(self::CACHE_KEY_TOWNS_LIST);
@@ -126,7 +126,7 @@ readonly class TownRepository
     /**
      * @return non-empty-list<TownFromDatabase>
      */
-    protected function getAllArraysFromDatabase(): array
+    private function getAllArraysFromDatabase(): array
     {
         $towns = $this->genericRepository->fetchRows(
             'id, name, name_url, name_url_lower, name_search, county, venue_count, lat, lng',
@@ -155,7 +155,7 @@ readonly class TownRepository
      * @param non-empty-string $key
      * @return ?non-empty-string
      */
-    protected function findFromCache(string $key): ?string
+    private function findFromCache(string $key): ?string
     {
         $res = $this->cache->get($key);
 
@@ -173,7 +173,7 @@ readonly class TownRepository
      * @param TownFromDatabase|list<TownFromDatabase> $input
      * @return void
      */
-    protected function saveToCache(string $key, array $input): void
+    private function saveToCache(string $key, array $input): void
     {
         $this->cache->set(
             $key,

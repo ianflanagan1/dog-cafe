@@ -11,11 +11,11 @@ use App\Framework\Support\StandardTypes;
 /**
  * @phpstan-import-type PosInt from StandardTypes
  */
-class SuggestRepository
+final readonly class SuggestRepository
 {
     public function __construct(
-        protected Database $database,
-        protected Auth $auth,
+        private Database $database,
+        private Auth $auth,
     ) {
     }
 

@@ -31,13 +31,13 @@ use Psr\SimpleCache\CacheInterface;
  * @phpstan-import-type VenueMinimalForJson from Venue
  * @phpstan-import-type VenuePage from VenueRepository
  */
-class ListVenuePageService
+final readonly class ListVenuePageService
 {
-    protected const int TTL = 604800; // 1 week
+    private const int TTL = 604800; // 1 week
 
     public function __construct(
-        protected CacheInterface $cache,
-        protected VenueRepository $venueRepository,
+        private CacheInterface $cache,
+        private VenueRepository $venueRepository,
     ) {
     }
 
@@ -96,7 +96,7 @@ class ListVenuePageService
      * @param list<VenueType> $types
      * @return non-empty-string
      */
-    protected static function buildTotalPagesCacheKey(int $townId, int $pageSize, array $types): string
+    private static function buildTotalPagesCacheKey(int $townId, int $pageSize, array $types): string
     {
         $types = array_map(fn ($type) => $type->value, $types);
         sort($types);
@@ -112,7 +112,7 @@ class ListVenuePageService
      * @param list<VenueType> $types
      * @return non-empty-string
      */
-    protected static function buildItemsCacheKey(int $townId, int $page, int $pageSize, array $types, VenueOrderBy $orderBy): string
+    private static function buildItemsCacheKey(int $townId, int $page, int $pageSize, array $types, VenueOrderBy $orderBy): string
     {
         $types = array_map(fn ($type) => $type->value, $types);
         sort($types);
@@ -137,7 +137,7 @@ class ListVenuePageService
      * @param VenueOrderBy $orderBy
      * @return VenuePage
      */
-    protected function getForDynamicState(
+    private function getForDynamicState(
         int $townId,
         int $page,
         int $pageSize,
@@ -169,7 +169,7 @@ class ListVenuePageService
      * @param ?SqlWhere $where
      * @return NonNegInt
      */
-    protected function getTotalPages(
+    private function getTotalPages(
         int $townId,
         int $pageSize,
         array $types,
@@ -213,7 +213,7 @@ class ListVenuePageService
      * @param ?SqlWhere $where
      * @return list<VenueMinimalForHtml>
      */
-    protected function getItems(
+    private function getItems(
         int $townId,
         int $page,
         int $pageSize,
@@ -263,7 +263,7 @@ class ListVenuePageService
      * @param VenueOrderBy $orderBy
      * @return list<VenueMinimalForCache>
      */
-    protected function itemsRefreshCache(
+    private function itemsRefreshCache(
         string $itemsCacheKey,
         int $page,
         int $pageSize,
@@ -288,7 +288,7 @@ class ListVenuePageService
      * @param SqlWhere $where
      * @return NonNegInt
      */
-    protected function totalPagesRefreshCache(
+    private function totalPagesRefreshCache(
         string $totalPageCacheKey,
         int $pageSize,
         SqlWhere $where,

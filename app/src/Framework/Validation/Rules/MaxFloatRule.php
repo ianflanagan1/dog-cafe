@@ -9,9 +9,9 @@ use App\Framework\Errors\ErrorCode;
 use App\Framework\Support\FloatComparator;
 use InvalidArgumentException;
 
-class MaxFloatRule implements RuleInterface
+final class MaxFloatRule implements RuleInterface
 {
-    public function __construct(protected float $max)
+    public function __construct(private float $max)
     {
     }
 

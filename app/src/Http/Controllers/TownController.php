@@ -13,7 +13,7 @@ use App\Services\TownSearchService;
 /**
  * @phpstan-import-type SearchTownValidated from SearchTownRequest
  */
-readonly class TownController extends Controller
+final readonly class TownController extends Controller
 {
     #[Get('/api/v1/search-town')]
     /**

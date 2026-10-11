@@ -21,7 +21,7 @@ use App\Repositories\SuggestRepository;
  * @phpstan-import-type PosInt from StandardTypes
  * @phpstan-import-type SuggestValidated from SuggestRequest
  */
-readonly class SuggestController extends Controller
+final readonly class SuggestController extends Controller
 {
     protected const string SUGGEST_ROUTE = '/suggest';
 

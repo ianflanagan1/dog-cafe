@@ -8,7 +8,7 @@ namespace App\Framework\Support;
  * @phpstan-import-type NonNegInt from StandardTypes
  * @phpstan-import-type Permissions from StandardTypes
  */
-class File
+final class File
 {
     /**
      * @param non-empty-string $url
@@ -237,7 +237,7 @@ class File
      * @param non-empty-string $file
      * @return bool
      */
-    protected static function ensureReadable(string $file): bool
+    private static function ensureReadable(string $file): bool
     {
         if (!file_exists($file)) {
             Log::error("File doesn't exist: {$file}");
@@ -256,7 +256,7 @@ class File
      * @param non-empty-string $file
      * @return bool
      */
-    protected static function ensureWritable(string $file): bool
+    private static function ensureWritable(string $file): bool
     {
         if (!file_exists($file)) {
             Log::error("File doesn't exist: {$file}");
@@ -277,7 +277,7 @@ class File
      * @param Permissions $mkdirPermissions
      * @return bool
      */
-    protected static function ensureTargetWritable(string $file, bool $overwrite, int $mkdirPermissions): bool
+    private static function ensureTargetWritable(string $file, bool $overwrite, int $mkdirPermissions): bool
     {
         $path = dirname($file);
 

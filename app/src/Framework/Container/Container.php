@@ -13,12 +13,12 @@ use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionUnionType;
 
-class Container implements ContainerInterface
+final class Container implements ContainerInterface
 {
     /**
      * @param array<string, callable|string|object> $instructions
      */
-    public function __construct(protected array $instructions = [])
+    public function __construct(private array $instructions = [])
     {
     }
 
@@ -79,7 +79,7 @@ class Container implements ContainerInterface
      * @return object
      * @throws ContainerException
      */
-    protected function resolve(string $id, array $loopTracker = []): object
+    private function resolve(string $id, array $loopTracker = []): object
     {
         if (array_search($id, $loopTracker) !== false) {
             throw new ContainerException('Circular dependency: ' . implode(' -> ', $loopTracker) . ' -> ' . $id);
@@ -111,7 +111,7 @@ class Container implements ContainerInterface
      * @return object
      * @throws ContainerException
      */
-    protected function resolveCallable(string $id, array $loopTracker): object
+    private function resolveCallable(string $id, array $loopTracker): object
     {
         /** @var callable $instruction */
         $instruction = $this->instructions[$id];
@@ -137,7 +137,7 @@ class Container implements ContainerInterface
      * @throws NotFoundException
      * @throws ContainerException
      */
-    protected function resolveClassName(string $id, array $loopTracker): object
+    private function resolveClassName(string $id, array $loopTracker): object
     {
         if (!class_exists($id)) {
             throw new NotFoundException("Cannot reflect: `$id` is not a class");
@@ -174,7 +174,7 @@ class Container implements ContainerInterface
      * @return list<mixed>
      * @throws ContainerException
      */
-    protected function buildDependencies(array $parameters, array $loopTracker, array $provided = []): array
+    private function buildDependencies(array $parameters, array $loopTracker, array $provided = []): array
     {
         if (empty($parameters)) {
             return [];

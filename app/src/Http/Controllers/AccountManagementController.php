@@ -15,7 +15,7 @@ use App\Framework\Session\FormTokenHandler;
 use App\Framework\View\ViewRenderer;
 use App\Services\AppUserDeletionService;
 
-readonly class AccountManagementController extends Controller
+final readonly class AccountManagementController extends Controller
 {
     protected const string LOGOUT_KEY = 'accountLogout';
     protected const string DELETE_KEY = 'accountDelete';

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Framework\Support;
 
-class FloatComparator
+final class FloatComparator
 {
-    protected const float EPSILON = 0.0000001;
+    private const float EPSILON = 0.0000001;
 
     public static function equalish(float $a, float $b, float $epsilon = self::EPSILON): bool
     {

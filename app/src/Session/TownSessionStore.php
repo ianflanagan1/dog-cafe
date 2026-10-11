@@ -14,13 +14,13 @@ use App\Models\Town;
  * 1. The most recently specified town by the user.
  * 2. The town inferred from the user's IP address.
  */
-readonly class TownSessionStore
+final readonly class TownSessionStore
 {
-    protected const string SESSION_KEY_SEARCH_TOWN = 'lastSpecifiedTown';
-    protected const string SESSION_KEY_IP_TOWN = 'ipTown';
+    private const string SESSION_KEY_SEARCH_TOWN = 'lastSpecifiedTown';
+    private const string SESSION_KEY_IP_TOWN = 'ipTown';
 
     public function __construct(
-        protected Session $session,
+        private Session $session,
     ) {
     }
 
@@ -58,7 +58,7 @@ readonly class TownSessionStore
         return $this->findTownFromSession(self::SESSION_KEY_IP_TOWN);
     }
 
-    protected function findTownFromSession(string $key): ?Town
+    private function findTownFromSession(string $key): ?Town
     {
         $town = $this->session->get($key);
 

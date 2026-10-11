@@ -18,12 +18,12 @@ use SensitiveParameter;
 /**
  * @phpstan-import-type PosInt from StandardTypes
  */
-class LoginService
+final readonly class LoginService
 {
-    protected const string DISCORD_TOKEN_URL = 'https://discordapp.com/api/oauth2/token';
-    protected const string DISCORD_USERS_URL = 'https://discordapp.com/api/users/@me';
-    protected const string DISCORD_AVATAR_URL_BASE = 'https://cdn.discordapp.com/avatars/';
-    protected const string SESSION_KEY_PRE_LOGIN_LOCATION = 'loginLocation';
+    private const string DISCORD_TOKEN_URL = 'https://discordapp.com/api/oauth2/token';
+    private const string DISCORD_USERS_URL = 'https://discordapp.com/api/users/@me';
+    private const string DISCORD_AVATAR_URL_BASE = 'https://cdn.discordapp.com/avatars/';
+    private const string SESSION_KEY_PRE_LOGIN_LOCATION = 'loginLocation';
 
     /**
      * @param array{
@@ -40,13 +40,13 @@ class LoginService
      * @param non-empty-string $appUrl Base URL without trailing slash, e.g. `https://example.com`
      */
     public function __construct(
-        #[SensitiveParameter] protected array $config,
-        protected AppUserRepository $appUserRepository,
-        protected Session $session,
-        protected FavouriteSessionStore $favouriteSessionStore,
-        protected AppUserPictureService $appUserPictureService,
-        protected Auth $auth,
-        protected string $appUrl,
+        #[SensitiveParameter] private array $config,
+        private AppUserRepository $appUserRepository,
+        private Session $session,
+        private FavouriteSessionStore $favouriteSessionStore,
+        private AppUserPictureService $appUserPictureService,
+        private Auth $auth,
+        private string $appUrl,
     ) {
     }
 
@@ -308,7 +308,7 @@ class LoginService
      * @param ?non-empty-string $pictureUrl
      * @return PosInt
      */
-    protected function handleLogin(string $email, ?string $name = null, ?string $pictureUrl = null): int
+    private function handleLogin(string $email, ?string $name = null, ?string $pictureUrl = null): int
     {
         $appUser = $this->appUserRepository->findByEmail($email);
 
@@ -338,7 +338,7 @@ class LoginService
         return $id;
     }
 
-    protected static function validateCode(#[SensitiveParameter] mixed $code): bool
+    private static function validateCode(#[SensitiveParameter] mixed $code): bool
     {
         if (!is_string($code) || empty($code)) {
             Log::error('`code` invalid', $code);

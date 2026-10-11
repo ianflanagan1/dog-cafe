@@ -17,7 +17,7 @@ use App\Framework\Support\StandardTypes;
  *     picture: ?non-empty-string
  * }
  */
-class AppUser extends Model
+final class AppUser extends Model
 {
     public const string TABLE = 'app_user';
 

@@ -6,7 +6,7 @@ namespace App\Framework\Support;
 
 use DateTime;
 
-class Time
+final class Time
 {
     /**
      * @param int<0, 6> $day

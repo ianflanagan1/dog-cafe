@@ -13,11 +13,11 @@ use RuntimeException;
  *
  * @phpstan-import-type TownForJson from Town
  */
-readonly class TownSearchService
+final readonly class TownSearchService
 {
-    protected const int SEARCH_MAX_RESULTS = 5;
+    private const int SEARCH_MAX_RESULTS = 5;
 
-    public function __construct(protected TownRepository $townRepository)
+    public function __construct(private TownRepository $townRepository)
     {
     }
 
@@ -59,7 +59,7 @@ readonly class TownSearchService
      * @param list<Town> $towns
      * @return list<TownForJson>
      */
-    protected static function formatSearchResults(array $towns): array
+    private static function formatSearchResults(array $towns): array
     {
         return array_map(fn (Town $town): array => [
             $town->nameUrl,

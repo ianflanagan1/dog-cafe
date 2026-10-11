@@ -30,17 +30,17 @@ use App\Models\Venue;
  *      1: list<VenueMinimalForHtml>,
  * }
  */
-class VenueRepository
+final readonly class VenueRepository
 {
-    protected const string COLUMNS_FULL = 'id, ext_id, name, human_url, town, lat, lng, images, is_cafe, is_restaurant, is_bar,
+    private const string COLUMNS_FULL = 'id, ext_id, name, human_url, town, lat, lng, images, is_cafe, is_restaurant, is_bar,
         open_0, close_0, open_1, close_1, open_2, close_2, open_3, close_3, open_4, close_4, open_5, close_5, open_6, close_6,
         street, area, locality, region, postcode, public_phone, website';
-    protected const string COLUMNS_MINIMAL = 'ext_id, name, image, is_cafe, is_restaurant, is_bar,
+    private const string COLUMNS_MINIMAL = 'ext_id, name, image, is_cafe, is_restaurant, is_bar,
         open_0, close_0, open_1, close_1, open_2, close_2, open_3, close_3, open_4, close_4, open_5, close_5, open_6, close_6';
-    protected const string COLUMNS_MAP = 'ext_id, lat, lng';
+    private const string COLUMNS_MAP = 'ext_id, lat, lng';
 
     public function __construct(
-        protected GenericRepository $genericRepository,
+        private GenericRepository $genericRepository,
     ) {
     }
 
@@ -311,7 +311,7 @@ class VenueRepository
      * @param bool $filterActive
      * @return SqlWhere
      */
-    protected static function commonWhereStatements(SqlWhere $where, array $types, bool $openNow, Locality $locality, ?int $townId = null, bool $filterActive = true): SqlWhere
+    private static function commonWhereStatements(SqlWhere $where, array $types, bool $openNow, Locality $locality, ?int $townId = null, bool $filterActive = true): SqlWhere
     {
         // Don't return venues that are permanently closed
         if ($filterActive) {
@@ -347,7 +347,7 @@ class VenueRepository
      * @param non-empty-string $columns
      * @return VenueFullFromDatabase|VenueMinimalFromDatabase|null
      */
-    protected function findByExtId(string $extId, string $columns): ?array
+    private function findByExtId(string $extId, string $columns): ?array
     {
         /** @phpstan-var VenueFullFromDatabase|VenueMinimalFromDatabase|null $res */
 

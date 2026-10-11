@@ -6,7 +6,7 @@ namespace App\Framework\View;
 
 use App\Framework\Support\Log;
 
-class HtmlEscaper
+final class HtmlEscaper
 {
     public static function html(mixed $value): string
     {

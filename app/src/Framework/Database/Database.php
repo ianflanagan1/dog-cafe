@@ -19,17 +19,17 @@ use stdClass;
  * @phpstan-import-type PosInt from StandardTypes
  * @phpstan-import-type NonNegInt from StandardTypes
  * */
-class Database
+final class Database
 {
     protected const array DEFAULT_OPTIONS = [
         PDO::ATTR_DEFAULT_FETCH_MODE    => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES      => false,
         PDO::ATTR_ERRMODE               => PDO::ERRMODE_EXCEPTION,
     ];
-    protected ?PDO $pdo = null;
 
     /** @var callable */
     protected $pdoFactory;
+    private ?PDO $pdo = null;
 
     /**
      * @param array{
@@ -44,8 +44,8 @@ class Database
      * @param callable $pdoFactory
      */
     public function __construct(
-        #[SensitiveParameter] protected array $config,
         callable $pdoFactory,
+        #[SensitiveParameter] private array $config,
     ) {
         $this->pdoFactory = $pdoFactory;
     }
@@ -231,7 +231,7 @@ class Database
         return $id;
     }
 
-    protected function connect(): PDO
+    private function connect(): PDO
     {
         if ($this->pdo === null) {
             $this->pdo = ($this->pdoFactory)($this->config, self::DEFAULT_OPTIONS);
@@ -245,7 +245,7 @@ class Database
      * @param non-empty-string $sql
      * @return never
      */
-    protected static function error(PDOException $e, string $sql): never
+    private static function error(PDOException $e, string $sql): never
     {
         // Note: Don't Log bound values (potentially sensitive)
         Log::error('Database error:' . $e->getMessage() . ' - ' . $sql);

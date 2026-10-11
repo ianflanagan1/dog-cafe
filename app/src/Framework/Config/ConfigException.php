@@ -6,6 +6,6 @@ namespace App\Framework\Config;
 
 use RuntimeException;
 
-class ConfigException extends RuntimeException
+final class ConfigException extends RuntimeException
 {
 }

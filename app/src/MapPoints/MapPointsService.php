@@ -29,11 +29,11 @@ use App\Repositories\VenueRepository;
  * @phpstan-import-type SinglePoint from MapPointsBuilder
  * @phpstan-import-type ClusterPoint from MapPointsBuilder
  */
-class MapPointsService
+final readonly class MapPointsService
 {
-    protected const int ZOOM_MIN = 2;
-    protected const int CACHED_ZOOM_MAX = 12;
-    protected const int CLUSTERING_ZOOM_MAX = 15;
+    private const int ZOOM_MIN = 2;
+    private const int CACHED_ZOOM_MAX = 12;
+    private const int CLUSTERING_ZOOM_MAX = 15;
 
     /**
      * Configuration array for spacial clustering of points at each level of zoom (0-22)
@@ -54,9 +54,9 @@ class MapPointsService
      * @param VenueRepository $venueRepository
      */
     public function __construct(
-        protected array $config,
-        protected array $zoomLevelProperties,
-        protected VenueRepository $venueRepository,
+        private array $config,
+        private array $zoomLevelProperties,
+        private VenueRepository $venueRepository,
     ) {
     }
 
@@ -96,7 +96,7 @@ class MapPointsService
      * @param MapZoom $zoom
      * @return list<SinglePoint|ClusterPoint>
      */
-    protected function getFromCacheFiles(float $lat1, float $lat2, float $lng1, float $lng2, array $types, bool $openNow, int $zoom): array
+    private function getFromCacheFiles(float $lat1, float $lat2, float $lng1, float $lng2, array $types, bool $openNow, int $zoom): array
     {
         $properties = $this->zoomLevelProperties[$zoom];
 
@@ -124,7 +124,7 @@ class MapPointsService
      * @param bool $openNow
      * @return list<SinglePoint|ClusterPoint>
      */
-    protected function getFromDatabase(float $lat1, float $lat2, float $lng1, float $lng2, array $types, bool $openNow, int $zoom): array
+    private function getFromDatabase(float $lat1, float $lat2, float $lng1, float $lng2, array $types, bool $openNow, int $zoom): array
     {
         $venues = $this->venueRepository->fetchForMap($lat1, $lat2, $lng1, $lng2, $types, $openNow);
 

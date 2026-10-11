@@ -10,10 +10,10 @@ use App\Framework\Support\StandardTypes;
  * @phpstan-import-type PosInt from StandardTypes
  * @phpstan-import-type NonNegInt from StandardTypes
  */
-class GenericRepository
+final readonly class GenericRepository
 {
     public function __construct(
-        protected Database $database,
+        private Database $database,
     ) {
     }
 

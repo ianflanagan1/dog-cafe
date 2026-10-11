@@ -23,7 +23,7 @@ use App\Framework\Validation\Filters\IsPresent;
  *      timestamp: ?int
  * }
  */
-readonly class SearchMapRequest extends FormRequest
+final readonly class SearchMapRequest extends FormRequest
 {
     protected const array EXPECTED_INPUTS = [
         'lat1' => [

@@ -15,9 +15,9 @@ use App\Framework\Http\Response;
  *      2: array<non-empty-string, string>
  * }
  */
-class ActionExecutor
+final class ActionExecutor
 {
-    public function __construct(protected Container $container)
+    public function __construct(private Container $container)
     {
     }
 

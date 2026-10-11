@@ -6,6 +6,6 @@ namespace App\Framework\Validation;
 
 use RuntimeException;
 
-class FilterException extends RuntimeException
+final class FilterException extends RuntimeException
 {
 }

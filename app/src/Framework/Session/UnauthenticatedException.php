@@ -6,7 +6,7 @@ namespace App\Framework\Session;
 
 use RuntimeException;
 
-class UnauthenticatedException extends RuntimeException
+final class UnauthenticatedException extends RuntimeException
 {
     public function __construct(public bool $redirect)
     {

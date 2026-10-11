@@ -14,7 +14,7 @@ use InvalidArgumentException;
 /**
  * @phpstan-import-type PosInt from StandardTypes
 */
-class MightBeExtIdRule implements RuleInterface
+final class MightBeExtIdRule implements RuleInterface
 {
     /**
      * @param non-empty-string $field

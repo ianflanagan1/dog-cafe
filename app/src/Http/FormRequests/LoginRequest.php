@@ -11,7 +11,7 @@ use App\Framework\Http\FormRequest;
  *      location: ?string,
  * }
  */
-readonly class LoginRequest extends FormRequest
+final readonly class LoginRequest extends FormRequest
 {
     protected const array EXPECTED_INPUTS = [
         'location',

@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Framework\Database;
 
-class SqlWhere
+final class SqlWhere
 {
     /**
      * @param list<non-empty-string> $statements
      * @param list<?scalar> $parameters
      */
     public function __construct(
-        protected array $statements = [],
-        protected array $parameters = [],
+        private array $statements = [],
+        private array $parameters = [],
     ) {
     }
 

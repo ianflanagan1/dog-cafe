@@ -8,7 +8,7 @@ use App\Framework\Http\Controller;
 use App\Framework\Http\Response;
 use App\Framework\Routing\Attributes\Get;
 
-readonly class BasicController extends Controller
+final readonly class BasicController extends Controller
 {
     #[Get('/docs')]
     /**

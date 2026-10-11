@@ -6,6 +6,6 @@ namespace App\Framework\Routing;
 
 use Exception;
 
-class RouteNotValidException extends Exception
+final class RouteNotValidException extends Exception
 {
 }

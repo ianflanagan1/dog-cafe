@@ -21,7 +21,7 @@ use App\Framework\Validation\Filters\IsPresent;
  *      timestamp: ?int,
  * }
  */
-readonly class ListRequest extends FormRequest
+final readonly class ListRequest extends FormRequest
 {
     protected const array EXPECTED_INPUTS = [
         'page' => [

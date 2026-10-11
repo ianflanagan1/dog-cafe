@@ -9,7 +9,7 @@ use App\Framework\Http\Request;
 use App\Framework\Http\Response;
 use App\Framework\Routing\Router;
 
-readonly class App
+final readonly class App
 {
     public function run(Container $container): void
     {
@@ -25,7 +25,7 @@ readonly class App
     /**
      * The only place the response status, headers and body are output.
      */
-    protected function send(Response $response): void
+    private function send(Response $response): void
     {
         http_response_code($response->status);
 
