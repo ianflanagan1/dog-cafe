@@ -124,7 +124,6 @@ final class RouteRegistry
     /**
      * @param Request $request
      * @return Actionable
-     * @throws RouteNotFoundException
      */
     public function resolve(Request $request): array
     {
@@ -229,7 +228,6 @@ final class RouteRegistry
      * @param NonNegInt $actionIndex
      * @param RouteSegment|RouteParameter $routes
      * @return void
-     * @throws RouteNotValidException
      */
     private function registerRoute(string $route, HttpMethod $httpMethod, int $actionIndex, array &$routes): void
     {
@@ -300,7 +298,6 @@ final class RouteRegistry
      * @param NonNegInt $actionIndex
      * @param RouteSegment|RouteParameter $routes
      * @return void
-     * @throws RouteConflictException
      */
     private static function registerParameter(array $segments, HttpMethod $httpMethod, int $actionIndex, array &$routes): void
     {
@@ -352,7 +349,6 @@ final class RouteRegistry
      * @param NonNegInt $actionIndex
      * @param RouteSegment|RouteParameter $routes
      * @return void
-     * @throws RouteConflictException
      */
     private static function registerSegment(array $segments, HttpMethod $httpMethod, int $actionIndex, array &$routes): void
     {

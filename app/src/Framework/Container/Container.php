@@ -24,7 +24,6 @@ final class Container implements ContainerInterface
 
     /**
      * @return object
-     * @throws ContainerException
      */
     #[Override]
     public function get(string $id): object
@@ -76,7 +75,6 @@ final class Container implements ContainerInterface
      * @param string $id
      * @param list<string> $loopTracker Tracks already-resolving IDs to detect circular dependencies.
      * @return object
-     * @throws ContainerException
      */
     private function resolve(string $id, array $loopTracker = []): object
     {
@@ -108,7 +106,6 @@ final class Container implements ContainerInterface
      * @param string $id
      * @param list<string> $loopTracker Tracks already-resolving IDs to detect circular dependencies.
      * @return object
-     * @throws ContainerException
      */
     private function resolveCallable(string $id, array $loopTracker): object
     {
@@ -137,8 +134,6 @@ final class Container implements ContainerInterface
      * @param string $id
      * @param list<string> $loopTracker Tracks already-resolving IDs to detect circular dependencies.
      * @return object
-     * @throws NotFoundException
-     * @throws ContainerException
      */
     private function resolveClassName(string $id, array $loopTracker): object
     {
@@ -175,7 +170,6 @@ final class Container implements ContainerInterface
      * @param list<string> $loopTracker Tracks already-resolving IDs to detect circular dependencies.
      * @param array<string, mixed> $provided
      * @return list<mixed>
-     * @throws ContainerException
      */
     private function buildDependencies(array $parameters, array $loopTracker, array $provided = []): array
     {

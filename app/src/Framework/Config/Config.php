@@ -18,7 +18,6 @@ final readonly class Config
     /**
      * @param string $index
      * @return array<string, ?scalar>
-     * @throws ConfigException
      */
     public function get(string $index): array
     {
