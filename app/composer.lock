@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bfe8fc775eae3a2e9b122e037951d1f5",
+    "content-hash": "135c315c4de203f0c91d57f81926cd45",
     "packages": [
         {
             "name": "firebase/php-jwt",
@@ -1376,7 +1376,7 @@
     "packages-dev": [
         {
             "name": "ianflanagan1/phpstan-inferable-var-tag-name",
-            "version": "v0.1.0",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ianflanagan1/phpstan-inferable-var-tag-name.git",
@@ -1396,6 +1396,7 @@
                 "laravel/pint": "^1.32",
                 "phpunit/phpunit": "^12.5"
             },
+            "default-branch": true,
             "type": "phpstan-extension",
             "extra": {
                 "phpstan": {
@@ -1434,7 +1435,7 @@
         },
         {
             "name": "ianflanagan1/phpstan-redundant-inherited-phpdoc",
-            "version": "v0.1.0",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ianflanagan1/phpstan-redundant-inherited-phpdoc.git",
@@ -1454,6 +1455,7 @@
                 "laravel/pint": "^1.32",
                 "phpunit/phpunit": "^12.5"
             },
+            "default-branch": true,
             "type": "phpstan-extension",
             "extra": {
                 "phpstan": {
@@ -3720,7 +3722,10 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "ianflanagan1/phpstan-inferable-var-tag-name": 20,
+        "ianflanagan1/phpstan-redundant-inherited-phpdoc": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
