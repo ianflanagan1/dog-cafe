@@ -130,6 +130,12 @@ tasks:
 
   ##### PHP CONTAINER #####
 
+  console:
+    desc: 'Run a console command, e.g. task console -- about (no command lists them)'
+    vars: { USER_STRING_PHP_FPM_NGINX: *user_php_fpm_nginx }
+    cmds:
+      - '{{.COMPOSE}} exec {{.USER_STRING_PHP_FPM_NGINX}} php php bin/console.php {{.CLI_ARGS}}'
+
   php:exec:
     desc: 'Run a command in the php container, e.g. task php:exec -- id'
     vars: { USER_STRING_PHP_FPM_NGINX: *user_php_fpm_nginx }

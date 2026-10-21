@@ -51,6 +51,7 @@ parameters:
     reportStaticMethodSignatures: true
     errorFormat: table  # raw table checkstyle json prettyJson junit github gitlab teamcity
     paths:
+        - bin
         - src
         - config
         - public
@@ -71,6 +72,16 @@ parameters:
                 - 'shuffle()'
                 - 'array_rand()'
             message: 'it uses the predictable Mt19937 generator; use Random\Randomizer (secure by default) or random_bytes()'
+        # PHP can't disable exit and die (disable_functions ignores them), so only this rule stops them.
+        # Only the CLI entry points may end the process, to hand the shell an exit code
+        -
+            function:
+                - 'exit()'
+                - 'die()'
+            message: 'return a value or throw instead; only a CLI entry point ends the process'
+            allowIn:
+                - bin/console.php
+                - scripts/check-vendor-disabled-functions.php
         # COUPLED:disabled-functions. ⊇ php.ini:disable_functions (deploy/php/php.ini); same order, so the two lists diff cleanly
         # Applies to tests/ too: a test that needs one (php.phpunit.ini's exceptions) ignores it inline with a reason,
         # except ini_set(), which ignoreErrors allows throughout tests/
