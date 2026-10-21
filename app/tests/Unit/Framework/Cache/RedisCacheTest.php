@@ -8,46 +8,50 @@ use App\Framework\Cache\RedisCache;
 use Closure;
 use DateInterval;
 use Generator;
-use InvalidArgumentException;
 use Override;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\SimpleCache\InvalidArgumentException as SimpleCacheInvalidArgumentException;
 use Redis;
 use stdClass;
-use Stringable;
 
-class RedisCacheTest extends TestCase
+/**
+ * RedisCache runs against an in-memory stand-in for Redis, so each test states what the cache does rather than which
+ * Redis calls it makes.
+ */
+final class RedisCacheTest extends TestCase
 {
-    /** @phpstan-var MockObject&Redis */
-    protected MockObject&Redis $redisMock;
+    private RedisCache $cache;
 
-    protected RedisCache $cache;
+    private int $factoryCalls = 0;
 
-    protected int $factoryCalls = 0;
+    /** @var array<string, string> Everything in the fake Redis database, keyed as Redis sees it */
+    private array $stored = [];
+
+    /** @var array<string, int> Seconds until expiry, for keys that have one */
+    private array $expiries = [];
+
+    /** @var array<int, mixed> */
+    private array $clientOptions = [];
 
     #[Override]
     protected function setUp(): void
     {
-        $this->redisMock = $this->createMock(Redis::class);
+        $redis = $this->fakeRedis();
 
         $this->cache = new RedisCache(
-            function (): MockObject&Redis {
+            function () use ($redis): Redis {
                 $this->factoryCalls++;
-                return $this->redisMock;
+                return $redis;
             },
         );
     }
 
-    #[AllowMockObjectsWithoutExpectations]
     public function test_constructing_the_cache_does_not_connect(): void
     {
         $this->assertSame(0, $this->factoryCalls);
     }
 
-    #[AllowMockObjectsWithoutExpectations]
     public function test_the_connection_is_made_once_on_first_use(): void
     {
         $this->cache->get('key1');
@@ -56,436 +60,372 @@ class RedisCacheTest extends TestCase
         $this->assertSame(1, $this->factoryCalls);
     }
 
-    public function test_values_are_stored_unserialized_whatever_the_injected_client_was_configured_with(): void
+    public function test_the_client_is_told_not_to_serialize_because_the_cache_serializes_values_itself(): void
     {
-        $this->redisMock->expects($this->once())
-            ->method('setOption')
-            ->with(Redis::OPT_SERIALIZER, Redis::SERIALIZER_NONE);
-
         $this->cache->get('key');
+
+        $this->assertSame(Redis::SERIALIZER_NONE, $this->clientOptions[Redis::OPT_SERIALIZER] ?? null);
     }
 
-    public function test_get_returns_value_when_key_exists(): void
+    public function test_a_missing_item_returns_the_default(): void
     {
-        $this->redisMock->expects($this->once())
-            ->method('get')
-            ->with('test_key')
-            ->willReturn('test_value');
-
-        $result = $this->cache->get('test_key');
-        $this->assertEquals('test_value', $result);
+        $this->assertNull($this->cache->get('missing'));
+        $this->assertSame('default', $this->cache->get('missing', 'default'));
     }
 
-    public function test_get_returns_null_default_when_key_does_not_exist(): void
+    /**
+     * @return array<string, array{mixed}>
+     */
+    public static function valuesOfEveryType(): array
     {
-        $this->redisMock->expects($this->once())
-            ->method('get')
-            ->with('nonexistent_key')
-            ->willReturn(false);
+        $object = new stdClass();
+        $object->name = 'value';
 
-        $result = $this->cache->get('nonexistent_key');
-        $this->assertNull($result);
+        return [
+            'string' => ['value'],
+            'numeric string' => ['5'],
+            'int' => [5],
+            'float' => [1.5],
+            'true' => [true],
+            'false' => [false],
+            'null' => [null],
+            'array' => [['a' => 1, 'b' => [2, 3]]],
+            'object' => [$object],
+        ];
     }
 
-    public function test_get_returns_passed_default_when_key_does_not_exist(): void
+    #[DataProvider('valuesOfEveryType')]
+    public function test_a_stored_value_comes_back_with_its_type_intact(mixed $value): void
     {
-        $this->redisMock->expects($this->once())
-            ->method('get')
-            ->with('nonexistent_key')
-            ->willReturn(false);
+        $this->cache->set('key', $value);
 
-        $result = $this->cache->get('nonexistent_key', 'default_value');
-        $this->assertEquals('default_value', $result);
+        $this->assertEquals($value, $this->cache->get('key', 'default'));
+        $this->assertSame(get_debug_type($value), get_debug_type($this->cache->get('key', 'default')));
     }
 
-    public function test_set_without_ttl(): void
+    public function test_an_item_set_without_a_ttl_never_expires(): void
     {
-        $this->redisMock->expects($this->once())
-            ->method('set')
-            ->with('test_key', 'test_value')
-            ->willReturn(true);
+        $this->cache->set('key', 'value');
 
-        $result = $this->cache->set('test_key', 'test_value');
-        $this->assertTrue($result);
+        $this->assertSame([], $this->expiries);
     }
 
-    public function test_set_with_integer_ttl(): void
+    /**
+     * @return array<string, array{int|DateInterval}>
+     */
+    public static function oneHourTtls(): array
     {
-        $this->redisMock->expects($this->once())
-            ->method('set')
-            ->with('test_key', 'test_value', ['EX' => 3600])
-            ->willReturn(true);
-
-        $result = $this->cache->set('test_key', 'test_value', 3600);
-        $this->assertTrue($result);
+        return [
+            'seconds' => [3600],
+            'interval' => [new DateInterval('PT1H')],
+        ];
     }
 
-    public function test_set_with_date_interval_ttl(): void
+    #[DataProvider('oneHourTtls')]
+    public function test_an_item_set_with_a_ttl_expires_after_it(int|DateInterval $ttl): void
     {
-        $interval = new DateInterval('PT1H'); // 1 hour
+        $this->assertTrue($this->cache->set('key', 'value', $ttl));
 
-        $this->redisMock->expects($this->once())
-            ->method('set')
-            ->with('test_key', 'test_value', ['EX' => 3600])
-            ->willReturn(true);
-
-        $result = $this->cache->set('test_key', 'test_value', $interval);
-        $this->assertTrue($result);
+        $this->assertSame('value', $this->cache->get('key'));
+        $this->assertSame(['cache:key' => 3600], $this->expiries);
     }
 
-    public function test_set_with_zero_ttl(): void
+    /**
+     * @return array<string, array{int|DateInterval}>
+     */
+    public static function expiredTtls(): array
     {
-        $this->redisMock->expects($this->once())
-            ->method('set')
-            ->with('test_key', 'test_value')
-            ->willReturn(true);
+        $negativeInterval = new DateInterval('PT1H');
+        $negativeInterval->invert = 1;
 
-        $result = $this->cache->set('test_key', 'test_value', 0);
-        $this->assertTrue($result);
+        return [
+            'zero' => [0],
+            'negative seconds' => [-1],
+            'negative interval' => [$negativeInterval],
+        ];
     }
 
-    public function test_set_throws_exception_for_invalid_value(): void
+    #[DataProvider('expiredTtls')]
+    public function test_setting_an_item_with_a_ttl_of_zero_or_less_removes_it(int|DateInterval $ttl): void
     {
-        $this->redisMock->expects($this->never())->method('set');
+        $this->cache->set('key', 'old');
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Only scalar, Stringable, or null values are supported for Redis storage. Type: array');
+        $this->assertTrue($this->cache->set('key', 'new', $ttl));
 
-        $this->cache->set('test_key', ['invalid' => 'array']);
+        $this->assertFalse($this->cache->has('key'));
     }
 
-    public function test_set_accepts_stringable_object(): void
+    public function test_deleting_an_item_removes_it(): void
     {
-        $stringable = new class () implements Stringable {
-            #[Override]
-            public function __toString(): string
-            {
-                return 'stringable_value';
-            }
-        };
+        $this->cache->set('key', 'value');
 
-        $this->redisMock->expects($this->once())
-            ->method('set')
-            ->with('test_key', $stringable)
-            ->willReturn(true);
+        $this->assertTrue($this->cache->delete('key'));
 
-        $result = $this->cache->set('test_key', $stringable);
-        $this->assertTrue($result);
+        $this->assertFalse($this->cache->has('key'));
     }
 
-    public function test_set_accepts_null_value(): void
+    public function test_deleting_a_missing_item_succeeds(): void
     {
-        $this->redisMock->expects($this->once())
-            ->method('set')
-            ->with('test_key', null)
-            ->willReturn(true);
-
-        $result = $this->cache->set('test_key', null);
-        $this->assertTrue($result);
+        $this->assertTrue($this->cache->delete('missing'));
     }
 
-    public function test_delete_existing_key(): void
+    public function test_has_reports_whether_an_item_is_stored(): void
     {
-        $this->redisMock->expects($this->once())
-            ->method('del')
-            ->with('test_key')
-            ->willReturn(1);
+        $this->cache->set('key', null);
 
-        $result = $this->cache->delete('test_key');
-        $this->assertTrue($result);
+        $this->assertTrue($this->cache->has('key'));
+        $this->assertFalse($this->cache->has('missing'));
     }
 
-    public function test_delete_non_existent_key(): void
+    public function test_clear_removes_every_cached_item_and_nothing_else_in_the_redis_database(): void
     {
-        $this->redisMock->expects($this->once())
-            ->method('del')
-            ->with('nonexistent_key')
-            ->willReturn(0);
+        $this->stored['PHPREDIS_SESSION:abc'] = 'session data';
+        $this->cache->set('key1', 'value');
+        $this->cache->set('key2', 'value');
 
-        $result = $this->cache->delete('nonexistent_key');
-        $this->assertFalse($result);
+        $this->assertTrue($this->cache->clear());
+
+        $this->assertFalse($this->cache->has('key1'));
+        $this->assertFalse($this->cache->has('key2'));
+        $this->assertSame(['PHPREDIS_SESSION:abc' => 'session data'], $this->stored);
     }
 
-    public function test_clear(): void
+    public function test_get_multiple_returns_each_value_or_the_default(): void
     {
-        $this->redisMock->expects($this->once())
-            ->method('flushDB')
-            ->willReturn(true);
-
-        $result = $this->cache->clear();
-        $this->assertTrue($result);
-    }
-
-    public function test_get_multiple(): void
-    {
-        $keys = ['key1', 'key2', 'key3'];
-        $values = ['value1', false, 'value3'];
-
-        $this->redisMock->expects($this->once())
-            ->method('mget')
-            ->with($keys)
-            ->willReturn($values);
-
-        $result = $this->cache->getMultiple($keys, 'default');
+        $this->cache->set('key1', 'value1');
+        $this->cache->set('key3', 3);
 
         $expected = [
             'key1' => 'value1',
             'key2' => 'default',
-            'key3' => 'value3',
+            'key3' => 3,
         ];
 
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $this->cache->getMultiple(['key1', 'key2', 'key3'], 'default'));
+        $this->assertSame($expected, $this->cache->getMultiple(self::generate(['key1', 'key2', 'key3']), 'default'));
     }
 
-    public function test_get_multiple_accepts_keys_from_a_generator(): void
+    public function test_set_multiple_stores_every_value(): void
     {
-        $this->redisMock->expects($this->once())
-            ->method('mget')
-            ->with(['key1', 'key2'])
-            ->willReturn(['value1', 'value2']);
+        $this->assertTrue($this->cache->setMultiple(['key1' => 'value1', 'key2' => 2]));
+        $this->assertTrue($this->cache->setMultiple(self::generate(['key3' => 'value3'])));
 
-        $result = $this->cache->getMultiple(self::generate(['key1', 'key2']));
-
-        $expected = [
-            'key1' => 'value1',
-            'key2' => 'value2',
-        ];
-
-        $this->assertEquals($expected, $result);
-    }
-
-    public function test_set_multiple_without_ttl(): void
-    {
-        $values = ['key1' => 'value1', 'key2' => 'value2'];
-
-        $this->redisMock->expects($this->once())
-            ->method('mset')
-            ->with($values)
-            ->willReturn(true);
-
-        $result = $this->cache->setMultiple($values);
-        $this->assertTrue($result);
-    }
-
-    public function test_set_multiple_with_ttl(): void
-    {
-        $values = ['key1' => 'value1', 'key2' => 'value2'];
-
-        $this->redisMock->expects($this->once())
-            ->method('mset')
-            ->with($values)
-            ->willReturn(true);
-
-        $expireCalls = [];
-        $this->redisMock->expects($this->exactly(2))
-            ->method('expire')
-            ->willReturnCallback(function (string $key, int $ttl) use (&$expireCalls): bool {
-                $expireCalls[] = [$key, $ttl];
-
-                return true;
-            });
-
-        $result = $this->cache->setMultiple($values, 3600);
-
-        $this->assertTrue($result);
-        $this->assertEquals([['key1', 3600], ['key2', 3600]], $expireCalls);
-    }
-
-    public function test_set_multiple_with_date_interval_ttl(): void
-    {
-        $values = ['key1' => 'value1'];
-        $interval = new DateInterval('PT30M'); // 30 minutes
-
-        $this->redisMock->expects($this->once())
-            ->method('mset')
-            ->with($values)
-            ->willReturn(true);
-
-        $this->redisMock->expects($this->once())
-            ->method('expire')
-            ->with('key1', 1800); // 30 minutes in seconds
-
-        $result = $this->cache->setMultiple($values, $interval);
-        $this->assertTrue($result);
+        $this->assertSame(
+            ['key1' => 'value1', 'key2' => 2, 'key3' => 'value3'],
+            $this->cache->getMultiple(['key1', 'key2', 'key3']),
+        );
     }
 
     public function test_set_multiple_accepts_numeric_string_keys_that_php_stores_as_ints(): void
     {
-        $values = ['123' => 'value1'];
+        $this->assertTrue($this->cache->setMultiple(['123' => 'value']));
 
-        $this->redisMock->expects($this->once())
-            ->method('mset')
-            ->with($values)
-            ->willReturn(true);
-
-        $result = $this->cache->setMultiple($values);
-        $this->assertTrue($result);
+        $this->assertSame('value', $this->cache->get('123'));
     }
 
-    public function test_set_multiple_accepts_values_from_a_generator(): void
+    #[DataProvider('oneHourTtls')]
+    public function test_set_multiple_with_a_ttl_expires_every_item_after_it(int|DateInterval $ttl): void
     {
-        $values = ['key1' => 'value1', 'key2' => 'value2'];
+        $this->cache->setMultiple(['key1' => 'value1', 'key2' => 'value2'], $ttl);
 
-        $this->redisMock->expects($this->once())
-            ->method('mset')
-            ->with($values)
-            ->willReturn(true);
-
-        $result = $this->cache->setMultiple(self::generate($values));
-        $this->assertTrue($result);
+        $this->assertSame(['cache:key1' => 3600, 'cache:key2' => 3600], $this->expiries);
     }
 
-    public function test_set_multiple_throws_exception_for_invalid_value(): void
+    #[DataProvider('expiredTtls')]
+    public function test_set_multiple_with_a_ttl_of_zero_or_less_removes_the_items(int|DateInterval $ttl): void
     {
-        $this->redisMock->expects($this->never())->method('mset');
+        $this->cache->set('key1', 'old');
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Only scalar, Stringable, or null values are supported for Redis storage. Type: stdClass');
+        $this->assertTrue($this->cache->setMultiple(['key1' => 'new', 'key2' => 'new'], $ttl));
 
-        $values = ['key1' => 'valid', 'key2' => new stdClass()];
-        $this->cache->setMultiple($values);
+        $this->assertSame([], $this->stored);
     }
 
-    public function test_delete_multiple_all_keys_exist(): void
+    public function test_delete_multiple_removes_the_items_and_succeeds_when_some_were_missing(): void
     {
-        $keys = ['key1', 'key2', 'key3'];
+        $this->cache->set('key1', 'value');
+        $this->cache->set('key2', 'value');
+        $this->cache->set('kept', 'value');
 
-        $this->redisMock->expects($this->once())
-            ->method('del')
-            ->with($keys)
-            ->willReturn(3);
+        $this->assertTrue($this->cache->deleteMultiple(self::generate(['key1', 'key2', 'missing'])));
 
-        $result = $this->cache->deleteMultiple($keys);
-        $this->assertTrue($result);
+        $this->assertSame(['key1' => null, 'key2' => null, 'kept' => 'value'], $this->cache->getMultiple(['key1', 'key2', 'kept']));
     }
 
-    public function test_delete_multiple_some_keys_do_not_exist(): void
+    public function test_operations_on_no_keys_succeed(): void
     {
-        $keys = ['key1', 'key2', 'key3'];
-
-        $this->redisMock->expects($this->once())
-            ->method('del')
-            ->with($keys)
-            ->willReturn(2); // Only 2 out of 3 keys were deleted
-
-        $result = $this->cache->deleteMultiple($keys);
-        $this->assertFalse($result);
+        $this->assertSame([], $this->cache->getMultiple([]));
+        $this->assertTrue($this->cache->setMultiple([]));
+        $this->assertTrue($this->cache->deleteMultiple([]));
     }
 
-    public function test_delete_multiple_accepts_keys_from_a_generator(): void
+    public function test_keys_made_of_letters_digits_underscores_and_dots_are_accepted(): void
     {
-        $this->redisMock->expects($this->once())
-            ->method('del')
-            ->with(['key1', 'key2'])
-            ->willReturn(2);
+        $key = 'AZaz09_.' . str_repeat('x', 100);
 
-        $result = $this->cache->deleteMultiple(self::generate(['key1', 'key2']));
-        $this->assertTrue($result);
+        $this->cache->set($key, 'value');
+
+        $this->assertSame('value', $this->cache->get($key));
     }
 
-    public function test_has_returns_true_when_key_exists(): void
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function keysOutsideThePortablePsr16Set(): array
     {
-        $this->redisMock->expects($this->once())
-            ->method('exists')
-            ->with('existing_key')
-            ->willReturn(1);
-
-        $result = $this->cache->has('existing_key');
-        $this->assertTrue($result);
+        return [
+            'empty' => [''],
+            'colon (reserved)' => ['a:b'],
+            'braces (reserved)' => ['a{b}'],
+            'parentheses (reserved)' => ['a(b)'],
+            'slash (reserved)' => ['a/b'],
+            'backslash (reserved)' => ['a\\b'],
+            'at sign (reserved)' => ['a@b'],
+            'space' => ['a b'],
+            'comma' => ['a,b'],
+            'hyphen' => ['a-b'],
+            'trailing newline' => ["a\n"],
+            'non-ASCII letter' => ['café'],
+        ];
     }
 
-    public function test_has_returns_false_when_key_does_not_exist(): void
+    #[DataProvider('keysOutsideThePortablePsr16Set')]
+    public function test_keys_outside_the_portable_psr16_set_are_rejected(string $key): void
     {
-        $this->redisMock->expects($this->once())
-            ->method('exists')
-            ->with('nonexistent_key')
-            ->willReturn(0);
+        $this->expectException(SimpleCacheInvalidArgumentException::class);
 
-        $result = $this->cache->has('nonexistent_key');
-        $this->assertFalse($result);
+        $this->cache->get($key);
     }
 
     /**
      * @return array<string, array{Closure(RedisCache): mixed}>
      */
-    public static function callsWithAnEmptyKey(): array
+    public static function callsWithAnIllegalKey(): array
     {
         return [
-            'get' => [static fn (RedisCache $cache): mixed => $cache->get('')],
-            'set' => [static fn (RedisCache $cache): bool => $cache->set('', 'value')],
-            'delete' => [static fn (RedisCache $cache): bool => $cache->delete('')],
-            'has' => [static fn (RedisCache $cache): bool => $cache->has('')],
-            'getMultiple' => [static fn (RedisCache $cache): iterable => $cache->getMultiple(['key1', ''])],
-            'setMultiple' => [static fn (RedisCache $cache): bool => $cache->setMultiple(['key1' => 'value', '' => 'value'])],
-            'deleteMultiple' => [static fn (RedisCache $cache): bool => $cache->deleteMultiple(['key1', ''])],
+            'get' => [static fn (RedisCache $cache): mixed => $cache->get('a:b')],
+            'set' => [static fn (RedisCache $cache): bool => $cache->set('a:b', 'value')],
+            'delete' => [static fn (RedisCache $cache): bool => $cache->delete('a:b')],
+            'has' => [static fn (RedisCache $cache): bool => $cache->has('a:b')],
+            'getMultiple' => [static fn (RedisCache $cache): iterable => $cache->getMultiple(['key1', 'a:b'])],
+            'getMultiple with a non-string key' => [static fn (RedisCache $cache): iterable => $cache->getMultiple([1])], // @phpstan-ignore argument.type (the int key is the illegal input)
+            'setMultiple' => [static fn (RedisCache $cache): bool => $cache->setMultiple(['key1' => 'value', 'a:b' => 'value'])],
+            'deleteMultiple' => [static fn (RedisCache $cache): bool => $cache->deleteMultiple(['key1', 'a:b'])],
         ];
     }
 
     /**
      * @param Closure(RedisCache): mixed $call
      */
-    #[AllowMockObjectsWithoutExpectations]
-    #[DataProvider('callsWithAnEmptyKey')]
-    public function test_an_empty_key_is_rejected_as_psr16_invalid(Closure $call): void
+    #[DataProvider('callsWithAnIllegalKey')]
+    public function test_every_operation_rejects_an_illegal_key(Closure $call): void
     {
         $this->expectException(SimpleCacheInvalidArgumentException::class);
 
         $call($this->cache);
     }
 
-    public function test_assert_redis_compatible_value_with_valid_types(): void
+    /**
+     * A stand-in for the phpredis client, covering the calls RedisCache makes, backed by $stored and $expiries
+     */
+    private function fakeRedis(): Redis
     {
-        // Test with various scalar types and null
-        $validValues = [
-            'string',
-            123,
-            45.67,
-            true,
-            false,
-            null,
-        ];
+        $redis = self::createStub(Redis::class);
 
-        $this->redisMock->expects($this->exactly(count($validValues)))
-            ->method('set')
-            ->willReturn(true);
+        $redis->method('setOption')->willReturnCallback(function (int $option, mixed $value): bool {
+            $this->clientOptions[$option] = $value;
+            return true;
+        });
 
-        foreach ($validValues as $value) {
-            $this->cache->set('test_key', $value);
+        $redis->method('get')->willReturnCallback(
+            fn (string $key): string|false => $this->stored[$key] ?? false,
+        );
+
+        $redis->method('set')->willReturnCallback(function (string $key, mixed $value, mixed $options = null): bool {
+            self::assertIsString($value);
+            $this->stored[$key] = $value;
+            unset($this->expiries[$key]);
+
+            if (is_array($options) && isset($options['EX'])) {
+                self::assertIsInt($options['EX']);
+                $this->expiries[$key] = $options['EX'];
+            }
+
+            return true;
+        });
+
+        $redis->method('mget')->willReturnCallback($this->fakeMget(...));
+        $redis->method('mset')->willReturnCallback($this->fakeMset(...));
+
+        $redis->method('expire')->willReturnCallback(function (string $key, int $seconds): bool {
+            if (!isset($this->stored[$key])) {
+                return false;
+            }
+
+            $this->expiries[$key] = $seconds;
+            return true;
+        });
+
+        $redis->method('del')->willReturnCallback($this->fakeRemove(...));
+        $redis->method('unlink')->willReturnCallback($this->fakeRemove(...));
+
+        $redis->method('exists')->willReturnCallback(
+            fn (string $key): int => (int) isset($this->stored[$key]),
+        );
+
+        // Returns every match in one batch, then false to end the iteration as phpredis does
+        $scanned = false;
+        $redis->method('scan')->willReturnCallback(function (mixed $iterator, string $pattern) use (&$scanned): array|false {
+            if ($scanned) {
+                return false;
+            }
+
+            $scanned = true;
+
+            return array_values(array_filter(array_keys($this->stored), fn (string $key): bool => fnmatch($pattern, $key)));
+        });
+
+        return $redis;
+    }
+
+    /**
+     * @param list<string> $keys
+     * @return list<string|false>
+     */
+    private function fakeMget(array $keys): array
+    {
+        return array_map(fn (string $key): string|false => $this->stored[$key] ?? false, $keys);
+    }
+
+    /**
+     * @param array<string, string> $pairs
+     */
+    private function fakeMset(array $pairs): bool
+    {
+        foreach ($pairs as $key => $value) {
+            $this->stored[$key] = $value;
+            unset($this->expiries[$key]);
         }
+
+        return true;
     }
 
-    public function test_assert_redis_compatible_value_with_invalid_object(): void
+    /**
+     * @param list<string> $keys
+     * @return int How many of the keys existed
+     */
+    private function fakeRemove(array $keys): int
     {
-        $this->redisMock->expects($this->never())->method('set');
+        $removed = 0;
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Only scalar, Stringable, or null values are supported for Redis storage. Type: stdClass');
-
-        $this->cache->set('test_key', new stdClass());
-    }
-
-    public function test_assert_redis_compatible_value_with_invalid_array(): void
-    {
-        $this->redisMock->expects($this->never())->method('set');
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Only scalar, Stringable, or null values are supported for Redis storage. Type: array');
-
-        $this->cache->set('test_key', [1, 2, 3]);
-    }
-
-    public function test_assert_redis_compatible_value_with_resource(): void
-    {
-        $this->redisMock->expects($this->never())->method('set');
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Only scalar, Stringable, or null values are supported for Redis storage. Type: resource (stream)');
-
-        $resource = fopen('php://memory', 'r');
-        if ($resource !== false) {
-            $this->cache->set('test_key', $resource);
-            fclose($resource);
+        foreach ($keys as $key) {
+            if (isset($this->stored[$key])) {
+                unset($this->stored[$key], $this->expiries[$key]);
+                $removed++;
+            }
         }
+
+        return $removed;
     }
 
     /**

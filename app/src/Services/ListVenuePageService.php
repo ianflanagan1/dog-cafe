@@ -100,9 +100,9 @@ final readonly class ListVenuePageService
     {
         $typeValues = array_map(fn (VenueType $type): int => $type->value, $types);
         sort($typeValues);
-        $typesStr = implode(',', $typeValues);
+        $typesStr = implode('_', $typeValues);
 
-        return "venueListTotalPages:{$townId}:{$typesStr}:{$pageSize}";
+        return "venueListTotalPages.{$townId}.{$typesStr}.{$pageSize}";
     }
 
     /**
@@ -116,9 +116,9 @@ final readonly class ListVenuePageService
     {
         $typeValues = array_map(fn (VenueType $type): int => $type->value, $types);
         sort($typeValues);
-        $typesStr = implode(',', $typeValues);
+        $typesStr = implode('_', $typeValues);
 
-        return "venueListItems:{$townId}:{$typesStr}:{$orderBy->value}:{$pageSize}:{$page}";
+        return "venueListItems.{$townId}.{$typesStr}.{$orderBy->value}.{$pageSize}.{$page}";
     }
 
     /**
@@ -181,13 +181,11 @@ final readonly class ListVenuePageService
         $totalPages = $this->cache->get($cacheKey);
 
         assert(
-            $totalPages === null || ctype_digit($totalPages),
-            '$totalPages (from cache) must be null or a string of an integer'
+            $totalPages === null || (is_int($totalPages) && $totalPages >= 0),
+            '$totalPages (from cache) must be null or a non-negative int'
         );
 
         if ($totalPages !== null) {
-            $totalPages = (int) $totalPages;
-            assert($totalPages >= 0, '$totalPages must be non-negative');
             return $totalPages;
         }
 

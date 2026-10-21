@@ -7,15 +7,29 @@ namespace App\Framework\Cache;
 use Closure;
 use DateInterval;
 use DateTime;
-use InvalidArgumentException;
 use Override;
 use Psr\SimpleCache\CacheInterface;
 use Redis;
 use RuntimeException;
-use Stringable;
 
+/**
+ * A PSR-16 cache in Redis. Values of any serializable type come back as they were stored.
+ */
 class RedisCache implements CacheInterface
 {
+    /**
+     * Prepended to every key in Redis, so clear() can remove the cache's items alone: sessions share the database,
+     * and production disables FLUSHDB (deploy/redis/redis.conf). The `:` is Redis's namespacing convention. PSR-16
+     * reserves it only in the keys callers pass.
+     */
+    private const string PREFIX = 'cache:';
+
+    /**
+     * Legal keys: the characters every PSR-16 implementation must accept (A-Z, a-z, 0-9, _ and .), which excludes the
+     * ones it reserves ({}()/\@:). Separate namespace segments with `.`
+     */
+    private const string KEY_PATTERN = '/^[A-Za-z0-9_.]+$/D';
+
     private ?Redis $redis = null;
 
     /**
@@ -31,26 +45,26 @@ class RedisCache implements CacheInterface
     {
         $this->assertValidKey($key);
 
-        $value = $this->connection()->get($key);
-
-        return $value === false
-            ? $default
-            : $value;
+        return $this->unserialize($this->connection()->get(self::PREFIX . $key), $default);
     }
 
     #[Override]
     public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
     {
         $this->assertValidKey($key);
-        $this->assertRedisCompatibleValue($value);
 
-        $seconds = self::seconds($ttl) ?? 0;
+        $seconds = self::seconds($ttl);
 
-        if ($seconds > 0) {
-            return (bool) $this->connection()->set($key, $value, ['EX' => $seconds]);
+        if ($seconds !== null && $seconds <= 0) {
+            // PSR-16: an item whose TTL is zero or less has already expired
+            return $this->deleteRedisKeys([self::PREFIX . $key]);
         }
 
-        return (bool) $this->connection()->set($key, $value);
+        $result = $seconds === null
+            ? $this->connection()->set(self::PREFIX . $key, serialize($value))
+            : $this->connection()->set(self::PREFIX . $key, serialize($value), ['EX' => $seconds]);
+
+        return $result === true;
     }
 
     #[Override]
@@ -58,21 +72,35 @@ class RedisCache implements CacheInterface
     {
         $this->assertValidKey($key);
 
-        return $this->connection()->del($key) === 1;
+        return $this->deleteRedisKeys([self::PREFIX . $key]);
     }
 
     #[Override]
     public function clear(): bool
     {
-        return $this->connection()->flushDB() === true;
+        $redis = $this->connection();
+        $iterator = null;
+
+        // scan() returns false once the iteration is complete, and may return no keys before then
+        while (($redisKeys = $redis->scan($iterator, self::PREFIX . '*')) !== false) {
+            if ($redisKeys !== [] && !is_int($redis->unlink($redisKeys))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     #[Override]
     public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
-        $keys = iterator_to_array($keys, false);
-        array_walk($keys, $this->assertValidKey(...));
-        $values = $this->connection()->mget($keys);
+        $keys = $this->validKeys($keys);
+
+        if ($keys === []) {
+            return [];
+        }
+
+        $values = $this->connection()->mget(array_map(fn (string $key): string => self::PREFIX . $key, $keys));
 
         if (!is_array($values)) {
             throw new RuntimeException('Redis MGET failed');
@@ -82,9 +110,7 @@ class RedisCache implements CacheInterface
 
         // mget() returns values in the same order as the keys
         foreach (array_combine($keys, $values) as $key => $value) {
-            $results[$key] = $value === false
-                ? $default
-                : $value;
+            $results[$key] = $this->unserialize($value, $default);
         }
 
         return $results;
@@ -96,21 +122,34 @@ class RedisCache implements CacheInterface
     #[Override]
     public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
     {
-        $values = iterator_to_array($values, true);
+        $serialized = [];
 
         foreach ($values as $key => $value) {
             // PHP stores numeric string keys like '123' as ints
-            $this->assertValidKey((string) $key);
-            $this->assertRedisCompatibleValue($value);
+            $key = is_int($key)
+                ? (string) $key
+                : $key;
+
+            $this->assertValidKey($key);
+            $serialized[self::PREFIX . $key] = serialize($value);
         }
 
-        /** @var array<string, mixed> $values Keys validated above. Numeric ones are ints, which Redis stores as their string form */
-        $result = $this->connection()->mset($values) === true;
+        if ($serialized === []) {
+            return true;
+        }
+
         $seconds = self::seconds($ttl);
 
+        if ($seconds !== null && $seconds <= 0) {
+            // PSR-16: an item whose TTL is zero or less has already expired
+            return $this->deleteRedisKeys(array_keys($serialized));
+        }
+
+        $result = $this->connection()->mset($serialized) === true;
+
         if ($seconds !== null) {
-            foreach (array_keys($values) as $key) {
-                $this->connection()->expire($key, $seconds);
+            foreach (array_keys($serialized) as $redisKey) {
+                $this->connection()->expire($redisKey, $seconds);
             }
         }
 
@@ -120,10 +159,10 @@ class RedisCache implements CacheInterface
     #[Override]
     public function deleteMultiple(iterable $keys): bool
     {
-        $keys = iterator_to_array($keys, false);
-        array_walk($keys, $this->assertValidKey(...));
+        $redisKeys = array_map(fn (string $key): string => self::PREFIX . $key, $this->validKeys($keys));
 
-        return $this->connection()->del($keys) === count($keys);
+        return $redisKeys === []
+            || $this->deleteRedisKeys($redisKeys);
     }
 
     #[Override]
@@ -131,26 +170,56 @@ class RedisCache implements CacheInterface
     {
         $this->assertValidKey($key);
 
-        return (bool) $this->connection()->exists($key);
+        return $this->connection()->exists(self::PREFIX . $key) === 1;
     }
 
     /**
      * @phpstan-assert non-empty-string $key
      *
-     * @throws InvalidKeyException PSR-16 requires keys of at least one character
+     * @throws InvalidKeyException PSR-16 requires keys to be strings of at least one character. This accepts the
+     *                             characters every PSR-16 implementation must, and rejects the ones it reserves
      */
     protected function assertValidKey(mixed $key): void
     {
-        if (!is_string($key) || $key === '') {
-            throw new InvalidKeyException('Cache keys must be non-empty strings. Got: ' . var_export($key, true));
+        if (!is_string($key) || preg_match(self::KEY_PATTERN, $key) !== 1) {
+            throw new InvalidKeyException('Cache keys must match ' . self::KEY_PATTERN . '. Got: ' . var_export($key, true));
         }
     }
 
-    protected function assertRedisCompatibleValue(mixed $value): void
+    /**
+     * @param iterable<mixed> $keys
+     * @return list<non-empty-string>
+     */
+    private function validKeys(iterable $keys): array
     {
-        if (!is_scalar($value) && !$value instanceof Stringable && $value !== null) {
-            throw new InvalidArgumentException('Only scalar, Stringable, or null values are supported for Redis storage. Type: ' . get_debug_type($value));
+        $valid = [];
+
+        foreach ($keys as $key) {
+            $this->assertValidKey($key);
+            $valid[] = $key;
         }
+
+        return $valid;
+    }
+
+    /**
+     * Succeeds whether or not the keys existed
+     *
+     * @param non-empty-list<string> $redisKeys
+     */
+    private function deleteRedisKeys(array $redisKeys): bool
+    {
+        return is_int($this->connection()->del($redisKeys));
+    }
+
+    /**
+     * @param mixed $value What Redis returned: the serialized value, or false for a missing key
+     */
+    private function unserialize(mixed $value, mixed $default): mixed
+    {
+        return is_string($value)
+            ? unserialize($value)
+            : $default;
     }
 
     private static function seconds(null|int|DateInterval $ttl): ?int
@@ -165,7 +234,7 @@ class RedisCache implements CacheInterface
         if ($this->redis === null) {
             $redis = ($this->redisFactory)();
 
-            // assertRedisCompatibleValue() and get() assume values go in and come out as plain strings
+            // Values are serialized here, so the client must store and return them as they are
             $redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_NONE);
 
             $this->redis = $redis;
