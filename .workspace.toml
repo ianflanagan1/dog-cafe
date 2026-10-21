@@ -1,0 +1,22 @@
+# Settings Dog Cafe's team shares, read by jira-tools and product-map. Only credentials stay on
+# each person's machine.
+
+# What product-map reads to build Dog Cafe's product map. See ~/projects/cli/product-map.
+[product-map]
+name = "Dog Cafe"
+adapter = "dog-cafe"
+source = "app"
+static = "static"
+out = "docs/product-map"
+
+# Where Dog Cafe's issues go, for jira-tools, and in its product map, for report-problem. See
+# workspace.example.toml in ~/projects/cli/jira-tools.
+[tracker]
+kind = "jira"
+site = "ianflanagan1.atlassian.net"
+space = "KAN"
+issue_type = "Task"
+labels = []
+
+[tracker.stages]
+being-worked-on = "In Progress"

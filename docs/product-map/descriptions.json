@@ -1,0 +1,78 @@
+{
+  "action:DELETE /account": {
+    "description": "Pressing Delete Account on the Settings page and confirming the warning removes your account for good: your personal details and profile picture are erased, you're signed out, and you're taken back to the home page. Cancelling the warning leaves everything as it was. Only signed-in people can do this.",
+    "fingerprint": "0aee1580150fd324",
+    "title": "Deleting your account"
+  },
+  "action:DELETE /api/v1/favs/:extId": {
+    "description": "Tapping the filled heart on a venue page while logged in removes the venue from your favourites. The heart empties straight away, and the venue no longer appears on your Saved favourites page.",
+    "fingerprint": "eecde4737df5adf4",
+    "title": "Removing a venue from favourites"
+  },
+  "action:GET /docs": {
+    "description": "Going to the site's docs address takes you straight to the documentation, which is hosted on an external Notion page.",
+    "fingerprint": "c3b3662993e7ab3b",
+    "title": "Opening the documentation"
+  },
+  "action:GET /redirect-discord-login": {
+    "description": "After you choose Sign in with Discord on the Login page and approve it at Discord, Discord sends you back here. You're logged in and returned to the page you were on before. If the sign-in link has expired or was tampered with, you see an error page (403) instead.",
+    "fingerprint": "4c23ef4c9aa15332",
+    "title": "Signing in with Discord"
+  },
+  "action:GET /redirect-google-login": {
+    "description": "After you choose Sign in with Google on the Login page and approve it at Google, Google sends you back here. You're logged in and returned to the page you were on before. If the sign-in link has expired or was tampered with, you see an error page (403) instead.",
+    "fingerprint": "c3146d5c854cc987",
+    "title": "Signing in with Google"
+  },
+  "action:POST /api/v1/favs": {
+    "description": "Tapping the empty heart on a venue page while logged in saves the venue to your favourites. The heart fills in straight away, and the venue then appears on your Saved favourites page.",
+    "fingerprint": "afb971ff59a4b006",
+    "title": "Saving a venue to favourites"
+  },
+  "action:POST /logout": {
+    "description": "Pressing Logout on the Account page logs you out and takes you to the home page. If the page had been open too long or the request wasn't genuine, you see an error page (403) instead.",
+    "fingerprint": "539e18edc0f2ba1f",
+    "title": "Logging out"
+  },
+  "action:POST /suggest": {
+    "description": "Pressing Submit on the Suggest a feature page sends what you wrote. It must be between 1 and 10,000 characters; if not, the page comes back with your text kept and a message saying what's wrong. Otherwise you see the Thank you! page.",
+    "fingerprint": "477913a688a1d532",
+    "title": "Sending a suggestion"
+  },
+  "page:error": {
+    "description": "Shown in place of a page when something goes wrong, for example when a page or venue can't be found, a form has expired, or a request isn't allowed. It shows only the error number, such as 404 or 403, under the site header.",
+    "fingerprint": "09c82654ddcf8612"
+  },
+  "page:favs": {
+    "description": "Saved favourites: the venues you've marked as favourites, listed page by page. You reach it from the Favourite Venues link on your Account page, and you must be logged in. Each venue shows its type and opening times; if you haven't saved any, it says No results.",
+    "fingerprint": "7401b3ebb3cee13a"
+  },
+  "page:list": {
+    "description": "Dog-friendly places in a town, as a list. You get here by searching for a town or choosing List in the header. The Filters let you tick Cafes, Restaurants, Bars/Pubs and Open now; the list updates as you change them, showing Searching... and then the venues, page by page, or No results.",
+    "fingerprint": "4cce620fd4a3b3ee"
+  },
+  "page:login": {
+    "description": "Where you log in, reached from Login in the header or by tapping the favourite heart on a venue while logged out. You choose Sign in with Google or Sign in with Discord; once that service confirms you, you're returned to the page you were on before.",
+    "fingerprint": "e7ce58cf00b59a80"
+  },
+  "page:map": {
+    "description": "Dog-friendly places in a town on a map, reached from Map in the header or a town search. It starts centred on the town. Filters let you tick Cafes, Restaurants, Bars/Pubs and Open now, and Nearby moves the map to where you are. Selecting a venue opens a short summary with See details, which goes to its venue page.",
+    "fingerprint": "ea78315c3738894c"
+  },
+  "page:settings": {
+    "description": "Where signed-in people manage their account. It has a link to Favourite Venues, a Logout button that signs you out and returns you to the home page, and a Delete Account button. Pressing Delete Account first asks \"Are you sure you want to delete your account? This is irreversible.\" People who aren't signed in can't use this page.",
+    "fingerprint": "f2e1438483247339"
+  },
+  "page:suggest": {
+    "description": "Suggest a new feature, or report a bug: a page with one text box and a Submit button, reached from Suggest in the header. Anyone can use it without logging in.",
+    "fingerprint": "c6a9f6b0cedefaa1"
+  },
+  "page:suggestSuccess": {
+    "description": "Shown after you submit a suggestion or bug report on the Suggest a feature page, thanking you with Thank you!",
+    "fingerprint": "264686ebe4a96517"
+  },
+  "page:venue": {
+    "description": "The details page for one venue, reached from a list, your favourites or See details on the map. It shows photos, the venue's name and type, address, phone number, Website link, opening times for each day and a small map. The heart saves it to your favourites, or takes you to log in if you aren't.",
+    "fingerprint": "ebc9f27ad976f825"
+  }
+}

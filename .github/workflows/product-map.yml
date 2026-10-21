@@ -1,0 +1,59 @@
+# Keeps docs/product-map/ in step with the app. Colleagues get the map apart from the public
+# report-problem plugin, installed in their ~/.claude/product-maps/: see
+# https://github.com/ianflanagan1/product-map.
+#
+# Secrets:
+#   ANTHROPIC_API_KEY     for Claude to describe pages and actions that are new or changed
+
+name: Product map
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: product-map
+
+jobs:
+  update:
+    # Builds the map from main. When what it says has changed, opens or updates a pull request,
+    # so someone reads the new descriptions before colleagues get them.
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Set up product-map and Claude Code
+        run: |
+          git clone --depth 1 https://github.com/ianflanagan1/product-map "$RUNNER_TEMP/product-map"
+          uv sync --project "$RUNNER_TEMP/product-map"
+          npm install --prefix "$RUNNER_TEMP/claude" @anthropic-ai/claude-code
+          echo "$RUNNER_TEMP/product-map/.venv/bin" >> "$GITHUB_PATH"
+          echo "$RUNNER_TEMP/claude/node_modules/.bin" >> "$GITHUB_PATH"
+      - name: Describe what's new, and build
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if ! product-map build .; then
+            claude -p "/product-map:product-map" --plugin-dir "$RUNNER_TEMP/product-map" \
+              --permission-mode default < /dev/null
+            product-map build --check .
+          fi
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          branch: product-map
+          add-paths: docs/product-map
+          commit-message: Update the product map
+          title: Update the product map
+          body: >-
+            Built by the Product map workflow. Read the new and changed descriptions: once this is
+            merged, it's the map to install for colleagues.
+
