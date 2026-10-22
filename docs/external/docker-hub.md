@@ -1,13 +1,14 @@
 # Docker Hub
 
-This records the **current** state of the image namespace.
+Where the Taskfile's image tags point. How to set it up on [Docker Hub](https://hub.docker.com/).
 
-- COUPLED:image-namespace. = task:IMAGE_NAMESPACE (`ianflanagan1`)
+## Couplings
 
-| Setting | Value |
-|---|---|
-| Account | `ianflanagan1` |
-| Repositories | `dog-cafe-php-prod`, `dog-cafe-php-dev`, `dog-cafe-nginx-prod`, `dog-cafe-nginx-dev`. TODO: confirm which exist, and their visibility |
-| Access tokens | TODO: none yet |
+- COUPLED:image-namespace. Docker Hub account or organisation = task:IMAGE_NAMESPACE (`ianflanagan1`)
 
-At the moment the Taskfile only builds and tags images locally. Nothing pushes them, and production builds from source ([compose.production.yaml](../../compose.production.yaml)), so the coupling only matters once images are pushed or pulled. When that happens, record here who pushes (CI or a person), which token they use, and where production pulls from.
+## Set up
+
+At the moment the Taskfile only builds and tags images locally. Nothing pushes them, and production builds from source ([compose.production.yaml](../../compose.production.yaml)), so this matters only once images are pushed or pulled.
+
+1. **Repositories.** [Repositories](https://hub.docker.com/repositories) → Create a repository, under the namespace above, for each image the Taskfile tags: `dog-cafe-php-prod`, `dog-cafe-php-dev`, `dog-cafe-nginx-prod` and `dog-cafe-nginx-dev`. Choose Public or Private.
+2. **Token.** [Personal access tokens](https://app.docker.com/settings/personal-access-tokens) → Generate new token, with Read & Write access for whoever pushes, or Read-only for a server that only pulls. It's shown once. Log in with `docker login -u <namespace>`, giving the token as the password, or store it as a CI secret.
