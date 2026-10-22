@@ -1,0 +1,18 @@
+# Serves the dev stack through local-https-proxy (github.com/ianflanagan1/local-https-proxy) at
+# APP_URL, instead of on HTTP_PORT. Enable it in app/.env with
+# COMPOSE_FILE=compose.yaml:compose.local-https-proxy.yaml, which `worktree-env configure` sets.
+# The proxy must be running: Compose won't start a stack whose external network is missing.
+
+services:
+
+  nginx:
+    ports: !reset []
+    labels:
+      caddy: ${APP_URL}
+      caddy.reverse_proxy: "{{upstreams 80}}"
+    networks:
+      - local-https-proxy
+
+networks:
+  local-https-proxy:
+    external: true

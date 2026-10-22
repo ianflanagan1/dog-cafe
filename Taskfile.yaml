@@ -21,7 +21,8 @@ vars:
   NGINX_PROD_IMAGE: '{{.IMAGE_NAMESPACE}}/dog-cafe-nginx-prod'
   NGINX_DEV_IMAGE: '{{.IMAGE_NAMESPACE}}/dog-cafe-nginx-dev'
 
-  COMPOSE: docker compose -f ./compose.yaml --env-file ./{{.PHP_DIRECTORY}}/.env
+  # Compose files come from COMPOSE_FILE in app/.env, or compose.yaml when it isn't set
+  COMPOSE: docker compose --env-file ./{{.PHP_DIRECTORY}}/.env
 
   # Extra php.ini layers (deploy/php/), mounted outside conf.d so only these commands load them.
   # The leading colon keeps the default conf.d (php.dev.ini) and adds the named directory after it.
@@ -104,6 +105,32 @@ tasks:
     desc: Stop the production stack
     cmds:
       - docker compose -f ./compose.production.yaml down
+
+
+  ##### WORKTREES #####
+  # Each git worktree in its own slot, with its own HTTPS hostname and stack. Needs worktree-env
+  # (~/projects/cli/worktree-env) and local-https-proxy running.
+
+  worktree:list:
+    desc: List the worktree slots in use, with their URLs
+    preconditions: &worktree_env
+      - sh: command -v worktree-env
+        msg: 'Needs worktree-env: see ~/projects/cli/worktree-env'
+    cmds:
+      - worktree-env list
+
+  worktree:new:
+    desc: Create a worktree in the next free slot and start its stack
+    preconditions: *worktree_env
+    cmds:
+      - worktree-env new
+
+  worktree:rm:
+    desc: 'Stop a worktree''s stack, delete its volumes and remove it, e.g. task worktree:rm -- wt3'
+    interactive: true
+    preconditions: *worktree_env
+    cmds:
+      - worktree-env rm {{.CLI_ARGS}}
 
 
   ##### TESTING #####

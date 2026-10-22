@@ -20,3 +20,20 @@ labels = []
 
 [tracker.stages]
 being-worked-on = "In Progress"
+
+# Each checkout's own HTTPS hostname, .env and stack, for worktree-env: <slot>.dogcafe.<domain>,
+# where the domain is each machine's own. See ~/projects/cli/worktree-env.
+[worktree-env]
+# COUPLED:dev-origin. https://<slot>.dogcafe.<domain> for main and wt1 to wt9 must be registered in google-console, discord-portal and the Maps key referrers (docs/external/)
+name = "dogcafe"
+slots = 9
+env-file = "app/.env"
+up = ["task", "setup"]
+down = ["task", "down:delete"]
+
+[worktree-env.env]
+COMPOSE_PROJECT_NAME = "{dir}"
+COMPOSE_FILE = "compose.yaml:compose.local-https-proxy.yaml"
+APP_URL = "https://{host}"
+SESSION_DOMAIN = "{host}"
+SESSION_SECURE_COOKIE = "true"
